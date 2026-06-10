@@ -46,20 +46,22 @@ export async function listarMensajes(
 
 /**
  * Inserts a new tema_foro row.
- * Does NOT pre-check session — RLS enforces authorship (SC-04).
- * Throws PostgrestError on error (including unauthenticated RLS rejection).
+ * Throws Error('Requiere sesión') when no session exists; RLS additionally
+ * enforces authorship at the DB level (SC-04).
  */
 export async function crearTemaForo(input: NuevoTemaForo): Promise<TemaForo> {
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Requiere sesión')
 
   const { data, error } = await supabase
     .from('temas_foro')
     .insert({
       titulo: input.titulo,
       cuerpo: input.cuerpo ?? null,
-      user_id: user?.id ?? '',
+      user_id: user.id,
     })
     .select()
     .single()
@@ -70,19 +72,22 @@ export async function crearTemaForo(input: NuevoTemaForo): Promise<TemaForo> {
 
 /**
  * Inserts a new mensajes_foro row.
- * Throws PostgrestError on error (including unauthenticated RLS rejection).
+ * Throws Error('Requiere sesión') when no session exists; RLS additionally
+ * enforces authorship at the DB level (SC-04).
  */
 export async function crearMensaje(input: NuevoMensaje): Promise<MensajeForo> {
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Requiere sesión')
 
   const { data, error } = await supabase
     .from('mensajes_foro')
     .insert({
       tema_foro_id: input.tema_foro_id,
       contenido: input.contenido,
-      user_id: user?.id ?? '',
+      user_id: user.id,
     })
     .select()
     .single()
@@ -96,9 +101,16 @@ export async function crearMensaje(input: NuevoMensaje): Promise<MensajeForo> {
  * RLS enforces authorship — only the row author can delete (SC-12).
  * CASCADE is confirmed on the DB (mensajes_foro.tema_foro_id → ON DELETE CASCADE),
  * so only the parent row needs to be deleted.
+ * Throws Error('Requiere sesión') when no session exists.
  * Throws PostgrestError on error.
  */
 export async function eliminarTemaForo(id: string): Promise<void> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Requiere sesión')
+
   const { error } = await supabase
     .from('temas_foro')
     .delete()
@@ -110,9 +122,16 @@ export async function eliminarTemaForo(id: string): Promise<void> {
 /**
  * Deletes a mensajes_foro row by id.
  * RLS enforces authorship.
+ * Throws Error('Requiere sesión') when no session exists.
  * Throws PostgrestError on error.
  */
 export async function eliminarMensaje(id: string): Promise<void> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Requiere sesión')
+
   const { error } = await supabase
     .from('mensajes_foro')
     .delete()
