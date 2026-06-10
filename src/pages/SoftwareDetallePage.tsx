@@ -4,6 +4,7 @@ import { useSoftware } from '../hooks/useSoftware'
 import { useRecomendaciones } from '../hooks/useRecomendaciones'
 import VideoEmbed from '../components/software/VideoEmbed'
 import SoftwareList from '../components/software/SoftwareList'
+import StarRating from '../components/ui/StarRating'
 import * as eventosService from '../services/eventosService'
 
 // ---------------------------------------------------------------------------
@@ -95,6 +96,7 @@ export default function SoftwareDetallePage() {
 
       {/* Nombre */}
       <h1 className="text-2xl font-semibold text-text">{sw.nombre}</h1>
+      <StarRating key={sw.id} tipo="software" contenidoId={sw.id} />
 
       {/* Descripcion corta — "—" when null */}
       <p className="text-muted">

@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useTema } from '../hooks/useTema'
 import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
 import SoftwareList from '../components/software/SoftwareList'
+import StarRating from '../components/ui/StarRating'
 
 // ---------------------------------------------------------------------------
 // TemaPage — detail page for a single tema with its software list
@@ -67,6 +68,7 @@ export default function TemaPage() {
           ← Volver al catálogo
         </Link>
         <h1 className="text-2xl font-semibold text-text">{temaData.nombre}</h1>
+        <StarRating key={temaData.id} tipo="tema" contenidoId={temaData.id} />
         {temaData.descripcion !== null && temaData.descripcion !== undefined && (
           <p className="text-muted">{temaData.descripcion}</p>
         )}
