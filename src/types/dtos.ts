@@ -94,7 +94,7 @@ export type NuevaValoracion = {
 
 export type NuevoTemaForo = {
   titulo: string
-  cuerpo: string
+  cuerpo?: string
 }
 
 export type NuevoMensaje = {

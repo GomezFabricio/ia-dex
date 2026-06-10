@@ -16,61 +16,61 @@ export type Database = {
     Tables: {
       clasificaciones_si: {
         Row: {
-          created_at: string | null
+          created_at: string
           ejemplos: string | null
           en_que_consiste: string | null
-          enlaces: Json | null
+          enlaces: Json
           id: string
           imagen_url: string | null
           nombre: string
-          orden: number | null
+          orden: number
           slug: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           ejemplos?: string | null
           en_que_consiste?: string | null
-          enlaces?: Json | null
+          enlaces?: Json
           id?: string
           imagen_url?: string | null
           nombre: string
-          orden?: number | null
+          orden?: number
           slug: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           ejemplos?: string | null
           en_que_consiste?: string | null
-          enlaces?: Json | null
+          enlaces?: Json
           id?: string
           imagen_url?: string | null
           nombre?: string
-          orden?: number | null
+          orden?: number
           slug?: string
         }
         Relationships: []
       }
       eventos: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          metadata: Json | null
+          metadata: Json
           software_id: string | null
           tipo: string
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          metadata?: Json | null
+          metadata?: Json
           software_id?: string | null
           tipo: string
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          metadata?: Json | null
+          metadata?: Json
           software_id?: string | null
           tipo?: string
           user_id?: string | null
@@ -102,21 +102,21 @@ export type Database = {
       mensajes_foro: {
         Row: {
           contenido: string
-          created_at: string | null
+          created_at: string
           id: string
           tema_foro_id: string
           user_id: string
         }
         Insert: {
           contenido: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           tema_foro_id: string
           user_id: string
         }
         Update: {
           contenido?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           tema_foro_id?: string
           user_id?: string
@@ -136,7 +136,7 @@ export type Database = {
           anio_lanzamiento: number | null
           autor_referencia: string | null
           clasificacion_si_id: string | null
-          created_at: string | null
+          created_at: string
           descripcion_corta: string | null
           id: string
           imagen_url: string | null
@@ -151,7 +151,7 @@ export type Database = {
           anio_lanzamiento?: number | null
           autor_referencia?: string | null
           clasificacion_si_id?: string | null
-          created_at?: string | null
+          created_at?: string
           descripcion_corta?: string | null
           id?: string
           imagen_url?: string | null
@@ -166,7 +166,7 @@ export type Database = {
           anio_lanzamiento?: number | null
           autor_referencia?: string | null
           clasificacion_si_id?: string | null
-          created_at?: string | null
+          created_at?: string
           descripcion_corta?: string | null
           id?: string
           imagen_url?: string | null
@@ -196,48 +196,48 @@ export type Database = {
       }
       temas: {
         Row: {
-          created_at: string | null
+          created_at: string
           descripcion: string | null
           id: string
           nombre: string
-          orden: number | null
+          orden: number
           slug: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           descripcion?: string | null
           id?: string
           nombre: string
-          orden?: number | null
+          orden?: number
           slug: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           descripcion?: string | null
           id?: string
           nombre?: string
-          orden?: number | null
+          orden?: number
           slug?: string
         }
         Relationships: []
       }
       temas_foro: {
         Row: {
-          created_at: string | null
+          created_at: string
           cuerpo: string | null
           id: string
           titulo: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           cuerpo?: string | null
           id?: string
           titulo: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           cuerpo?: string | null
           id?: string
           titulo?: string
@@ -249,7 +249,7 @@ export type Database = {
         Row: {
           contenido_id: string
           contenido_tipo: string
-          created_at: string | null
+          created_at: string
           id: string
           puntaje: number
           user_id: string
@@ -257,7 +257,7 @@ export type Database = {
         Insert: {
           contenido_id: string
           contenido_tipo: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           puntaje: number
           user_id: string
@@ -265,7 +265,7 @@ export type Database = {
         Update: {
           contenido_id?: string
           contenido_tipo?: string
-          created_at?: string | null
+          created_at?: string
           id?: string
           puntaje?: number
           user_id?: string
