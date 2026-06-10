@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useBusqueda } from '../hooks/useBusqueda'
 import { useTemas } from '../hooks/useTemas'
+import { useVoz } from '../hooks/useVoz'
 import type { FiltrosBusqueda } from '../types/dtos'
 import SoftwareList from '../components/software/SoftwareList'
 
 // ---------------------------------------------------------------------------
 // BuscarPage — five-state search page (idle → loading → error / no-results / results).
 // Filter state persists across searches (never resets after submit).
-// T4: form + state machine only; voice integration added in T5.
+// Voice integration (T5): useVoz auto-submits when a transcript arrives (D3+D4).
 // ---------------------------------------------------------------------------
 
 type FormState = {
@@ -52,6 +53,16 @@ export default function BuscarPage() {
   const [form, setForm] = useState<FormState>(initialForm)
   const temas = useTemas()
 
+  // D3+D4: handleTranscript updates texto in state AND calls buscar with an
+  // explicit texto override. The setForm flush hasn't happened yet, so we pass
+  // {...form, texto: transcript} directly to buildFiltros to avoid stale closure.
+  const handleTranscript = (transcript: string) => {
+    setForm((prev) => ({ ...prev, texto: transcript }))
+    buscar(buildFiltros({ ...form, texto: transcript }))
+  }
+
+  const voz = useVoz(handleTranscript)
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     buscar(buildFiltros(form))
@@ -83,10 +94,67 @@ export default function BuscarPage() {
                 value={form.texto}
                 onChange={(e) => {
                   setForm((prev) => ({ ...prev, texto: e.target.value }))
+                  voz.clearError()
                 }}
                 className="flex-1 bg-bg border border-surface rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
               />
+              {/* Mic button — rendered only when voice is supported (Spec 2) */}
+              {voz.isSupported && (
+                <>
+                  <button
+                    type="button"
+                    aria-label={
+                      voz.isListening
+                        ? 'Detener búsqueda por voz'
+                        : 'Activar búsqueda por voz'
+                    }
+                    onClick={() => {
+                      if (voz.isListening) {
+                        voz.stop()
+                      } else {
+                        voz.start()
+                      }
+                    }}
+                    className={
+                      voz.isListening
+                        ? 'text-error animate-pulse border border-surface rounded p-2'
+                        : 'text-muted border border-surface rounded p-2 hover:text-text transition-colors'
+                    }
+                  >
+                    {/* Inline microphone SVG — no icon dependency */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                      <line x1="12" x2="12" y1="19" y2="22" />
+                    </svg>
+                  </button>
+                  {voz.isListening && (
+                    <span className="text-sm text-error">Escuchando…</span>
+                  )}
+                </>
+              )}
             </div>
+            {/* Voice error — displayed inline below the texto input */}
+            {voz.error !== null && (
+              <p className="text-error text-sm">{voz.error}</p>
+            )}
+            {/* Unsupported hint — shown only when voice is not available */}
+            {!voz.isSupported && (
+              <p className="text-sm text-muted">
+                Búsqueda por voz disponible en Chrome o Edge.
+              </p>
+            )}
           </div>
 
           {/* Tema select */}
