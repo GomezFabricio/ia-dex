@@ -1,8 +1,3 @@
-// TODO: regenerate via gen:types once supabase login is available
-// Command: npm run gen:types
-// This file mirrors the verified Supabase schema for project othwyesmfpjaykbdwxrh.
-// Column nullability verified via live PostgREST column-explicit probe (2026-06-10).
-
 export type Json =
   | string
   | number
@@ -12,241 +7,73 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      temas: {
-        Row: {
-          id: string
-          slug: string
-          nombre: string
-          descripcion: string | null
-          orden: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          slug: string
-          nombre: string
-          descripcion?: string | null
-          orden?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          slug?: string
-          nombre?: string
-          descripcion?: string | null
-          orden?: number
-          created_at?: string
-        }
-        Relationships: []
-      }
       clasificaciones_si: {
         Row: {
-          id: string
-          slug: string
-          nombre: string
-          en_que_consiste: string | null
-          imagen_url: string | null
+          created_at: string | null
           ejemplos: string | null
-          enlaces: Json
-          orden: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          slug: string
-          nombre: string
-          en_que_consiste?: string | null
-          imagen_url?: string | null
-          ejemplos?: string | null
-          enlaces?: Json
-          orden?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          slug?: string
-          nombre?: string
-          en_que_consiste?: string | null
-          imagen_url?: string | null
-          ejemplos?: string | null
-          enlaces?: Json
-          orden?: number
-          created_at?: string
-        }
-        Relationships: []
-      }
-      software: {
-        Row: {
+          en_que_consiste: string | null
+          enlaces: Json | null
           id: string
-          tema_id: string
-          clasificacion_si_id: string | null
-          nombre: string
-          objetivo: string | null
-          descripcion_corta: string | null
-          url_acceso: string | null
-          licencia: string | null
-          anio_lanzamiento: number | null
-          autor_referencia: string | null
-          video_url: string | null
           imagen_url: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          tema_id: string
-          clasificacion_si_id?: string | null
           nombre: string
-          objetivo?: string | null
-          descripcion_corta?: string | null
-          url_acceso?: string | null
-          licencia?: string | null
-          anio_lanzamiento?: number | null
-          autor_referencia?: string | null
-          video_url?: string | null
+          orden: number | null
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          ejemplos?: string | null
+          en_que_consiste?: string | null
+          enlaces?: Json | null
+          id?: string
           imagen_url?: string | null
-          created_at?: string
+          nombre: string
+          orden?: number | null
+          slug: string
         }
         Update: {
+          created_at?: string | null
+          ejemplos?: string | null
+          en_que_consiste?: string | null
+          enlaces?: Json | null
           id?: string
-          tema_id?: string
-          clasificacion_si_id?: string | null
+          imagen_url?: string | null
           nombre?: string
-          objetivo?: string | null
-          descripcion_corta?: string | null
-          url_acceso?: string | null
-          licencia?: string | null
-          anio_lanzamiento?: number | null
-          autor_referencia?: string | null
-          video_url?: string | null
-          imagen_url?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "software_tema_id_fkey"
-            columns: ["tema_id"]
-            isOneToOne: false
-            referencedRelation: "temas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "software_clasificacion_si_id_fkey"
-            columns: ["clasificacion_si_id"]
-            isOneToOne: false
-            referencedRelation: "clasificaciones_si"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      valoraciones: {
-        Row: {
-          id: string
-          user_id: string | null
-          contenido_tipo: string
-          contenido_id: string
-          puntaje: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          contenido_tipo: string
-          contenido_id: string
-          puntaje: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          contenido_tipo?: string
-          contenido_id?: string
-          puntaje?: number
-          created_at?: string
+          orden?: number | null
+          slug?: string
         }
         Relationships: []
-      }
-      temas_foro: {
-        Row: {
-          id: string
-          user_id: string | null
-          titulo: string
-          cuerpo: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          titulo: string
-          cuerpo: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          titulo?: string
-          cuerpo?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
-      mensajes_foro: {
-        Row: {
-          id: string
-          tema_foro_id: string
-          user_id: string | null
-          contenido: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          tema_foro_id: string
-          user_id?: string | null
-          contenido: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          tema_foro_id?: string
-          user_id?: string | null
-          contenido?: string
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mensajes_foro_tema_foro_id_fkey"
-            columns: ["tema_foro_id"]
-            isOneToOne: false
-            referencedRelation: "temas_foro"
-            referencedColumns: ["id"]
-          }
-        ]
       }
       eventos: {
         Row: {
+          created_at: string | null
           id: string
-          user_id: string | null
+          metadata: Json | null
           software_id: string | null
           tipo: string
-          metadata: Json
-          created_at: string
+          user_id: string | null
         }
         Insert: {
+          created_at?: string | null
           id?: string
-          user_id?: string | null
+          metadata?: Json | null
           software_id?: string | null
           tipo: string
-          metadata?: Json
-          created_at?: string
+          user_id?: string | null
         }
         Update: {
+          created_at?: string | null
           id?: string
-          user_id?: string | null
+          metadata?: Json | null
           software_id?: string | null
           tipo?: string
-          metadata?: Json
-          created_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -255,39 +82,347 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "software"
             referencedColumns: ["id"]
-          }
+          },
+          {
+            foreignKeyName: "eventos_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "v_software_populares"
+            referencedColumns: ["software_id"]
+          },
+          {
+            foreignKeyName: "eventos_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "v_software_rating"
+            referencedColumns: ["software_id"]
+          },
         ]
+      }
+      mensajes_foro: {
+        Row: {
+          contenido: string
+          created_at: string | null
+          id: string
+          tema_foro_id: string
+          user_id: string
+        }
+        Insert: {
+          contenido: string
+          created_at?: string | null
+          id?: string
+          tema_foro_id: string
+          user_id: string
+        }
+        Update: {
+          contenido?: string
+          created_at?: string | null
+          id?: string
+          tema_foro_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensajes_foro_tema_foro_id_fkey"
+            columns: ["tema_foro_id"]
+            isOneToOne: false
+            referencedRelation: "temas_foro"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      software: {
+        Row: {
+          anio_lanzamiento: number | null
+          autor_referencia: string | null
+          clasificacion_si_id: string | null
+          created_at: string | null
+          descripcion_corta: string | null
+          id: string
+          imagen_url: string | null
+          licencia: string | null
+          nombre: string
+          objetivo: string | null
+          tema_id: string
+          url_acceso: string | null
+          video_url: string | null
+        }
+        Insert: {
+          anio_lanzamiento?: number | null
+          autor_referencia?: string | null
+          clasificacion_si_id?: string | null
+          created_at?: string | null
+          descripcion_corta?: string | null
+          id?: string
+          imagen_url?: string | null
+          licencia?: string | null
+          nombre: string
+          objetivo?: string | null
+          tema_id: string
+          url_acceso?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          anio_lanzamiento?: number | null
+          autor_referencia?: string | null
+          clasificacion_si_id?: string | null
+          created_at?: string | null
+          descripcion_corta?: string | null
+          id?: string
+          imagen_url?: string | null
+          licencia?: string | null
+          nombre?: string
+          objetivo?: string | null
+          tema_id?: string
+          url_acceso?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "software_clasificacion_si_id_fkey"
+            columns: ["clasificacion_si_id"]
+            isOneToOne: false
+            referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      temas: {
+        Row: {
+          created_at: string | null
+          descripcion: string | null
+          id: string
+          nombre: string
+          orden: number | null
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          orden?: number | null
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          orden?: number | null
+          slug?: string
+        }
+        Relationships: []
+      }
+      temas_foro: {
+        Row: {
+          created_at: string | null
+          cuerpo: string | null
+          id: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          cuerpo?: string | null
+          id?: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          cuerpo?: string | null
+          id?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      valoraciones: {
+        Row: {
+          contenido_id: string
+          contenido_tipo: string
+          created_at: string | null
+          id: string
+          puntaje: number
+          user_id: string
+        }
+        Insert: {
+          contenido_id: string
+          contenido_tipo: string
+          created_at?: string | null
+          id?: string
+          puntaje: number
+          user_id: string
+        }
+        Update: {
+          contenido_id?: string
+          contenido_tipo?: string
+          created_at?: string | null
+          id?: string
+          puntaje?: number
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
-      v_software_rating: {
-        Row: {
-          software_id: string | null
-          nombre: string | null
-          promedio: number | null
-          cantidad_votos: number | null
-        }
-      }
       v_software_populares: {
         Row: {
-          software_id: string | null
           nombre: string | null
+          software_id: string | null
           vistas: number | null
         }
+        Relationships: []
+      }
+      v_software_rating: {
+        Row: {
+          cantidad_votos: number | null
+          nombre: string | null
+          promedio: number | null
+          software_id: string | null
+        }
+        Relationships: []
       }
     }
-    Enums: Record<string, never>
-    CompositeTypes: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
 
-// Convenience type helpers (mirrors supabase-js gen v2 output)
-export type Tables<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Row']
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-export type TablesInsert<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Insert']
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
-export type Views<T extends keyof Database['public']['Views']> =
-  Database['public']['Views'][T]['Row']
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

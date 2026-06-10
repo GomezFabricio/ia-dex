@@ -1,4 +1,4 @@
-import type { Tables, Views } from './database.types'
+import type { Tables } from './database.types'
 
 // ---------------------------------------------------------------------------
 // Primitive union types
@@ -69,9 +69,10 @@ export type SoftwarePopular = {
   vistas: number
 }
 
-// Views raw rows for internal service use
-export type SoftwareRatingRow = Views<'v_software_rating'>
-export type SoftwarePopularRow = Views<'v_software_populares'>
+// Views raw rows for internal service use (the generated Tables helper
+// resolves view names as well as table names)
+export type SoftwareRatingRow = Tables<'v_software_rating'>
+export type SoftwarePopularRow = Tables<'v_software_populares'>
 
 // ---------------------------------------------------------------------------
 // Filter / input types
