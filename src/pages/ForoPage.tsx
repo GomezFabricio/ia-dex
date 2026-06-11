@@ -48,9 +48,9 @@ export default function ForoPage() {
       setTitulo('')
       setCuerpo('')
       setFormOpen(false)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err)
-      setSubmitError(`No se pudo crear el tema: ${msg}`)
+    } catch {
+      // Fixed Spanish copy — never surface the raw service/Postgres message.
+      setSubmitError('No se pudo crear el tema. Intentá de nuevo.')
     } finally {
       setEnviando(false)
     }
@@ -123,7 +123,7 @@ export default function ForoPage() {
       {loading ? (
         <p className="text-muted">Cargando temas...</p>
       ) : error !== null ? (
-        <p className="text-error">{error}</p>
+        <p className="text-error">No se pudieron cargar los temas. Intentá de nuevo.</p>
       ) : temas.length === 0 ? (
         <p className="text-muted">No hay temas todavía.</p>
       ) : (
