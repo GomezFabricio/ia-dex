@@ -92,11 +92,11 @@ export function useValoracion(
           },
         })
       })
-      .catch((err: unknown) => {
+      .catch(() => {
         if (!active) return
         dispatch({
           type: 'error',
-          payload: err instanceof Error ? err.message : 'Error al cargar la valoración',
+          payload: 'Error al cargar la valoración',
         })
       })
 
@@ -116,10 +116,10 @@ export function useValoracion(
         .then(() => {
           dispatch({ type: 'refetch' })
         })
-        .catch((err: unknown) => {
+        .catch(() => {
           dispatch({
             type: 'save-error',
-            payload: err instanceof Error ? err.message : 'Error al guardar la valoración',
+            payload: 'Error al guardar la valoración',
           })
         })
     },
