@@ -4,7 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ia-dex</title>
+    <meta name="color-scheme" content="light dark" />
+    <!-- Apply a pinned theme before first paint to avoid a flash (FOUC). -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme')
+          if (t === 'light' || t === 'dark') document.documentElement.style.colorScheme = t
+        } catch (e) {}
+      })()
+    </script>
+    <meta
+      name="description"
+      content="IA-dex — el índice de software de inteligencia artificial, catalogado por temas."
+    />
+
+    <!-- Brand type: Inter (body) · Space Grotesk (display) · JetBrains Mono (data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    />
+
+    <title>IA-dex · Índice de software de IA</title>
   </head>
   <body>
     <div id="root"></div>

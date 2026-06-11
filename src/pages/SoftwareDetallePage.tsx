@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useSoftware } from '../hooks/useSoftware'
 import { useRecomendaciones } from '../hooks/useRecomendaciones'
 import VideoEmbed from '../components/software/VideoEmbed'
 import SoftwareList from '../components/software/SoftwareList'
 import StarRating from '../components/ui/StarRating'
+import { useImageOk } from '../hooks/useImageOk'
 import * as eventosService from '../services/eventosService'
 
 // ---------------------------------------------------------------------------
@@ -27,8 +28,17 @@ export default function SoftwareDetallePage() {
   const software = useSoftware(softwareId)
   const recos = useRecomendaciones(software.data?.tema_id, softwareId)
 
-  // Vista event — fires once per softwareId change; fail-soft (eventosService never throws)
+  // Banner image gate: hide low-res raster images (they would upscale into a
+  // blurry banner) and fall back to the lettered placeholder. SVGs always pass.
+  const banner = useImageOk(software.data?.imagen_url, 200)
+
+  // Vista event — fires EXACTLY once per softwareId. The ref guard dedupes
+  // React StrictMode's dev double-invoke (mount→unmount→mount) and any remount,
+  // so a single visit never counts twice. Fail-soft (eventosService never throws).
+  const vistaRegistrada = useRef<string | null>(null)
   useEffect(() => {
+    if (vistaRegistrada.current === softwareId) return
+    vistaRegistrada.current = softwareId
     void eventosService.registrarEvento({ tipo: 'vista', software_id: softwareId })
   }, [softwareId])
 
@@ -81,22 +91,48 @@ export default function SoftwareDetallePage() {
         ← Volver al catálogo
       </Link>
 
-      {/* Imagen — placeholder div with nombre[0] when imagen_url is null */}
-      {sw.imagen_url !== null && sw.imagen_url !== undefined ? (
-        <img
-          src={sw.imagen_url}
-          alt={sw.nombre}
-          className="w-full max-h-72 object-cover rounded-lg"
-        />
+      {/* Banner — blurred cover fill behind the full (contain) image, so logos
+          and screenshots alike always sit inside the frame without distortion.
+          Low-res raster images are rejected by useImageOk → placeholder. */}
+      {banner.show && sw.imagen_url ? (
+        <div className="relative flex h-52 w-full items-center justify-center overflow-hidden rounded-2xl border border-border sm:h-64">
+          <img
+            src={sw.imagen_url}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
+          />
+          <div className="absolute inset-0 bg-bg/40" />
+          <img
+            src={sw.imagen_url}
+            alt={sw.nombre}
+            {...banner.imgProps}
+            className="relative max-h-[78%] max-w-[78%] object-contain drop-shadow-lg"
+          />
+        </div>
       ) : (
-        <div className="w-full max-h-72 h-48 rounded-lg bg-surface flex items-center justify-center text-5xl font-semibold text-accent">
+        <div className="dex-grid flex h-52 w-full items-center justify-center rounded-2xl border border-border bg-gradient-to-br from-surface-2 to-bg font-display text-6xl font-bold text-accent sm:h-64">
           {sw.nombre[0]}
         </div>
       )}
 
-      {/* Nombre */}
-      <h1 className="text-2xl font-semibold text-text">{sw.nombre}</h1>
-      <StarRating key={sw.id} tipo="software" contenidoId={sw.id} />
+      {/* Nombre + meta chips */}
+      <div className="flex flex-col gap-3">
+        <h1 className="font-display text-3xl font-bold text-text">{sw.nombre}</h1>
+        {(sw.licencia || sw.anio_lanzamiento) && (
+          <div className="flex flex-wrap items-center gap-2">
+            {sw.licencia !== null && sw.licencia !== undefined && (
+              <span className="dex-label rounded border border-accent/30 bg-accent/10 px-2 py-0.5 text-[11px] text-accent-strong">
+                {sw.licencia}
+              </span>
+            )}
+            {sw.anio_lanzamiento !== null && sw.anio_lanzamiento !== undefined && (
+              <span className="dex-label text-[11px] text-muted">{sw.anio_lanzamiento}</span>
+            )}
+          </div>
+        )}
+        <StarRating key={sw.id} tipo="software" contenidoId={sw.id} />
+      </div>
 
       {/* Descripcion corta — "—" when null */}
       <p className="text-muted">
@@ -109,23 +145,23 @@ export default function SoftwareDetallePage() {
       <VideoEmbed url={sw.video_url} nombre={sw.nombre} />
 
       {/* Definition list — all text fields with Spanish labels */}
-      <dl className="flex flex-col gap-3">
+      <dl className="grid gap-4 rounded-2xl border border-border bg-surface p-5 sm:grid-cols-2">
         <div>
-          <dt className="text-sm text-muted">Objetivo</dt>
+          <dt className="dex-label mb-0.5 text-[11px] uppercase tracking-wider text-muted">Objetivo</dt>
           <dd className="text-text">
             {sw.objetivo !== null && sw.objetivo !== undefined ? sw.objetivo : '—'}
           </dd>
         </div>
 
         <div>
-          <dt className="text-sm text-muted">Licencia</dt>
+          <dt className="dex-label mb-0.5 text-[11px] uppercase tracking-wider text-muted">Licencia</dt>
           <dd className="text-text">
             {sw.licencia !== null && sw.licencia !== undefined ? sw.licencia : '—'}
           </dd>
         </div>
 
         <div>
-          <dt className="text-sm text-muted">Año de lanzamiento</dt>
+          <dt className="dex-label mb-0.5 text-[11px] uppercase tracking-wider text-muted">Año de lanzamiento</dt>
           <dd className="text-text">
             {sw.anio_lanzamiento !== null && sw.anio_lanzamiento !== undefined
               ? sw.anio_lanzamiento
@@ -134,7 +170,7 @@ export default function SoftwareDetallePage() {
         </div>
 
         <div>
-          <dt className="text-sm text-muted">Autor/Referencia</dt>
+          <dt className="dex-label mb-0.5 text-[11px] uppercase tracking-wider text-muted">Autor/Referencia</dt>
           <dd className="text-text">
             {sw.autor_referencia !== null && sw.autor_referencia !== undefined
               ? sw.autor_referencia
@@ -143,7 +179,7 @@ export default function SoftwareDetallePage() {
         </div>
 
         <div>
-          <dt className="text-sm text-muted">Enlace de acceso</dt>
+          <dt className="dex-label mb-0.5 text-[11px] uppercase tracking-wider text-muted">Enlace de acceso</dt>
           <dd className="text-text">
             {sw.url_acceso !== null && sw.url_acceso !== undefined ? (
               <a

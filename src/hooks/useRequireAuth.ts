@@ -1,30 +1,25 @@
-import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
 import type { User } from '@supabase/supabase-js'
-import { useAuth } from './useAuth'
+import { RequireAuthContext } from '../context/require-auth-context'
 
 // ---------------------------------------------------------------------------
-// useRequireAuth — returns a stable callback (ADR D3: action-level auth gate)
+// useRequireAuth — returns the action-level auth gate (ADR D3).
 //
 // Usage: const requireAuth = useRequireAuth()
 //   const handleWrite = () => {
-//     const user = requireAuth()   // navigates to /login if anon; returns null
+//     const user = requireAuth()   // opens the sign-in modal if anon; returns null
 //     if (!user) return
 //     // ... perform write action
 //   }
 //
+// The gate (and its modal) live in RequireAuthProvider, mounted in AppLayout.
 // Does NOT navigate on render. Caller invokes inside event handlers only.
 // ---------------------------------------------------------------------------
 
 export function useRequireAuth(): () => User | null {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-
-  return useCallback(() => {
-    if (!user) {
-      navigate('/login')
-      return null
-    }
-    return user
-  }, [user, navigate])
+  const requireAuth = useContext(RequireAuthContext)
+  if (!requireAuth) {
+    throw new Error('useRequireAuth must be used within a RequireAuthProvider')
+  }
+  return requireAuth
 }
