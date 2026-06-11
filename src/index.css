@@ -3,7 +3,10 @@
 /* ---------------------------------------------------------------------------
    IA-dex — "Tech-Index" design system
    A dex (catalog/index) of AI software. Indexed, data-forward, dual-theme.
-   Colors switch via light-dark() driven by `color-scheme` (see useTheme).
+   Theming is CLASS-BASED: dark is the default; a `.light` class on <html>
+   overrides the tokens. (We previously used light-dark(), but the production
+   CSS minifier downlevels it to prefers-color-scheme media queries, which
+   breaks a manual toggle — it would only follow the OS setting.)
    Signature: violet accent + cyan glow, display + mono type, visible structure.
 --------------------------------------------------------------------------- */
 
@@ -13,39 +16,57 @@
   --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Surfaces — light-dark(LIGHT, DARK). A DISTINCT border token keeps every
-     surface edge visible (the original design reused --surface as the border). */
-  --color-bg: light-dark(#f6f7fb, #0b1020);
-  --color-surface: light-dark(#ffffff, #151b2e);
-  --color-surface-2: light-dark(#eef1f8, #1c2540);
-  --color-border: light-dark(#dde2ef, #2a3350);
+  /* Surfaces — DARK defaults; a DISTINCT border token keeps edges visible. */
+  --color-bg: #0b1020;
+  --color-surface: #151b2e;
+  --color-surface-2: #1c2540;
+  --color-border: #2a3350;
 
   /* Ink */
-  --color-text: light-dark(#1b2034, #e6eaf5);
-  --color-muted: light-dark(#5c6783, #8a93b2);
+  --color-text: #e6eaf5;
+  --color-muted: #8a93b2;
 
-  /* Brand — violet signature + cyan glow (tuned per theme for contrast) */
-  --color-accent: light-dark(#6d4ef5, #7c5cff);
-  --color-accent-strong: light-dark(#5a3ce0, #9a80ff);
-  --color-accent-2: light-dark(#0891b2, #22d3ee);
-  --color-error: light-dark(#dc2626, #f87171);
+  /* Brand — violet signature + cyan glow */
+  --color-accent: #7c5cff;
+  --color-accent-strong: #9a80ff;
+  --color-accent-2: #22d3ee;
+  --color-error: #f87171;
 
-  /* Elevation — only the shadow COLOR switches (light-dark is a color fn) */
-  --shadow-card: 0 1px 2px light-dark(rgb(20 25 45 / 0.10), rgb(0 0 0 / 0.35));
-  --shadow-pop: 0 16px 40px -18px light-dark(rgb(20 25 45 / 0.22), rgb(0 0 0 / 0.75));
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-pop: 0 16px 40px -18px rgb(0 0 0 / 0.75);
   --shadow-glow:
     0 0 0 1px color-mix(in oklab, var(--color-accent) 45%, transparent),
     0 18px 40px -20px color-mix(in oklab, var(--color-accent) 60%, transparent);
 }
 
+/* Light theme overrides — unlayered so they win over the @theme tokens.
+   Applied by adding the `.light` class to <html> (see useTheme + index.html). */
+:root.light {
+  --color-bg: #f6f7fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef1f8;
+  --color-border: #dde2ef;
+  --color-text: #1b2034;
+  --color-muted: #5c6783;
+  --color-accent: #6d4ef5;
+  --color-accent-strong: #5a3ce0;
+  --color-accent-2: #0891b2;
+  --color-error: #dc2626;
+  --shadow-card: 0 1px 2px rgb(20 25 45 / 0.10);
+  --shadow-pop: 0 16px 40px -18px rgb(20 25 45 / 0.22);
+  --scrollbar-thumb: #c4cad9;
+  --scrollbar-track: #eef1f8;
+  color-scheme: light;
+}
+
 @layer base {
   :root {
-    /* Default to the system preference; useTheme pins an explicit value. */
-    color-scheme: light dark;
+    color-scheme: dark;
     accent-color: var(--color-accent);
 
-    --scrollbar-thumb: light-dark(#c4cad9, #2a3350);
-    --scrollbar-track: light-dark(#eef1f8, #0b1020);
+    --scrollbar-thumb: #2a3350;
+    --scrollbar-track: #0b1020;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     scrollbar-width: thin;
   }

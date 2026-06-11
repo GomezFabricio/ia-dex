@@ -33,9 +33,12 @@ export function useTheme() {
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  // Drive native UI + light-dark() resolution.
+  // Apply the theme: the `.light` class drives the CSS token overrides, and
+  // color-scheme themes native UI (scrollbars, form controls, autofill).
   useEffect(() => {
-    document.documentElement.style.colorScheme = theme
+    const el = document.documentElement
+    el.style.colorScheme = theme
+    el.classList.toggle('light', theme === 'light')
   }, [theme])
 
   const toggle = () => {
