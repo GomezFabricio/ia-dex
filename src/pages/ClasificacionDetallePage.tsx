@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useClasificacion } from '../hooks/useClasificacion'
+import StarRating from '../components/ui/StarRating'
 
 // ---------------------------------------------------------------------------
 // ClasificacionDetallePage — detail page for a single ClasificacionSI
@@ -65,6 +66,7 @@ export default function ClasificacionDetallePage() {
 
       {/* Title */}
       <h1 className="text-2xl font-semibold text-text">{data.nombre}</h1>
+      <StarRating key={data.id} tipo="clasificacion_si" contenidoId={data.id} />
 
       {/* Hero image — object-contain (didactic diagram, never cropped) */}
       {data.imagen_url !== null && data.imagen_url !== undefined && (
