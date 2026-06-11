@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTema } from '../hooks/useTema'
 import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
@@ -9,6 +10,8 @@ import StarRating from '../components/ui/StarRating'
 // Reads :temaSlug from params. Both hooks called unconditionally at top level.
 // useSoftwarePorTema uses the skip variant until tema.id is available.
 // D4 state pattern: loading / error+retry / not-found / data
+// Client-side filter: useState + useMemo placed BEFORE early returns (hooks rules).
+// Filters by nombre + descripcion_corta (D6 deviation: card-visible fields only).
 // ---------------------------------------------------------------------------
 
 export default function TemaPage() {
@@ -17,6 +20,20 @@ export default function TemaPage() {
 
   const tema = useTema(slug)
   const software = useSoftwarePorTema(tema.data?.id)
+
+  // Filter state — declared before early returns to satisfy rules of hooks
+  const [filtro, setFiltro] = useState('')
+
+  // Filtered list — recomputed only when software.data or filtro changes
+  const softwareFiltrado = useMemo(() => {
+    const q = filtro.trim().toLowerCase()
+    if (q === '') return software.data
+    return software.data.filter(
+      (sw) =>
+        sw.nombre.toLowerCase().includes(q) ||
+        (sw.descripcion_corta ?? '').toLowerCase().includes(q),
+    )
+  }, [software.data, filtro])
 
   // Loading state — either hook still resolving
   if (tema.loading) {
@@ -95,7 +112,22 @@ export default function TemaPage() {
       )}
 
       {!software.loading && software.error === null && software.data.length > 0 && (
-        <SoftwareList items={software.data} />
+        <div className="flex flex-col gap-4">
+          <input
+            type="text"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+            placeholder="Filtrar en este tema…"
+            aria-label="Filtrar software del tema"
+            className="w-full rounded-md bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+
+          {softwareFiltrado.length === 0 ? (
+            <p className="text-muted">Sin coincidencias en este tema.</p>
+          ) : (
+            <SoftwareList items={softwareFiltrado} />
+          )}
+        </div>
       )}
     </div>
   )
