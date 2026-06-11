@@ -1,11 +1,134 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   IA-dex — "Tech-Index" design system
+   A dex (catalog/index) of AI software. Indexed, data-forward, dual-theme.
+   Colors switch via light-dark() driven by `color-scheme` (see useTheme).
+   Signature: violet accent + cyan glow, display + mono type, visible structure.
+--------------------------------------------------------------------------- */
+
 @theme {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --color-bg: #0f172a;
-  --color-surface: #1e293b;
-  --color-text: #e2e8f0;
-  --color-muted: #94a3b8;
-  --color-accent: #38bdf8;
-  --color-error: #f87171;
+  /* Type scale — three roles: body / display / data-label */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Surfaces — light-dark(LIGHT, DARK). A DISTINCT border token keeps every
+     surface edge visible (the original design reused --surface as the border). */
+  --color-bg: light-dark(#f6f7fb, #0b1020);
+  --color-surface: light-dark(#ffffff, #151b2e);
+  --color-surface-2: light-dark(#eef1f8, #1c2540);
+  --color-border: light-dark(#dde2ef, #2a3350);
+
+  /* Ink */
+  --color-text: light-dark(#1b2034, #e6eaf5);
+  --color-muted: light-dark(#5c6783, #8a93b2);
+
+  /* Brand — violet signature + cyan glow (tuned per theme for contrast) */
+  --color-accent: light-dark(#6d4ef5, #7c5cff);
+  --color-accent-strong: light-dark(#5a3ce0, #9a80ff);
+  --color-accent-2: light-dark(#0891b2, #22d3ee);
+  --color-error: light-dark(#dc2626, #f87171);
+
+  /* Elevation — only the shadow COLOR switches (light-dark is a color fn) */
+  --shadow-card: 0 1px 2px light-dark(rgb(20 25 45 / 0.10), rgb(0 0 0 / 0.35));
+  --shadow-pop: 0 16px 40px -18px light-dark(rgb(20 25 45 / 0.22), rgb(0 0 0 / 0.75));
+  --shadow-glow:
+    0 0 0 1px color-mix(in oklab, var(--color-accent) 45%, transparent),
+    0 18px 40px -20px color-mix(in oklab, var(--color-accent) 60%, transparent);
+}
+
+@layer base {
+  :root {
+    /* Default to the system preference; useTheme pins an explicit value. */
+    color-scheme: light dark;
+    accent-color: var(--color-accent);
+
+    --scrollbar-thumb: light-dark(#c4cad9, #2a3350);
+    --scrollbar-track: light-dark(#eef1f8, #0b1020);
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    /* Normalize fallback x-height so swapping Inter in causes no layout
+       shift (CLS) — modern-web-guidance: visually-stable-font-fallbacks. */
+    font-size-adjust: from-font;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  /* Display face + balanced wrapping for short headings. */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Pretty rag for body copy (no orphans). Progressive enhancement. */
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-accent) 38%, transparent);
+    color: var(--color-text);
+  }
+
+  /* Modal backdrop + a subtle entrance. */
+  dialog::backdrop {
+    background-color: rgb(8 11 24 / 0.55);
+    backdrop-filter: blur(4px);
+  }
+  dialog[open] {
+    animation: modal-in 0.18s ease-out;
+  }
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+
+  /* Legacy WebKit scrollbar fallback (Safari < 18.2 / old Chrome). */
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 6px;
+      border: 2px solid var(--scrollbar-track);
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+--------------------------------------------------------------------------- */
+
+/* Data label: monospace, tabular figures — for dex numbers, years, licenses. */
+@utility dex-label {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  letter-spacing: 0.02em;
+}
+
+/* Indexed grid backdrop — the faint "dex" lattice behind shell surfaces. */
+@utility dex-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center;
 }
