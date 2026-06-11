@@ -11,7 +11,10 @@ export default function CatalogoPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-text">Catálogo</h1>
+      <div className="flex flex-col gap-1">
+        <h1 className="font-display text-3xl font-bold text-text">Catálogo</h1>
+        <p className="text-sm text-muted">Explorá el software por tema del curso.</p>
+      </div>
 
       {loading && <p className="text-muted">Cargando…</p>}
 
@@ -33,17 +36,23 @@ export default function CatalogoPage() {
       )}
 
       {!loading && error === null && data.length > 0 && (
-        <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.map((tema) => (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {data.map((tema, i) => (
             <li key={tema.id}>
               <Link
                 to={`/catalogo/${tema.slug}`}
-                className="bg-surface rounded-lg p-4 flex flex-col gap-1 border border-surface hover:border-accent transition-colors no-underline"
+                className="group flex h-full flex-col gap-2 rounded-xl border border-border bg-surface p-5 no-underline shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
               >
-                <span className="font-semibold text-text">{tema.nombre}</span>
+                <span className="dex-label text-[11px] text-accent-2">{String(i + 1).padStart(2, '0')}</span>
+                <span className="font-display text-lg font-semibold text-text transition-colors group-hover:text-accent-strong">
+                  {tema.nombre}
+                </span>
                 {tema.descripcion !== null && tema.descripcion !== undefined && (
-                  <span className="text-sm text-muted">{tema.descripcion}</span>
+                  <span className="line-clamp-3 text-sm text-muted">{tema.descripcion}</span>
                 )}
+                <span className="dex-label mt-auto inline-flex items-center gap-1 pt-2 text-[11px] uppercase tracking-wider text-accent transition-transform group-hover:translate-x-0.5">
+                  Ver software →
+                </span>
               </Link>
             </li>
           ))}

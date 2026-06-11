@@ -10,14 +10,11 @@ import * as foroService from '../services/foroService'
 // ForoTemaPage — full thread view for a single TemaForo.
 // Route: /foro/:id
 //
-// Layout: tema header (titulo, author, date, cuerpo) + mensajes list + responder.
+// Layout: full-width back link + two columns on desktop (conversation | stats
+// aside). Stacks on mobile (aside hidden). Tema header + mensajes + responder.
 // Responder: visible only to authenticated users; empty contenido blocked.
-// Delete handlers (design D5, D6):
-//   - Mensaje: window.confirm('¿Eliminar este mensaje?') → eliminarMensaje → refetch.
-//   - Tema: window.confirm('¿Eliminar este tema y todas sus respuestas?') →
-//     eliminarTemaForo → navigate('/foro'). Button visible only if currentUser owns tema.
-// States: loading, not-found (tema null), error, thread.
-// All error strings are fixed Spanish — never exposes error.message (spec).
+// Delete handlers (design D5, D6) via window.confirm. States: loading,
+// not-found, error, thread. All error strings are fixed Spanish.
 // ---------------------------------------------------------------------------
 
 export default function ForoTemaPage() {
@@ -88,18 +85,14 @@ export default function ForoTemaPage() {
   // -------------------------------------------------------------------------
 
   if (loading) {
-    return (
-      <div className="max-w-2xl mx-auto py-6 px-4">
-        <p className="text-muted">Cargando...</p>
-      </div>
-    )
+    return <p className="text-muted">Cargando…</p>
   }
 
   if (error !== null) {
     return (
-      <div className="max-w-2xl mx-auto py-6 px-4">
+      <div className="flex flex-col gap-3">
         <p className="text-error">No se pudo cargar el tema. Intentá de nuevo.</p>
-        <Link to="/foro" className="text-accent hover:opacity-80 transition-opacity text-sm mt-2 inline-block">
+        <Link to="/foro" className="w-fit text-sm text-accent transition-opacity hover:opacity-80">
           ← Volver al foro
         </Link>
       </div>
@@ -108,9 +101,9 @@ export default function ForoTemaPage() {
 
   if (tema === null) {
     return (
-      <div className="max-w-2xl mx-auto py-6 px-4 flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         <p className="text-muted">Tema no encontrado.</p>
-        <Link to="/foro" className="text-accent hover:opacity-80 transition-opacity text-sm">
+        <Link to="/foro" className="w-fit text-sm text-accent transition-opacity hover:opacity-80">
           ← Volver al foro
         </Link>
       </div>
@@ -118,87 +111,102 @@ export default function ForoTemaPage() {
   }
 
   const temaIsOwn = currentUserId !== null && tema.user_id === currentUserId
-  const temaAuthorLabel =
-    temaIsOwn ? 'vos' : `Usuario ${tema.user_id.slice(0, 8)}`
+  const temaAuthorLabel = temaIsOwn ? 'vos' : `Usuario ${tema.user_id.slice(0, 8)}`
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto py-6 px-4">
+    <div className="flex flex-col gap-6">
       {/* Back link */}
-      <Link to="/foro" className="text-accent hover:opacity-80 transition-opacity text-sm w-fit">
+      <Link to="/foro" className="w-fit text-sm text-accent transition-opacity hover:opacity-80">
         ← Volver al foro
       </Link>
 
-      {/* Tema header */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-bold text-text">{tema.titulo}</h1>
-          {temaIsOwn && (
-            <button
-              type="button"
-              onClick={() => { void handleEliminarTema() }}
-              disabled={eliminandoTema}
-              className="text-error text-sm hover:opacity-80 transition-opacity disabled:opacity-50 shrink-0"
+      <div className="grid gap-6 lg:grid-cols-[1fr_19rem]">
+        {/* Main — conversation */}
+        <div className="order-1 flex flex-col gap-6">
+          {/* Tema header */}
+          <div className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5">
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-display text-2xl font-bold text-text">{tema.titulo}</h1>
+              {temaIsOwn && (
+                <button
+                  type="button"
+                  onClick={() => { void handleEliminarTema() }}
+                  disabled={eliminandoTema}
+                  className="shrink-0 text-sm text-error transition-opacity hover:opacity-80 disabled:opacity-50"
+                >
+                  {eliminandoTema ? 'Eliminando…' : 'Eliminar tema'}
+                </button>
+              )}
+            </div>
+            <p className="dex-label text-[11px] text-muted">
+              {temaAuthorLabel} · {formatFecha(tema.created_at)}
+            </p>
+            {tema.cuerpo !== null && tema.cuerpo !== '' && (
+              <p className="mt-2 whitespace-pre-wrap text-text">{tema.cuerpo}</p>
+            )}
+          </div>
+
+          {/* Mensajes list */}
+          <section className="flex flex-col gap-3">
+            <h2 className="font-display text-lg font-semibold text-text">
+              {mensajes.length === 0 ? 'Sin respuestas' : `${mensajes.length} respuesta${mensajes.length !== 1 ? 's' : ''}`}
+            </h2>
+            {mensajes.length > 0 && (
+              <ul className="flex flex-col gap-3">
+                {mensajes.map((msg) => (
+                  <MensajeItem
+                    key={msg.id}
+                    mensaje={msg}
+                    currentUserId={currentUserId}
+                    onEliminar={(msgId) => { void handleEliminarMensaje(msgId) }}
+                  />
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Responder form — authenticated users only */}
+          {currentUserId !== null && (
+            <form
+              onSubmit={(e) => { void handleResponder(e) }}
+              className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5"
             >
-              {eliminandoTema ? 'Eliminando…' : 'Eliminar tema'}
-            </button>
+              <label className="flex flex-col gap-1 text-sm text-muted">
+                Tu respuesta
+                <textarea
+                  value={contenido}
+                  onChange={(e) => setContenido(e.target.value)}
+                  disabled={enviando}
+                  rows={4}
+                  required
+                  className="mt-1 resize-y rounded-md border border-border bg-bg px-3 py-2 text-text transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
+                />
+              </label>
+              {responderError !== null && <p className="text-sm text-error">{responderError}</p>}
+              <button
+                type="submit"
+                disabled={enviando}
+                className="w-fit rounded-md bg-accent px-4 py-2 text-sm font-semibold text-bg shadow-glow transition-transform hover:-translate-y-px disabled:opacity-50"
+              >
+                {enviando ? 'Publicando…' : 'Responder'}
+              </button>
+            </form>
           )}
         </div>
-        <p className="text-muted text-sm">
-          {temaAuthorLabel} · {formatFecha(tema.created_at)}
-        </p>
-        {tema.cuerpo !== null && tema.cuerpo !== '' && (
-          <p className="text-text mt-2 whitespace-pre-wrap">{tema.cuerpo}</p>
-        )}
-      </div>
 
-      {/* Mensajes list */}
-      <section className="flex flex-col gap-0">
-        <h2 className="text-lg font-semibold text-text mb-2">
-          {mensajes.length === 0 ? 'Sin respuestas' : `${mensajes.length} respuesta${mensajes.length !== 1 ? 's' : ''}`}
-        </h2>
-        {mensajes.length > 0 && (
-          <ul>
-            {mensajes.map((msg) => (
-              <MensajeItem
-                key={msg.id}
-                mensaje={msg}
-                currentUserId={currentUserId}
-                onEliminar={(msgId) => { void handleEliminarMensaje(msgId) }}
-              />
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Responder form — authenticated users only */}
-      {currentUserId !== null && (
-        <form
-          onSubmit={(e) => { void handleResponder(e) }}
-          className="flex flex-col gap-3 p-4 bg-surface rounded"
-        >
-          <label className="flex flex-col gap-1 text-sm text-muted">
-            Tu respuesta
-            <textarea
-              value={contenido}
-              onChange={(e) => setContenido(e.target.value)}
-              disabled={enviando}
-              rows={4}
-              required
-              className="mt-1 px-3 py-2 bg-bg border border-muted rounded text-text focus:outline-none focus:border-accent disabled:opacity-50 resize-y"
-            />
-          </label>
-          {responderError !== null && (
-            <p className="text-error text-sm">{responderError}</p>
+        {/* Aside — stats (desktop) */}
+        <aside className="order-2 hidden flex-col gap-4 lg:flex">
+          <div className="flex flex-col gap-0.5 rounded-2xl border border-border bg-surface p-5">
+            <span className="dex-label text-3xl font-bold text-text">{mensajes.length}</span>
+            <span className="text-sm text-muted">{mensajes.length === 1 ? 'respuesta' : 'respuestas'}</span>
+          </div>
+          {currentUserId === null && (
+            <div className="rounded-2xl border border-border bg-surface p-5 text-sm text-muted">
+              Iniciá sesión para sumarte al debate.
+            </div>
           )}
-          <button
-            type="submit"
-            disabled={enviando}
-            className="px-4 py-2 bg-accent text-bg rounded font-medium hover:opacity-90 transition-opacity disabled:opacity-50 w-fit"
-          >
-            {enviando ? 'Publicando…' : 'Responder'}
-          </button>
-        </form>
-      )}
+        </aside>
+      </div>
     </div>
   )
 }

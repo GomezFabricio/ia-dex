@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import Logo from '../components/layout/Logo'
 
 // ---------------------------------------------------------------------------
 // AuthError code → Spanish message map (design D7)
@@ -76,9 +77,20 @@ export default function LoginPage() {
     : '¿Ya tenés cuenta? Iniciá sesión'
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
-      <div className="bg-surface w-full max-w-sm rounded-xl p-8 flex flex-col gap-6">
-        <h1 className="text-text text-2xl font-semibold text-center">{heading}</h1>
+    <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-bg p-4">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(50%_100%_at_50%_0%,color-mix(in_oklab,var(--color-accent)_22%,transparent),transparent)]"
+      />
+      <div
+        aria-hidden="true"
+        className="dex-grid pointer-events-none absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(60%_60%_at_50%_30%,black,transparent)]"
+      />
+      <div className="flex w-full max-w-sm flex-col gap-6 rounded-2xl border border-border bg-surface/90 p-8 shadow-pop backdrop-blur-sm">
+        <Link to="/" className="self-center no-underline" aria-label="IA-dex — inicio">
+          <Logo />
+        </Link>
+        <h1 className="text-center font-display text-2xl font-semibold text-text">{heading}</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -92,7 +104,7 @@ export default function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="bg-bg border border-surface text-text rounded-lg px-3 py-2 placeholder:text-muted focus:outline-none focus:border-accent"
+              className="bg-bg border border-border text-text rounded-lg px-3 py-2 placeholder:text-muted transition-colors focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
               placeholder="tu@correo.com"
             />
           </div>
@@ -108,7 +120,7 @@ export default function LoginPage() {
               autoComplete={isSignIn ? 'current-password' : 'new-password'}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="bg-bg border border-surface text-text rounded-lg px-3 py-2 placeholder:text-muted focus:outline-none focus:border-accent"
+              className="bg-bg border border-border text-text rounded-lg px-3 py-2 placeholder:text-muted transition-colors focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
               placeholder="••••••••"
             />
           </div>
@@ -122,7 +134,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-accent text-bg font-semibold rounded-lg py-2 hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="bg-accent text-bg font-semibold rounded-lg py-2 shadow-glow hover:-translate-y-px disabled:translate-y-0 disabled:opacity-50 transition-transform"
           >
             {submitting ? 'Cargando...' : submitLabel}
           </button>

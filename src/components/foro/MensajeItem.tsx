@@ -22,9 +22,9 @@ export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Prop
   const authorLabel = isOwn ? 'vos' : `Usuario ${mensaje.user_id.slice(0, 8)}`
 
   return (
-    <li className="flex flex-col gap-2 py-4 border-b border-surface last:border-0">
+    <li className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-4">
       <div className="flex items-start justify-between gap-4">
-        <p className="text-text flex-1">{mensaje.contenido}</p>
+        <p className="text-text flex-1 whitespace-pre-wrap">{mensaje.contenido}</p>
         {isOwn && (
           <button
             type="button"
@@ -35,7 +35,7 @@ export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Prop
           </button>
         )}
       </div>
-      <p className="text-muted text-xs">
+      <p className="dex-label text-[11px] text-muted">
         {authorLabel} · {formatFecha(mensaje.created_at)}
       </p>
     </li>

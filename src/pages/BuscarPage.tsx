@@ -96,7 +96,7 @@ export default function BuscarPage() {
                   setForm((prev) => ({ ...prev, texto: e.target.value }))
                   voz.clearError()
                 }}
-                className="flex-1 bg-bg border border-surface rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+                className="flex-1 bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
               />
               {/* Mic button — rendered only when voice is supported (Spec 2) */}
               {voz.isSupported && (
@@ -117,8 +117,8 @@ export default function BuscarPage() {
                     }}
                     className={
                       voz.isListening
-                        ? 'text-error animate-pulse border border-surface rounded p-2'
-                        : 'text-muted border border-surface rounded p-2 hover:text-text transition-colors'
+                        ? 'text-error animate-pulse border border-border rounded p-2'
+                        : 'text-muted border border-border rounded p-2 hover:text-text transition-colors'
                     }
                   >
                     {/* Inline microphone SVG — no icon dependency */}
@@ -171,7 +171,7 @@ export default function BuscarPage() {
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, temaId: e.target.value }))
               }
-              className="bg-bg border border-surface rounded px-3 py-2 text-text focus:outline-none focus:border-accent"
+              className="bg-bg border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-accent"
             >
               <option value="">Todos los temas</option>
               {temas.data.map((tema) => (
@@ -198,7 +198,7 @@ export default function BuscarPage() {
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, licencia: e.target.value }))
               }
-              className="bg-bg border border-surface rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+              className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
 
@@ -217,7 +217,7 @@ export default function BuscarPage() {
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, anioDesde: e.target.value }))
               }
-              className="bg-bg border border-surface rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+              className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
 
@@ -236,7 +236,7 @@ export default function BuscarPage() {
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, anioHasta: e.target.value }))
               }
-              className="bg-bg border border-surface rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+              className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
         </div>
