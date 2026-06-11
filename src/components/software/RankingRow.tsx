@@ -15,15 +15,21 @@ type Props = {
 
 export default function RankingRow({ position, softwareId, nombre, metricText }: Props) {
   return (
-    <li className="flex items-center justify-between gap-2 py-1">
-      <span className="text-muted w-6 shrink-0">{position}.</span>
+    <li className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-surface/60">
+      <span
+        className={`dex-label w-7 shrink-0 text-right text-sm ${
+          position <= 3 ? 'text-accent-2' : 'text-muted'
+        }`}
+      >
+        {String(position).padStart(2, '0')}
+      </span>
       <Link
         to={`/software/${softwareId}`}
-        className="flex-1 text-accent hover:text-text transition-colors"
+        className="flex-1 text-text no-underline transition-colors group-hover:text-accent-strong"
       >
         {nombre}
       </Link>
-      <span className="text-text font-semibold shrink-0">{metricText}</span>
+      <span className="dex-label shrink-0 text-sm text-text">{metricText}</span>
     </li>
   )
 }

@@ -14,10 +14,10 @@ export default function SoftwareList({ items }: Props) {
   if (items.length === 0) return null
 
   return (
-    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {items.map((sw) => (
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((sw, i) => (
         <li key={sw.id}>
-          <SoftwareCard software={sw} />
+          <SoftwareCard software={sw} position={i + 1} />
         </li>
       ))}
     </ul>
