@@ -35,7 +35,8 @@ function reducer(state: State, action: Action): State {
     case 'success':
       return { ...state, loading: false, results: action.payload }
     case 'error':
-      return { ...state, loading: false, results: [], error: action.payload }
+      // results retain their previous value on error (spec: not reset).
+      return { ...state, loading: false, error: action.payload }
   }
 }
 
@@ -68,18 +69,18 @@ export function useBusqueda(): UseBusquedaReturn {
 
     dispatch({ type: 'search' })
 
-    // Fire-and-forget analytics; failure must not affect search outcome (Spec 1).
-    void eventosService.registrarEvento({
-      tipo: 'busqueda',
-      metadata: buildMetadata(filtros),
-    })
-
     softwareService
       .buscar(filtros)
       .then((items) => {
         if (requestId === requestIdRef.current) {
           dispatch({ type: 'success', payload: items })
         }
+        // Fire-and-forget analytics AFTER a successful fetch; failure here
+        // must not affect the search outcome (spec: register on success).
+        void eventosService.registrarEvento({
+          tipo: 'busqueda',
+          metadata: buildMetadata(filtros),
+        })
       })
       .catch((err: unknown) => {
         if (requestId === requestIdRef.current) {
