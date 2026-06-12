@@ -1,6 +1,5 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { corsHeaders, handleOptions } from '../_shared/cors.ts';
 
 /**
  * buscar — public search pipeline edge function
@@ -13,13 +12,29 @@ import { corsHeaders, handleOptions } from '../_shared/cors.ts';
  * 6. Return { resultados, filtros_aplicados, intent_usado }
  *
  * Auth: public (anon key); CORS: wildcard.
+ *
+ * Note: cors.ts is intentionally inlined here because the MCP deploy bundler
+ * cannot resolve relative paths outside the function directory (../_shared/).
+ * The _shared/cors.ts file remains canonical for local Supabase CLI use.
  */
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
+function handleOptions(req: Request): Response | null {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+  return null;
+}
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 // gemini-2.5-flash-lite is the current Flash-Lite class id.
 // Fall back to gemini-2.0-flash-lite if the primary id returns model-not-found.
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 const GEMINI_TIMEOUT_MS = 2000;
 
 interface Filtros {
@@ -90,7 +105,8 @@ Devuelve un JSON con exactamente esta estructura:
   const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
 
   try {
-    const res = await fetch(GEMINI_URL, {
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    const res = await fetch(geminiUrl, {
       method: 'POST',
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
@@ -113,7 +129,19 @@ Devuelve un JSON con exactamente esta estructura:
 
     const data = await res.json();
     const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-    const parsed: IntentResult = JSON.parse(raw);
+
+    let parsed: IntentResult;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (parseErr) {
+      console.error(
+        'Gemini JSON parse failed. Raw response:',
+        raw,
+        'Error:',
+        parseErr instanceof Error ? parseErr.message : String(parseErr),
+      );
+      return { intent: { texto_semantico: texto }, success: false };
+    }
 
     return {
       intent: {
@@ -216,7 +244,7 @@ Deno.serve(async (req: Request) => {
     if (rpcErr) {
       console.error('RPC error:', rpcErr.message);
       return new Response(
-        JSON.stringify({ error: rpcErr.message }),
+        JSON.stringify({ error: 'Search unavailable' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
