@@ -138,6 +138,8 @@ export type Database = {
           clasificacion_si_id: string | null
           created_at: string
           descripcion_corta: string | null
+          embedding: string | null
+          fts: unknown
           id: string
           imagen_url: string | null
           licencia: string | null
@@ -153,6 +155,8 @@ export type Database = {
           clasificacion_si_id?: string | null
           created_at?: string
           descripcion_corta?: string | null
+          embedding?: string | null
+          fts?: unknown
           id?: string
           imagen_url?: string | null
           licencia?: string | null
@@ -168,6 +172,8 @@ export type Database = {
           clasificacion_si_id?: string | null
           created_at?: string
           descripcion_corta?: string | null
+          embedding?: string | null
+          fts?: unknown
           id?: string
           imagen_url?: string | null
           licencia?: string | null
@@ -293,7 +299,35 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      buscar_hibrido: {
+        Args: {
+          match_limit?: number
+          match_threshold?: number
+          p_anio_desde?: number
+          p_anio_hasta?: number
+          p_licencia?: string
+          p_tema_id?: string
+          query_embedding: string
+          query_text: string
+          rrf_k?: number
+        }
+        Returns: {
+          anio_lanzamiento: number
+          autor_referencia: string
+          clasificacion_si_id: string
+          created_at: string
+          descripcion_corta: string
+          id: string
+          imagen_url: string
+          licencia: string
+          nombre: string
+          objetivo: string
+          tema_id: string
+          url_acceso: string
+          video_url: string
+        }[]
+      }
+      get_embed_secret: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

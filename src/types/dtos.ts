@@ -23,7 +23,8 @@ export type Enlace = {
 
 export type Tema = Tables<'temas'>
 
-export type Software = Tables<'software'>
+// embedding and fts are internal ML columns; consumers must never see them.
+export type Software = Omit<Tables<'software'>, 'embedding' | 'fts'>
 
 // ClasificacionSI narrows `enlaces` from raw Json to Enlace[].
 // The service layer is responsible for the JSON.parse cast at the read boundary.
@@ -84,6 +85,28 @@ export type FiltrosBusqueda = {
   licencia?: string
   anio_desde?: number
   anio_hasta?: number
+}
+
+// ---------------------------------------------------------------------------
+// Busqueda Inteligente — Edge Function buscar request/response contract
+// ---------------------------------------------------------------------------
+
+export type FiltrosExtraidos = {
+  tema_id?: string
+  licencia?: string
+  anio_desde?: number
+  anio_hasta?: number
+}
+
+export type BusquedaInteligenteRequest = {
+  texto: string
+  filtros?: FiltrosExtraidos
+}
+
+export type BusquedaInteligenteResponse = {
+  resultados: Software[]
+  filtros_aplicados: FiltrosExtraidos
+  intent_usado: boolean
 }
 
 export type NuevaValoracion = {
