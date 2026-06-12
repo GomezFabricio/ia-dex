@@ -17,6 +17,8 @@ import Modal from '../ui/Modal'
 
 type Props = {
   open: boolean
+  /** True while the recognizer detects speech — animates the placeholder bars. */
+  speaking: boolean
   onCancel: () => void
 }
 
@@ -31,7 +33,7 @@ const CANVAS_HEIGHT = 72
 // the animated placeholder instead.
 const IS_MOBILE = /Android|iPhone|iPad/i.test(navigator.userAgent)
 
-export default function VoiceSearchOverlay({ open, onCancel }: Props) {
+export default function VoiceSearchOverlay({ open, speaking, onCancel }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [vizFailed, setVizFailed] = useState(IS_MOBILE)
 
@@ -129,17 +131,30 @@ export default function VoiceSearchOverlay({ open, onCancel }: Props) {
           Escuchando…
         </p>
 
-        {/* Live waveform, or a static pulse if mic visualization is unavailable */}
+        {/* Live waveform (desktop), or speech-activity bars (mobile / no mic
+            stream): they oscillate while the recognizer reports sound and
+            settle low during silence. Staggered delays and varied durations
+            per bar give an organic, non-uniform motion. */}
         {vizFailed ? (
           <div
             className="flex h-[72px] items-center justify-center gap-1.5"
             aria-hidden="true"
           >
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 7 }).map((_, i) => (
               <span
                 key={i}
-                className="h-4 w-1.5 animate-pulse rounded-full bg-accent"
-                style={{ animationDelay: `${i * 150}ms` }}
+                className="h-10 w-1.5 rounded-full bg-accent"
+                style={
+                  speaking
+                    ? {
+                        animation: `voice-bar ${420 + (i % 3) * 140}ms ease-in-out ${i * 80}ms infinite`,
+                      }
+                    : {
+                        transform: 'scaleY(0.25)',
+                        opacity: 0.5,
+                        transition: 'transform 300ms, opacity 300ms',
+                      }
+                }
               />
             ))}
           </div>

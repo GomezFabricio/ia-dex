@@ -170,7 +170,11 @@ export default function BuscarPage() {
       {/* Listening overlay — open while recognition runs; cancel stops it.
           Closes automatically when a transcript arrives or recognition ends
           (isListening goes false), and on Esc / backdrop click via Modal. */}
-      <VoiceSearchOverlay open={voz.isListening} onCancel={voz.stop} />
+      <VoiceSearchOverlay
+        open={voz.isListening}
+        speaking={voz.isSpeaking}
+        onCancel={voz.stop}
+      />
 
       {/* Filter form card */}
       <form

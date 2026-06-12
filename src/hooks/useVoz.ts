@@ -47,6 +47,10 @@ interface SpeechRecognitionInstance {
   onresult: ((ev: SpeechRecognitionEvent) => void) | null
   onerror: ((ev: SpeechRecognitionErrorEvent) => void) | null
   onend: (() => void) | null
+  onsoundstart: (() => void) | null
+  onsoundend: (() => void) | null
+  onspeechstart: (() => void) | null
+  onspeechend: (() => void) | null
   start(): void
   stop(): void
   abort(): void
@@ -87,6 +91,8 @@ const VOICE_ERROR_FALLBACK = 'No se pudo usar el micrófono. Escribí tu búsque
 export type UseVozReturn = {
   isSupported: boolean
   isListening: boolean
+  /** True while the recognizer detects sound/speech — drives UI activity feedback. */
+  isSpeaking: boolean
   error: string | null
   start: () => void
   stop: () => void
@@ -95,6 +101,7 @@ export type UseVozReturn = {
 
 export function useVoz(onTranscript: (transcript: string) => void): UseVozReturn {
   const [isListening, setIsListening] = useState(false)
+  const [isSpeaking, setIsSpeaking] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
@@ -132,8 +139,16 @@ export function useVoz(onTranscript: (transcript: string) => void): UseVozReturn
       setError(VOICE_ERROR_MESSAGES[ev.error] ?? VOICE_ERROR_FALLBACK)
     }
 
+    // Speech-activity events: no audio stream access needed, so they work on
+    // Android where a second getUserMedia capture would starve recognition.
+    recognition.onsoundstart = () => setIsSpeaking(true)
+    recognition.onspeechstart = () => setIsSpeaking(true)
+    recognition.onsoundend = () => setIsSpeaking(false)
+    recognition.onspeechend = () => setIsSpeaking(false)
+
     recognition.onend = () => {
       setIsListening(false)
+      setIsSpeaking(false)
     }
 
     recognitionRef.current = recognition
@@ -158,10 +173,14 @@ export function useVoz(onTranscript: (transcript: string) => void): UseVozReturn
         r.onresult = null
         r.onerror = null
         r.onend = null
+        r.onsoundstart = null
+        r.onsoundend = null
+        r.onspeechstart = null
+        r.onspeechend = null
         r.abort()
       }
     }
   }, [])
 
-  return { isSupported, isListening, error, start, stop, clearError }
+  return { isSupported, isListening, isSpeaking, error, start, stop, clearError }
 }
