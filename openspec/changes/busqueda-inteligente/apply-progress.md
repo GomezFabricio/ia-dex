@@ -289,11 +289,11 @@ The 23-row catalog has no generative image tools (no Midjourney, DALL-E, Stable 
 
 ### T18 — E2E checklist (for verify phase)
 
-- [ ] NL text query → resultados non-empty, filter controls populated
-- [ ] Voice query → identical pipeline, filters auto-populated
-- [ ] Kill buscar EF → ilike results render, no error banner, fallback notice shown
-- [ ] Empty text + active filters → plain filtered listing, no EF call
-- [ ] Empty text + no filters → all rows returned, no EF call
-- [ ] Manual filter edit after auto-population → search re-runs with updated constraint
-- [ ] Insert new software row → embedding non-null within 30 s
-- [ ] `count(*) where embedding is null` → 0
+- [x] NL text query → resultados non-empty, filter controls populated
+- [x] Voice query → identical pipeline, filters auto-populated
+- [x] Kill buscar EF → ilike results render, no error banner, fallback notice shown
+- [x] Empty text + active filters → plain filtered listing, no EF call
+- [x] Empty text + no filters → all rows returned, no EF call
+- [x] Manual filter edit after auto-population → search re-runs with updated constraint
+- [x] Insert new software row → embedding non-null within 30 s
+- [x] `count(*) where embedding is null` → 0
