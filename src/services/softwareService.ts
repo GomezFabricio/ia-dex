@@ -1,5 +1,10 @@
 import { supabase } from '../lib/supabase'
-import type { Software, FiltrosBusqueda } from '../types/dtos'
+import type {
+  Software,
+  FiltrosBusqueda,
+  BusquedaInteligenteRequest,
+  BusquedaInteligenteResponse,
+} from '../types/dtos'
 
 /**
  * Returns all software belonging to the given temaId, ordered by nombre asc.
@@ -66,4 +71,23 @@ export async function buscar(filtros: FiltrosBusqueda): Promise<Software[]> {
 
   if (error) throw error
   return data ?? []
+}
+
+/**
+ * Calls the buscar Edge Function for hybrid NLP + semantic search.
+ * On any error (network, 4xx, 5xx) this throws so callers can fall back to buscar().
+ * The EF returns resultados without embedding/fts columns — shape matches Software[].
+ */
+export async function buscarInteligente(
+  req: BusquedaInteligenteRequest,
+): Promise<BusquedaInteligenteResponse> {
+  const { data, error } = await supabase.functions.invoke<BusquedaInteligenteResponse>(
+    'buscar',
+    { body: req },
+  )
+
+  if (error) throw error
+  if (!data) throw new Error('Empty response from buscar edge function')
+
+  return data
 }
