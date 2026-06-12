@@ -2,13 +2,24 @@ import { useState } from 'react'
 import { useBusqueda } from '../hooks/useBusqueda'
 import { useTemas } from '../hooks/useTemas'
 import { useVoz } from '../hooks/useVoz'
-import type { FiltrosBusqueda } from '../types/dtos'
+import type { FiltrosBusqueda, FiltrosExtraidos } from '../types/dtos'
 import SoftwareList from '../components/software/SoftwareList'
 
 // ---------------------------------------------------------------------------
-// BuscarPage — five-state search page (idle → loading → error / no-results / results).
-// Filter state persists across searches (never resets after submit).
-// Voice integration (T5): useVoz auto-submits when a transcript arrives (D3+D4).
+// BuscarPage — hybrid NLP search page.
+//
+// texto is the primary driver. Submitting a non-empty texto calls the buscar
+// Edge Function (Gemini intent + semantic hybrid). The EF returns extracted
+// filters which are mirrored into the form controls so users can see and refine them.
+//
+// Manual filter edits after a hybrid search re-run the search with those values
+// as hard constraints (manual wins over extracted, per design).
+//
+// Voice: transcript → same pipeline via handleTranscript (useVoz unchanged).
+//
+// Loading: previous results are kept visible during a new fetch (no flash).
+// Fallback: when EF fails and ilike is used, a subtle non-blocking notice appears.
+// Error: shown only when even the ilike fallback fails.
 // ---------------------------------------------------------------------------
 
 type FormState = {
@@ -48,10 +59,37 @@ function buildFiltros(form: FormState): FiltrosBusqueda {
   return filtros
 }
 
+// Merges extracted filters from a hybrid search response into form state.
+function applyFiltrosExtraidos(
+  prev: FormState,
+  filtros: FiltrosExtraidos,
+): FormState {
+  return {
+    ...prev,
+    ...(filtros.tema_id !== undefined ? { temaId: filtros.tema_id } : {}),
+    ...(filtros.licencia !== undefined ? { licencia: filtros.licencia } : {}),
+    ...(filtros.anio_desde !== undefined
+      ? { anioDesde: String(filtros.anio_desde) }
+      : {}),
+    ...(filtros.anio_hasta !== undefined
+      ? { anioHasta: String(filtros.anio_hasta) }
+      : {}),
+  }
+}
+
 export default function BuscarPage() {
-  const { results, loading, error, hasSearched, buscar } = useBusqueda()
   const [form, setForm] = useState<FormState>(initialForm)
   const temas = useTemas()
+
+  // onFiltrosExtraidos is called by useBusqueda after a successful hybrid search.
+  // It runs inside the async callback chain (not inside an effect), so setState
+  // here is safe and won't trigger the react-hooks/set-state-in-effect rule.
+  const onFiltrosExtraidos = (filtros: FiltrosExtraidos) => {
+    setForm((prev) => applyFiltrosExtraidos(prev, filtros))
+  }
+
+  const { results, loading, error, hasSearched, usoFallback, buscar } =
+    useBusqueda({ onFiltrosExtraidos })
 
   // D3+D4: handleTranscript updates texto in state AND calls buscar with an
   // explicit texto override. The setForm flush hasn't happened yet, so we pass
@@ -68,6 +106,16 @@ export default function BuscarPage() {
     buscar(buildFiltros(form))
   }
 
+  // When a manual filter changes, re-run search if a search has already been made.
+  // This implements "manual filter edit re-runs as hard constraint" (design).
+  const handleFilterChange = (patch: Partial<FormState>) => {
+    const nextForm = { ...form, ...patch }
+    setForm(nextForm)
+    if (hasSearched) {
+      buscar(buildFiltros(nextForm))
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold text-text">Buscar</h1>
@@ -78,7 +126,7 @@ export default function BuscarPage() {
         className="bg-surface rounded-lg p-4 flex flex-col gap-4"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Texto — spans both columns */}
+          {/* Texto — primary search driver, spans both columns */}
           <div className="sm:col-span-2 flex flex-col gap-1">
             <label
               htmlFor="buscar-texto"
@@ -91,6 +139,7 @@ export default function BuscarPage() {
                 id="buscar-texto"
                 type="text"
                 aria-label="Buscar software"
+                placeholder="Ej: herramientas gratuitas para procesamiento de lenguaje natural"
                 value={form.texto}
                 onChange={(e) => {
                   setForm((prev) => ({ ...prev, texto: e.target.value }))
@@ -168,9 +217,7 @@ export default function BuscarPage() {
             <select
               id="buscar-tema"
               value={form.temaId}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, temaId: e.target.value }))
-              }
+              onChange={(e) => handleFilterChange({ temaId: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-accent"
             >
               <option value="">Todos los temas</option>
@@ -195,9 +242,7 @@ export default function BuscarPage() {
               type="text"
               placeholder="ej. MIT"
               value={form.licencia}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, licencia: e.target.value }))
-              }
+              onChange={(e) => handleFilterChange({ licencia: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
@@ -214,9 +259,7 @@ export default function BuscarPage() {
               id="buscar-anio-desde"
               type="number"
               value={form.anioDesde}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, anioDesde: e.target.value }))
-              }
+              onChange={(e) => handleFilterChange({ anioDesde: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
@@ -233,9 +276,7 @@ export default function BuscarPage() {
               id="buscar-anio-hasta"
               type="number"
               value={form.anioHasta}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, anioHasta: e.target.value }))
-              }
+              onChange={(e) => handleFilterChange({ anioHasta: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
@@ -256,12 +297,15 @@ export default function BuscarPage() {
           <p className="text-muted">Ingresá los filtros para buscar.</p>
         )}
 
-        {/* Loading */}
+        {/* Loading — preserve previous results, show spinner text below */}
+        {hasSearched && loading && results.length > 0 && (
+          <SoftwareList items={results} />
+        )}
         {hasSearched && loading && (
           <p className="text-muted">Buscando…</p>
         )}
 
-        {/* Error */}
+        {/* Error — only shown when both EF and fallback failed */}
         {hasSearched && !loading && error !== null && (
           <div className="flex flex-col gap-2">
             <p className="text-muted">No se pudieron cargar los datos</p>
@@ -273,6 +317,13 @@ export default function BuscarPage() {
               Reintentar
             </button>
           </div>
+        )}
+
+        {/* Fallback notice — subtle, non-blocking; shown when EF failed but ilike succeeded */}
+        {hasSearched && !loading && error === null && usoFallback && (
+          <p className="text-sm text-muted">
+            Búsqueda semántica no disponible. Mostrando resultados por texto exacto.
+          </p>
         )}
 
         {/* No results */}
