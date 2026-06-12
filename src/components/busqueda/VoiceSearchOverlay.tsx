@@ -24,12 +24,19 @@ const BAR_COUNT = 24
 const CANVAS_WIDTH = 280
 const CANVAS_HEIGHT = 72
 
+// On Android the microphone is effectively exclusive: opening a second
+// getUserMedia capture starves SpeechRecognition, which then never produces a
+// transcript (the waveform moves but nothing is recognized). Desktop browsers
+// allow concurrent capture, so the live waveform is desktop-only; mobile gets
+// the animated placeholder instead.
+const IS_MOBILE = /Android|iPhone|iPad/i.test(navigator.userAgent)
+
 export default function VoiceSearchOverlay({ open, onCancel }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [vizFailed, setVizFailed] = useState(false)
+  const [vizFailed, setVizFailed] = useState(IS_MOBILE)
 
   useEffect(() => {
-    if (!open) return
+    if (!open || IS_MOBILE) return
 
     let cancelled = false
     let stream: MediaStream | null = null
