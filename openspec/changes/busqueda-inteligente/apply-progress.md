@@ -257,6 +257,36 @@ The 23-row catalog has no generative image tools (no Midjourney, DALL-E, Stable 
 
 ---
 
+---
+
+## Adversarial Review Fixes — Slice 2 Frontend
+
+**Branch**: `feat/busqueda-inteligente-frontend`
+**Status**: COMPLETE
+**Date**: 2026-06-12
+
+### Fixes applied
+
+**BLOCKING — keystroke spam (BuscarPage.tsx)**:
+- Text/number filter inputs (licencia, año desde, año hasta) now update form state on every `onChange` keystroke but defer the re-search to `onBlur` (commit semantics). Re-search is skipped when the committed value produces filtros identical to the last searched value (`lastSearchedFiltrosRef` no-op guard). Tema `<select>` keeps immediate `onChange` re-search (single event per selection). `buscarAndRecord()` helper wraps `buscar()` and records the serialized filtros so blur guards and `handleSubmit`/retry all share a consistent baseline.
+
+**BLOCKING — client-side timeout (softwareService.ts)**:
+- `buscarInteligente()` passes `{ timeout: 8000 }` to `supabase.functions.invoke`. The native `timeout` option was verified present in the installed `@supabase/functions-js` FunctionsClient (v2.108.1). On expiry the internal `AbortController` fires an `AbortError` wrapped as `FunctionsFetchError`, which activates `useBusqueda`'s ilike fallback path transparently. No `Promise.race` needed.
+
+**Non-blocking — useCallback for onFiltrosExtraidos (BuscarPage.tsx)**:
+- `onFiltrosExtraidos` wrapped in `useCallback([], [])` — only uses `setForm` (stable). The `optsRef` sync in `useBusqueda` is kept as a defensive pattern.
+
+### Verification
+
+- `npm run lint` → 0 errors, 0 warnings
+- `npx tsc -b --noEmit` → clean
+
+### Commits
+
+1. `fix(search): commit filter edits on blur and add edge function timeout`
+
+---
+
 ### T18 — E2E checklist (for verify phase)
 
 - [ ] NL text query → resultados non-empty, filter controls populated
