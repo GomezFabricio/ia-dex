@@ -33,9 +33,15 @@ function handleOptions(req: Request): Response | null {
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 // gemini-2.5-flash-lite is the current Flash-Lite class id.
-// Fall back to gemini-2.0-flash-lite if the primary id returns model-not-found.
+// On ANY primary failure (quota, timeout, model-not-found) we retry once with
+// the fallback model — free-tier quotas are per-model, so a separate model id
+// keeps intent extraction alive when the primary's daily quota is exhausted.
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
-const GEMINI_TIMEOUT_MS = 2000;
+const GEMINI_FALLBACK_MODEL =
+  Deno.env.get('GEMINI_FALLBACK_MODEL') ?? 'gemini-2.0-flash-lite';
+// 2500 ms per attempt; two attempts worst-case = 5 s, within the frontend's
+// 8 s invoke timeout with room for embedding + RPC.
+const GEMINI_TIMEOUT_MS = 2500;
 
 interface Filtros {
   tema_id?: string;
@@ -74,6 +80,8 @@ Consulta: "${texto}"
 
 Temas disponibles (solo usa uno de estos valores exactos o null): ${JSON.stringify(temaNombres)}
 
+Si la consulta refiere a un área aunque use otras palabras, mapeala al tema disponible más cercano (ej: "imágenes", "fotos", "visión", "detección de objetos" → el tema de reconocimiento/visión; "chatbots", "texto", "lenguaje" → el tema de procesamiento del lenguaje natural). Solo devolvé null en tema_nombre si la consulta no sugiere ningún área.
+
 Devuelve un JSON con exactamente esta estructura:
 - anio_desde: número de año (ej: 2022) o null
 - anio_hasta: número de año o null
@@ -101,61 +109,71 @@ Devuelve un JSON con exactamente esta estructura:
     required: ['texto_semantico'],
   };
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+  // One attempt against a specific model; null on any failure.
+  const tryModel = async (model: string): Promise<IntentResult | null> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
 
-  try {
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-    const res = await fetch(geminiUrl, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          responseSchema: schema,
-          temperature: 0,
-        },
-      }),
-    });
-
-    clearTimeout(timer);
-
-    if (!res.ok) {
-      console.error(`Gemini error: ${res.status} ${await res.text()}`);
-      return { intent: { texto_semantico: texto }, success: false };
-    }
-
-    const data = await res.json();
-    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-
-    let parsed: IntentResult;
     try {
-      parsed = JSON.parse(raw);
-    } catch (parseErr) {
-      console.error(
-        'Gemini JSON parse failed. Raw response:',
-        raw,
-        'Error:',
-        parseErr instanceof Error ? parseErr.message : String(parseErr),
-      );
-      return { intent: { texto_semantico: texto }, success: false };
-    }
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const res = await fetch(geminiUrl, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema: schema,
+            temperature: 0,
+          },
+        }),
+      });
 
-    return {
-      intent: {
-        ...parsed,
-        texto_semantico: parsed.texto_semantico || texto,
-      },
-      success: true,
-    };
-  } catch (err) {
-    clearTimeout(timer);
-    const reason = err instanceof Error ? err.message : String(err);
-    console.error(`Gemini extraction failed: ${reason}`);
-    return { intent: { texto_semantico: texto }, success: false };
+      clearTimeout(timer);
+
+      if (!res.ok) {
+        console.error(`Gemini [${model}] error: ${res.status} ${await res.text()}`);
+        return null;
+      }
+
+      const data = await res.json();
+      const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+
+      try {
+        return JSON.parse(raw) as IntentResult;
+      } catch (parseErr) {
+        console.error(
+          `Gemini [${model}] JSON parse failed. Raw response:`,
+          raw,
+          'Error:',
+          parseErr instanceof Error ? parseErr.message : String(parseErr),
+        );
+        return null;
+      }
+    } catch (err) {
+      clearTimeout(timer);
+      const reason = err instanceof Error ? err.message : String(err);
+      console.error(`Gemini [${model}] extraction failed: ${reason}`);
+      return null;
+    }
+  };
+
+  // Primary, then fallback model (separate free-tier quota bucket).
+  for (const model of [GEMINI_MODEL, GEMINI_FALLBACK_MODEL]) {
+    const parsed = await tryModel(model);
+    if (parsed !== null) {
+      return {
+        intent: {
+          ...parsed,
+          texto_semantico: parsed.texto_semantico || texto,
+        },
+        success: true,
+      };
+    }
   }
+
+  return { intent: { texto_semantico: texto }, success: false };
 }
 
 Deno.serve(async (req: Request) => {
