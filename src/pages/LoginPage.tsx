@@ -16,6 +16,8 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
     'Ya te enviamos un correo hace poco. Esperá un minuto e intentá de nuevo.',
   over_request_rate_limit:
     'Demasiados intentos. Esperá unos minutos e intentá de nuevo.',
+  email_not_confirmed:
+    'Tu correo todavía no está confirmado. Revisá tu bandeja de entrada.',
 }
 
 const FALLBACK_ERROR = 'Ocurrió un error. Intenta de nuevo.'
@@ -40,11 +42,13 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [resetSent, setResetSent] = useState(false)
+  const [confirmationSent, setConfirmationSent] = useState(false)
 
   function toggleMode() {
     setMode(m => (m === 'signin' ? 'signup' : 'signin'))
     setErrorMsg(null)
     setResetSent(false)
+    setConfirmationSent(false)
   }
 
   function goToReset() {
@@ -97,13 +101,20 @@ export default function LoginPage() {
           return
         }
       } else {
-        const { error } = await supabase.auth.signUp({ email, password })
+        const { data, error } = await supabase.auth.signUp({ email, password })
         if (error) {
           setErrorMsg(mapAuthError(error.code))
           return
         }
-        // autoconfirm is ON — signUp returns an active session immediately (ruling #4)
-        // onAuthStateChange fires with SIGNED_IN; navigate right away
+        // With "Confirm email" enabled, signUp returns a user but NO session:
+        // the account activates when the user clicks the link in the email.
+        // (Also covers the obfuscated existing-user response — same message,
+        // so account existence is not leaked.) With autoconfirm, session is
+        // present and we navigate as before.
+        if (data.session === null) {
+          setConfirmationSent(true)
+          return
+        }
       }
 
       navigate('/', { replace: true })
@@ -199,6 +210,13 @@ export default function LoginPage() {
             <p role="status" className="text-sm text-text">
               Si existe una cuenta con ese correo, te enviamos un enlace para
               restablecer la contraseña. Revisá tu bandeja (y el spam).
+            </p>
+          )}
+
+          {mode === 'signup' && confirmationSent && (
+            <p role="status" className="text-sm text-text">
+              Te enviamos un correo para confirmar tu cuenta. Revisá tu bandeja
+              (y el spam) y después iniciá sesión.
             </p>
           )}
 
