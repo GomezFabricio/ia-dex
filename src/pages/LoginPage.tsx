@@ -12,6 +12,10 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   user_already_exists: 'Ya existe una cuenta con este correo.',
   email_exists: 'Ya existe una cuenta con este correo.',
   weak_password: 'La contraseña debe tener al menos 6 caracteres.',
+  over_email_send_rate_limit:
+    'Ya te enviamos un correo hace poco. Esperá un minuto e intentá de nuevo.',
+  over_request_rate_limit:
+    'Demasiados intentos. Esperá unos minutos e intentá de nuevo.',
 }
 
 const FALLBACK_ERROR = 'Ocurrió un error. Intenta de nuevo.'
