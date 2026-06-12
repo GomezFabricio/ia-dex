@@ -25,7 +25,7 @@ function mapAuthError(code: string | undefined): string {
 // LoginPage
 // ---------------------------------------------------------------------------
 
-type Mode = 'signin' | 'signup'
+type Mode = 'signin' | 'signup' | 'reset'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -35,10 +35,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   function toggleMode() {
     setMode(m => (m === 'signin' ? 'signup' : 'signin'))
     setErrorMsg(null)
+    setResetSent(false)
+  }
+
+  function goToReset() {
+    setMode('reset')
+    setErrorMsg(null)
+    setResetSent(false)
   }
 
   // Full-page redirect to Google via Supabase OAuth. On return, supabase-js
@@ -64,6 +72,20 @@ export default function LoginPage() {
     setErrorMsg(null)
 
     try {
+      if (mode === 'reset') {
+        // Sends the recovery email; the link lands on /restablecer with a
+        // temporary session where the user sets the new password.
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/restablecer`,
+        })
+        if (error) {
+          setErrorMsg(mapAuthError(error.code))
+          return
+        }
+        setResetSent(true)
+        return
+      }
+
       if (mode === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) {
@@ -87,8 +109,17 @@ export default function LoginPage() {
   }
 
   const isSignIn = mode === 'signin'
-  const heading = isSignIn ? 'Iniciar sesión' : 'Registrarse'
-  const submitLabel = isSignIn ? 'Ingresar' : 'Crear cuenta'
+  const isReset = mode === 'reset'
+  const heading = isReset
+    ? 'Recuperar contraseña'
+    : isSignIn
+      ? 'Iniciar sesión'
+      : 'Registrarse'
+  const submitLabel = isReset
+    ? 'Enviar enlace'
+    : isSignIn
+      ? 'Ingresar'
+      : 'Crear cuenta'
   const toggleLabel = isSignIn
     ? '¿No tenés cuenta? Registrate'
     : '¿Ya tenés cuenta? Iniciá sesión'
@@ -126,25 +157,44 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label htmlFor="password" className="text-muted text-sm">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              autoComplete={isSignIn ? 'current-password' : 'new-password'}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="bg-bg border border-border text-text rounded-lg px-3 py-2 placeholder:text-muted transition-colors focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
-              placeholder="••••••••"
-            />
-          </div>
+          {!isReset && (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="password" className="text-muted text-sm">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                autoComplete={isSignIn ? 'current-password' : 'new-password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="bg-bg border border-border text-text rounded-lg px-3 py-2 placeholder:text-muted transition-colors focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
+
+          {isSignIn && (
+            <button
+              type="button"
+              onClick={goToReset}
+              className="self-end text-muted text-xs hover:text-text transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          )}
 
           {errorMsg && (
             <p role="alert" className="text-sm text-error">
               {errorMsg}
+            </p>
+          )}
+
+          {isReset && resetSent && (
+            <p role="status" className="text-sm text-text">
+              Si existe una cuenta con ese correo, te enviamos un enlace para
+              restablecer la contraseña. Revisá tu bandeja (y el spam).
             </p>
           )}
 
@@ -157,12 +207,28 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="flex items-center gap-3" aria-hidden="true">
-          <span className="h-px flex-1 bg-border" />
-          <span className="text-muted text-xs">o</span>
-          <span className="h-px flex-1 bg-border" />
-        </div>
+        {isReset && (
+          <button
+            type="button"
+            onClick={() => {
+              setMode('signin')
+              setErrorMsg(null)
+              setResetSent(false)
+            }}
+            className="text-muted text-sm text-center hover:text-text transition-colors"
+          >
+            Volver a iniciar sesión
+          </button>
+        )}
+
+        {!isReset && (
+          <>
+            {/* Divider */}
+            <div className="flex items-center gap-3" aria-hidden="true">
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-muted text-xs">o</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
 
         <button
           type="button"
@@ -192,13 +258,15 @@ export default function LoginPage() {
           Continuar con Google
         </button>
 
-        <button
-          type="button"
-          onClick={toggleMode}
-          className="text-muted text-sm text-center hover:text-text transition-colors"
-        >
-          {toggleLabel}
-        </button>
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="text-muted text-sm text-center hover:text-text transition-colors"
+            >
+              {toggleLabel}
+            </button>
+          </>
+        )}
       </div>
     </div>
   )

@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import AppLayout from '../components/layout/AppLayout'
 import PageStub from '../components/ui/PageStub'
 import LoginPage from '../pages/LoginPage'
+import RestablecerPage from '../pages/RestablecerPage'
 import InicioPage from '../pages/InicioPage'
 import CatalogoPage from '../pages/CatalogoPage'
 import TemaPage from '../pages/TemaPage'
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/restablecer',
+    element: <RestablecerPage />,
   },
 ])
 
