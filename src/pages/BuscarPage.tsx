@@ -4,6 +4,7 @@ import { useTemas } from '../hooks/useTemas'
 import { useVoz } from '../hooks/useVoz'
 import type { FiltrosBusqueda, FiltrosExtraidos } from '../types/dtos'
 import SoftwareList from '../components/software/SoftwareList'
+import VoiceSearchOverlay from '../components/busqueda/VoiceSearchOverlay'
 
 // ---------------------------------------------------------------------------
 // BuscarPage — hybrid NLP search page.
@@ -92,12 +93,36 @@ export default function BuscarPage() {
   const { results, loading, error, hasSearched, usoFallback, buscar } =
     useBusqueda({ onFiltrosExtraidos })
 
-  // D3+D4: handleTranscript updates texto in state AND calls buscar with an
-  // explicit texto override. The setForm flush hasn't happened yet, so we pass
-  // {...form, texto: transcript} directly to buildFiltros to avoid stale closure.
+  // lastSearchedFiltrosRef holds the serialized filtros from the most recent buscar()
+  // call. Used by handleTextFilterBlur to skip no-op re-searches when the committed
+  // value matches what was already searched.
+  const lastSearchedFiltrosRef = useRef<string>('')
+
+  // lastSearchedTextoRef holds the trimmed texto of the most recent search.
+  // A submit/transcript whose texto DIFFERS starts a clean search: stale filters
+  // (auto-extracted or manual) are cleared so they don't constrain the new intent
+  // as hard filters; the new extraction repopulates the controls.
+  const lastSearchedTextoRef = useRef<string>('')
+
+  // Wraps buscar() and records what was searched so blur handlers can detect no-ops.
+  const buscarAndRecord = (nextForm: FormState) => {
+    const texto = nextForm.texto.trim()
+    const isNewTexto = texto !== '' && texto !== lastSearchedTextoRef.current
+    const searchForm = isNewTexto
+      ? { ...initialForm, texto: nextForm.texto }
+      : nextForm
+    setForm(searchForm)
+    lastSearchedTextoRef.current = texto
+    const filtros = buildFiltros(searchForm)
+    lastSearchedFiltrosRef.current = JSON.stringify(filtros)
+    buscar(filtros)
+  }
+
+  // D3+D4: handleTranscript passes {...form, texto: transcript} directly so the
+  // search doesn't depend on the pending setForm flush (no stale closure).
+  // buscarAndRecord applies the new-texto filter reset, same as a manual submit.
   const handleTranscript = (transcript: string) => {
-    setForm((prev) => ({ ...prev, texto: transcript }))
-    buscar(buildFiltros({ ...form, texto: transcript }))
+    buscarAndRecord({ ...form, texto: transcript })
   }
 
   const voz = useVoz(handleTranscript)
@@ -105,18 +130,6 @@ export default function BuscarPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     buscarAndRecord(form)
-  }
-
-  // lastSearchedFiltrosRef holds the serialized filtros from the most recent buscar()
-  // call. Used by handleTextFilterBlur to skip no-op re-searches when the committed
-  // value matches what was already searched.
-  const lastSearchedFiltrosRef = useRef<string>('')
-
-  // Wraps buscar() and records what was searched so blur handlers can detect no-ops.
-  const buscarAndRecord = (nextForm: FormState) => {
-    const filtros = buildFiltros(nextForm)
-    lastSearchedFiltrosRef.current = JSON.stringify(filtros)
-    buscar(filtros)
   }
 
   // For the tema <select>: re-search immediately on every change (fires once per
@@ -153,6 +166,11 @@ export default function BuscarPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold text-text">Buscar</h1>
+
+      {/* Listening overlay — open while recognition runs; cancel stops it.
+          Closes automatically when a transcript arrives or recognition ends
+          (isListening goes false), and on Esc / backdrop click via Modal. */}
+      <VoiceSearchOverlay open={voz.isListening} onCancel={voz.stop} />
 
       {/* Filter form card */}
       <form
@@ -222,9 +240,6 @@ export default function BuscarPage() {
                       <line x1="12" x2="12" y1="19" y2="22" />
                     </svg>
                   </button>
-                  {voz.isListening && (
-                    <span className="text-sm text-error">Escuchando…</span>
-                  )}
                 </>
               )}
             </div>
