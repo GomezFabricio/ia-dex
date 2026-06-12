@@ -197,6 +197,9 @@ Deno.serve(async (req: Request) => {
     const queryEmbedding = Array.from(embeddingRaw as Float32Array);
 
     // ── Call hybrid RPC ──────────────────────────────────────────────────────
+    // match_threshold 0.82: empirically tuned for gte-small on this Spanish corpus.
+    // Irrelevant queries (e.g. off-topic text) peak at ~0.80; relevant AI-tool
+    // queries start at 0.82+. Explicit here so it documents the tuned value.
     const { data: resultados, error: rpcErr } = await supabase.rpc(
       'buscar_hibrido',
       {
@@ -206,6 +209,7 @@ Deno.serve(async (req: Request) => {
         p_licencia: filtrosAplicados.licencia ?? null,
         p_anio_desde: filtrosAplicados.anio_desde ?? null,
         p_anio_hasta: filtrosAplicados.anio_hasta ?? null,
+        match_threshold: 0.82,
       },
     );
 

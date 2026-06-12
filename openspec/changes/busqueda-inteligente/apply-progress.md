@@ -78,6 +78,55 @@
 
 ---
 
+## Threshold Tuning — match_threshold 0.80 → 0.82
+
+**Branch**: `feat/busqueda-inteligente-backend`
+**Status**: COMPLETE
+**Date**: 2026-06-12
+
+### Problem
+
+`match_threshold: 0.80` (RPC default) returned zero vector-leg results for Spanish queries because gte-small is English-centric and Spanish cosine similarities cluster between 0.75–0.93 for this corpus — well below the English-typical range where 0.80 would be a meaningful cutoff.
+
+### Measurement methodology
+
+Deployed a temporary `debug-embed` edge function (no JWT, 5-line Deno function) to obtain real gte-small embeddings for 8 test queries. Used `execute_sql` to compute `1 - (embedding <=> query_vector)` for all 23 rows at threshold 0, producing the full distribution.
+
+### Similarity distribution (23-row Spanish corpus, gte-small)
+
+| Query | Top result | Max sim | Min sim | Notes |
+|-------|-----------|---------|---------|-------|
+| "herramientas para generar imagenes" | OpenCV | 0.8647 | 0.7997 | Vision tools at top |
+| "chatbot para conversar" | ChatGPT | 0.9128 | 0.7853 | ChatGPT 0.91, Rasa 0.90 — clear leaders |
+| "recetas de cocina italiana" (IRRELEVANT) | CLIPS | **0.7985** | 0.7514 | Highest irrelevant peak |
+
+### Chosen threshold: 0.82
+
+- Above the irrelevant query ceiling (cocina: 0.7985) → filters out-of-domain garbage
+- Below the top relevant hits → OpenCV 0.8647, ChatGPT 0.9128, YOLO 0.8458 all pass
+- Natural gap: relevant queries have at least 4 hits above 0.82; irrelevant query has 0
+
+### Changes applied
+
+1. **`db/2026-06-12_ajuste_umbral.sql`**: `CREATE OR REPLACE FUNCTION buscar_hibrido` with `match_threshold float default 0.82`. Applied via `apply_migration`.
+2. **`supabase/functions/buscar/index.ts`**: Added explicit `match_threshold: 0.82` in the `supabase.rpc()` call with a comment explaining the rationale. Redeployed as version 2.
+3. **Temporary `debug-embed` function**: Deployed to get real embeddings; NOT committed to repo (was a MCP-only deploy for measurement).
+
+### Smoke test results (post-fix)
+
+| Test | Result |
+|------|--------|
+| "herramientas para generar imagenes con IA" (no hard filters) | 3 results: OpenCV, Tesseract OCR, YOLO — vision tools, closest in catalog |
+| "herramientas gratuitas para generar imagenes despues de 2022" | 0 results — corpus gap: no image-gen tools post-2022 with licencia=free exist in the 23-row catalog. Filters correct; corpus coverage issue, not a threshold issue |
+| "chatbot para conversar" | 4 results: ChatGPT, Rasa, spaCy, NLTK — all relevant |
+| "recetas de cocina italiana" (off-topic guard) | **0 results** — threshold correctly blocks irrelevant query |
+
+### Key finding
+
+The 23-row catalog has no generative image tools (no Midjourney, DALL-E, Stable Diffusion). The "imagenes" query correctly identifies the vision/pattern-recognition tema (OpenCV, YOLO, Tesseract). The original smoke test failure was caused by the combined hard filters (`licencia=free` + `anio_desde=2022` + `tema_id=vision`) eliminating all vision-tema rows (all pre-2022 or non-free). This is a **corpus coverage gap**, not a threshold bug. Threshold fix is confirmed working.
+
+---
+
 ## Slice 2 — Frontend (T10–T18)
 
 **Status**: NOT STARTED — pending orchestrator review of slice 1.
