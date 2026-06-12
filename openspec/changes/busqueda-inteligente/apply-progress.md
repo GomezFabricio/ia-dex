@@ -127,6 +127,72 @@ The 23-row catalog has no generative image tools (no Midjourney, DALL-E, Stable 
 
 ---
 
+---
+
+## Adversarial Review Fixes
+
+**Branch**: `feat/busqueda-inteligente-backend`
+**Status**: COMPLETE
+**Date**: 2026-06-12
+
+### Fixes applied
+
+**MUST FIX — all done:**
+
+1. **Dead `NEW.embedding := null` removed** (`db/2026-06-12_003_review_fixes.sql`): Assignment to `NEW` in an AFTER trigger is silently ignored by Postgres. Line removed; async race window documented in comment (stale embedding persists until embed writes back — typically <2 s, acceptable by design).
+
+2. **`embed` caller authentication** — full pre-shared secret flow without dashboard steps:
+   - Vault: `embed_shared_secret` created via `vault.create_secret(gen_random_uuid()::text || gen_random_uuid()::text, ...)` (upsert-safe)
+   - `get_embed_secret()` RPC: `SECURITY DEFINER`, `REVOKE ... FROM public, anon, authenticated`, `GRANT ... TO service_role`
+   - Trigger: reads secret from Vault, sends as `x-embed-secret` header in pg_net call; skips call with `raise warning` if any secret is null
+   - `embed/index.ts`: fetches expected secret once at module level via `get_embed_secret()` RPC (cached); rejects 401 on mismatch or absence
+
+3. **Hardcoded URL + anon key fallbacks removed from trigger**:
+   - `supabase_anon_key` added to Vault (seeded from the original hardcoded value)
+   - Trigger reads `supabase_project_url`, `supabase_anon_key`, `embed_shared_secret` from Vault only
+   - Any null → `raise warning` + `return NEW` without calling pg_net (fail loudly in logs)
+
+**SHOULD FIX — done:**
+
+4. `buscar/index.ts`: RPC error now returns generic `{ error: 'Search unavailable' }` (500); real `rpcErr.message` logged server-side only.
+
+5. `cors.ts` + `buscar/index.ts`: `Access-Control-Allow-Methods: POST, OPTIONS` added. Note: `buscar` inlines CORS (bundler constraint — see deviation below). `_shared/cors.ts` updated as canonical source.
+
+**LOW PRIORITY — done:**
+
+6. `buscar/index.ts`: `JSON.parse(raw)` from Gemini wrapped in own try/catch; logs raw response + parse error on failure, degrades gracefully.
+
+7. FTS generated column: `nombre` is `NOT NULL` per `db/2026-06-10_not_null_hardening.sql`. No DDL change needed; invariant documented in migration comment.
+
+8. `buscar/index.ts`: Gemini URL built inline inside the fetch call (no module-level constant with embedded key).
+
+9. Migration files renamed: `_001_busqueda_hibrida.sql`, `_002_ajuste_umbral.sql`, `_003_review_fixes.sql`.
+
+10. `embed/index.ts`: UUID regex validation at boundary → 400 on mismatch.
+
+### Verification results (honest)
+
+| Check | Result | Detail |
+|-------|--------|--------|
+| **a. Trigger path** | PASS | Updated Stockfish `objetivo` → embedding MD5 changed `002ad1a9` → `1bb9c5d4` within 6 s; reverted and re-embedded successfully |
+| **b. embed rejects unauthenticated** | PASS | pg_net POST without `x-embed-secret` → `status_code: 401`, `{"error":"Unauthorized"}` |
+| **c. buscar — relevant query** | PASS | "herramientas para generar imagenes con IA" → 3 results: OpenCV, Tesseract OCR, YOLO |
+| **c. buscar — off-topic guard** | PASS | "recetas de cocina italiana" → 0 results, 200 OK |
+| **d. embedding coverage** | PASS | `count(*) where embedding is null = 0` (23/23) |
+
+### Deviation
+
+**`buscar` CORS inlined**: The MCP `deploy_edge_function` bundler cannot resolve `../_shared/cors.ts` at build time. CORS constants are inlined in the deployed `buscar/index.ts`. The local file also uses the inline version for consistency. `_shared/cors.ts` remains canonical for Supabase CLI local dev.
+
+### Commits
+
+1. `refactor(db): rename migration files with _001_/_002_ ordering prefix`
+2. `fix(db): apply adversarial review fixes to hybrid search backend`
+3. `fix(functions/embed): add pre-shared secret auth and UUID input validation`
+4. `fix(functions/buscar): harden error handling and CORS method exposure`
+
+---
+
 ## Slice 2 — Frontend (T10–T18)
 
 **Status**: NOT STARTED — pending orchestrator review of slice 1.
