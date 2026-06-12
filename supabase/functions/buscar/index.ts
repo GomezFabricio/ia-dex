@@ -261,7 +261,7 @@ Deno.serve(async (req: Request) => {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('buscar unhandled error:', msg);
     return new Response(
-      JSON.stringify({ error: msg }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   }
