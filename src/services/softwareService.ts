@@ -75,15 +75,21 @@ export async function buscar(filtros: FiltrosBusqueda): Promise<Software[]> {
 
 /**
  * Calls the buscar Edge Function for hybrid NLP + semantic search.
- * On any error (network, 4xx, 5xx) this throws so callers can fall back to buscar().
+ * On any error (network, 4xx, 5xx, or timeout) this throws so callers can fall back to buscar().
  * The EF returns resultados without embedding/fts columns — shape matches Software[].
+ *
+ * The 8 s timeout is passed via the native `timeout` option in @supabase/functions-js
+ * (supported since v2.4.0 — verified present in the installed v2.108.1 FunctionsClient).
+ * On expiry the internal AbortController fires and the fetch rejects with an AbortError,
+ * which supabase-js surfaces as a FunctionsFetchError — caught by useBusqueda's .catch()
+ * path, activating the ilike fallback transparently.
  */
 export async function buscarInteligente(
   req: BusquedaInteligenteRequest,
 ): Promise<BusquedaInteligenteResponse> {
   const { data, error } = await supabase.functions.invoke<BusquedaInteligenteResponse>(
     'buscar',
-    { body: req },
+    { body: req, timeout: 8000 },
   )
 
   if (error) throw error

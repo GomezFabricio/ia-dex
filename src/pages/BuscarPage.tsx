@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useBusqueda } from '../hooks/useBusqueda'
 import { useTemas } from '../hooks/useTemas'
 import { useVoz } from '../hooks/useVoz'
@@ -84,9 +84,10 @@ export default function BuscarPage() {
   // onFiltrosExtraidos is called by useBusqueda after a successful hybrid search.
   // It runs inside the async callback chain (not inside an effect), so setState
   // here is safe and won't trigger the react-hooks/set-state-in-effect rule.
-  const onFiltrosExtraidos = (filtros: FiltrosExtraidos) => {
+  // Wrapped in useCallback with [] deps because it only uses setForm (stable).
+  const onFiltrosExtraidos = useCallback((filtros: FiltrosExtraidos) => {
     setForm((prev) => applyFiltrosExtraidos(prev, filtros))
-  }
+  }, [])
 
   const { results, loading, error, hasSearched, usoFallback, buscar } =
     useBusqueda({ onFiltrosExtraidos })
@@ -103,16 +104,49 @@ export default function BuscarPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    buscar(buildFiltros(form))
+    buscarAndRecord(form)
   }
 
-  // When a manual filter changes, re-run search if a search has already been made.
-  // This implements "manual filter edit re-runs as hard constraint" (design).
-  const handleFilterChange = (patch: Partial<FormState>) => {
+  // lastSearchedFiltrosRef holds the serialized filtros from the most recent buscar()
+  // call. Used by handleTextFilterBlur to skip no-op re-searches when the committed
+  // value matches what was already searched.
+  const lastSearchedFiltrosRef = useRef<string>('')
+
+  // Wraps buscar() and records what was searched so blur handlers can detect no-ops.
+  const buscarAndRecord = (nextForm: FormState) => {
+    const filtros = buildFiltros(nextForm)
+    lastSearchedFiltrosRef.current = JSON.stringify(filtros)
+    buscar(filtros)
+  }
+
+  // For the tema <select>: re-search immediately on every change (fires once per
+  // selection — no keystroke spam risk). Re-runs with updated hard constraints.
+  const handleSelectFilterChange = (patch: Partial<FormState>) => {
     const nextForm = { ...form, ...patch }
     setForm(nextForm)
     if (hasSearched) {
-      buscar(buildFiltros(nextForm))
+      buscarAndRecord(nextForm)
+    }
+  }
+
+  // For text / number inputs (licencia, año desde, año hasta): update form state on
+  // every keystroke via onChange but defer the re-search to onBlur (commit semantics).
+  // On blur, only re-search if the committed value actually differs from the last
+  // searched value to avoid no-op blur re-searches.
+  const handleTextFilterChange = (patch: Partial<FormState>) => {
+    setForm((prev) => ({ ...prev, ...patch }))
+  }
+
+  const handleTextFilterBlur = (patch: Partial<FormState>) => {
+    if (!hasSearched) return
+    // Compute nextForm from the CURRENT form snapshot (the input's e.target.value
+    // is captured in patch so we don't need a state-updater closure for the diff check).
+    const nextForm = { ...form, ...patch }
+    setForm(nextForm)
+    const filtros = buildFiltros(nextForm)
+    if (JSON.stringify(filtros) !== lastSearchedFiltrosRef.current) {
+      lastSearchedFiltrosRef.current = JSON.stringify(filtros)
+      buscar(filtros)
     }
   }
 
@@ -206,7 +240,7 @@ export default function BuscarPage() {
             )}
           </div>
 
-          {/* Tema select */}
+          {/* Tema select — re-search fires immediately on change (single event per selection) */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="buscar-tema"
@@ -217,7 +251,7 @@ export default function BuscarPage() {
             <select
               id="buscar-tema"
               value={form.temaId}
-              onChange={(e) => handleFilterChange({ temaId: e.target.value })}
+              onChange={(e) => handleSelectFilterChange({ temaId: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-accent"
             >
               <option value="">Todos los temas</option>
@@ -229,7 +263,7 @@ export default function BuscarPage() {
             </select>
           </div>
 
-          {/* Licencia */}
+          {/* Licencia — onChange updates state only; onBlur commits and re-searches if changed */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="buscar-licencia"
@@ -242,12 +276,13 @@ export default function BuscarPage() {
               type="text"
               placeholder="ej. MIT"
               value={form.licencia}
-              onChange={(e) => handleFilterChange({ licencia: e.target.value })}
+              onChange={(e) => handleTextFilterChange({ licencia: e.target.value })}
+              onBlur={(e) => handleTextFilterBlur({ licencia: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
 
-          {/* Año desde */}
+          {/* Año desde — onChange updates state only; onBlur commits and re-searches if changed */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="buscar-anio-desde"
@@ -259,12 +294,13 @@ export default function BuscarPage() {
               id="buscar-anio-desde"
               type="number"
               value={form.anioDesde}
-              onChange={(e) => handleFilterChange({ anioDesde: e.target.value })}
+              onChange={(e) => handleTextFilterChange({ anioDesde: e.target.value })}
+              onBlur={(e) => handleTextFilterBlur({ anioDesde: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
 
-          {/* Año hasta */}
+          {/* Año hasta — onChange updates state only; onBlur commits and re-searches if changed */}
           <div className="flex flex-col gap-1">
             <label
               htmlFor="buscar-anio-hasta"
@@ -276,7 +312,8 @@ export default function BuscarPage() {
               id="buscar-anio-hasta"
               type="number"
               value={form.anioHasta}
-              onChange={(e) => handleFilterChange({ anioHasta: e.target.value })}
+              onChange={(e) => handleTextFilterChange({ anioHasta: e.target.value })}
+              onBlur={(e) => handleTextFilterBlur({ anioHasta: e.target.value })}
               className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
             />
           </div>
@@ -311,7 +348,7 @@ export default function BuscarPage() {
             <p className="text-muted">No se pudieron cargar los datos</p>
             <button
               type="button"
-              onClick={() => buscar(buildFiltros(form))}
+              onClick={() => buscarAndRecord(form)}
               className="text-accent hover:text-text self-start transition-colors"
             >
               Reintentar
