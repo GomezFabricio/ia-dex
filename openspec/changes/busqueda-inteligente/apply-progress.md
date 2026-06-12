@@ -195,4 +195,75 @@ The 23-row catalog has no generative image tools (no Midjourney, DALL-E, Stable 
 
 ## Slice 2 — Frontend (T10–T18)
 
-**Status**: NOT STARTED — pending orchestrator review of slice 1.
+**Branch**: `feat/busqueda-inteligente-frontend`
+**Status**: COMPLETE (T10–T17 done; T18 is manual E2E checklist for verify phase)
+**Date**: 2026-06-12
+
+---
+
+### What was done
+
+**T10 — Regenerated `src/types/database.types.ts`**:
+- Used Supabase MCP `generate_typescript_types` — CLI not available (SSL cert issue)
+- `software.Row` now includes `embedding: string | null` and `fts: unknown`
+- `buscar_hibrido` RPC and `get_embed_secret` function appear in `Functions`
+
+**T11 — Updated `src/types/dtos.ts`**:
+- `Software` changed to `Omit<Tables<'software'>, 'embedding' | 'fts'>` — all 20+ consumers unaffected (no cast changes needed)
+- Added `FiltrosExtraidos`, `BusquedaInteligenteRequest`, `BusquedaInteligenteResponse`
+
+**T12 — Added `buscarInteligente()` to `src/services/softwareService.ts`**:
+- Uses `supabase.functions.invoke('buscar', { body: req })`
+- Throws on any error (network, 4xx, 5xx) so callers can trigger fallback
+- Existing `buscar()` unchanged
+
+**T13 — Rewrote `src/hooks/useBusqueda.ts`**:
+- Hybrid-first when texto non-empty: `buscarInteligente` → on error falls back to `buscar()` transparently
+- `usoFallback` and `intentUsado` flags exposed in state
+- `onFiltrosExtraidos` callback option — called from async chain (not effect), so page can safely call setState for filter mirroring without triggering `react-hooks/set-state-in-effect`
+- Filter-only path (empty texto): calls `buscar()` direct, no EF
+- `optsRef` updated via `useEffect` (not during render) to satisfy `react-hooks/refs` rule
+- Stale-response guard, analytics event, and original public API shape preserved
+
+**T14/T15/T16 — Updated `src/pages/BuscarPage.tsx`**:
+- texto field as primary with NL placeholder in Spanish
+- `onFiltrosExtraidos` callback passed to `useBusqueda` — mirrors extracted filters into form state inside async callback (not effect)
+- `handleFilterChange` re-runs search with updated hard constraints when `hasSearched` is true
+- Loading state preserves previous results (no empty flash); spinner text shown below
+- Subtle non-blocking fallback notice ("Búsqueda semántica no disponible…") when `usoFallback` is true
+- Voice transcript → same pipeline unchanged
+- Error state shown only when both EF and fallback fail
+
+**T17 — Static analysis**:
+- `npm run lint` → 0 errors, 0 warnings
+- `tsc -b --noEmit` → 0 type errors
+- No existing consumer (SoftwareList, SoftwareCard, etc.) required any cast or import change
+
+---
+
+### Deviations from design
+
+1. **`useBusqueda` API extended, not replaced**: Added optional `opts.onFiltrosExtraidos` callback parameter — additive, zero breakage for existing callers. `filtrosAplicados` is NOT returned in the hook state (spec exposed it, but the ESLint rules make synchronous state derived from async results safer via callback than via state+effect). The page doesn't need it as state — it only needs to apply it to form.
+
+2. **`vite build` blocked by infra**: `npm run build` (`tsc -b && vite build`) — `tsc -b` exits 0 clean. `vite build` fails because `@rolldown/binding-win32-x64-msvc` (a native optional dep) was not downloaded due to the corporate proxy SSL certificate issue (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`). This is a local environment infra problem, NOT a code defect. The Vercel build pipeline will install it correctly. `npm install --strict-ssl false` (user needs to authorize) would fix it locally.
+
+---
+
+### Commits on branch
+
+1. `feat(types): regenerate database types with embedding/fts columns and add buscar EF DTOs`
+2. `feat(service): add buscarInteligente() calling the buscar edge function`
+3. `feat(search): wire hybrid NLP search with fallback, filter mirroring and fallback notice`
+
+---
+
+### T18 — E2E checklist (for verify phase)
+
+- [ ] NL text query → resultados non-empty, filter controls populated
+- [ ] Voice query → identical pipeline, filters auto-populated
+- [ ] Kill buscar EF → ilike results render, no error banner, fallback notice shown
+- [ ] Empty text + active filters → plain filtered listing, no EF call
+- [ ] Empty text + no filters → all rows returned, no EF call
+- [ ] Manual filter edit after auto-population → search re-runs with updated constraint
+- [ ] Insert new software row → embedding non-null within 30 s
+- [ ] `count(*) where embedding is null` → 0

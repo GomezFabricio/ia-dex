@@ -136,11 +136,11 @@
 > Can start in parallel with Group B/C if on a separate branch; otherwise sequential after T09 (end of backend slice).
 > Spec satisfied: hybrid-search / Requirement: Result Shape Compatibility
 
-- [ ] **T10** — Regenerate `src/types/database.types.ts`
+- [x] **T10** — Regenerate `src/types/database.types.ts`
   - Run Supabase type generation (e.g., `supabase gen types typescript --project-id othwyesmfpjaykbdwxrh > src/types/database.types.ts`) to pick up new `embedding` and `fts` columns on `software`, and `buscar_hibrido` RPC signature
   - **Verifiable**: file updated; `tsc -b` passes; `embedding` and `fts` columns appear in `Tables<'software'>`; `buscar_hibrido` appears in `Functions`
 
-- [ ] **T11** — Update `src/types/dtos.ts`
+- [x] **T11** — Update `src/types/dtos.ts`
   - Change `Software` type to `Omit<Tables<'software'>, 'embedding' | 'fts'>` (strips internal columns; existing consumers unaffected)
   - Add `FiltrosExtraidos`: `{ tema_id?: string; licencia?: string; anio_desde?: number; anio_hasta?: number }`
   - Add `BusquedaInteligenteRequest`: `{ texto: string; filtros?: FiltrosExtraidos }`
@@ -153,7 +153,7 @@
 > Depends on: T10–T11 complete.
 > Spec satisfied: hybrid-search / Requirement: Edge Function Fallback
 
-- [ ] **T12** — Add `buscarInteligente()` to `src/services/softwareService.ts`
+- [x] **T12** — Add `buscarInteligente()` to `src/services/softwareService.ts`
   - New method `buscarInteligente(req: BusquedaInteligenteRequest): Promise<BusquedaInteligenteResponse>`
   - Uses `supabase.functions.invoke('buscar', { body: req })` (anon key, existing supabase-js client)
   - On invoke error (network failure, 5xx): throws so caller can trigger fallback
@@ -166,7 +166,7 @@
 > Depends on: T12 complete.
 > Spec satisfied: search-ui / Requirement: Filter Auto-Population, Manual Filter Refinement, Filtered-Listing Mode, Fallback Transparency, Loading and Empty States; voice-search / Requirement: Transcript Pipeline Parity, Single Input Source Contract
 
-- [ ] **T13** — Update `src/hooks/useBusqueda.ts`
+- [x] **T13** — Update `src/hooks/useBusqueda.ts`
   - **Hybrid-first flow** when `texto` is non-empty:
     1. Call `softwareService.buscarInteligente({ texto, filtros: hardFiltros })`
     2. On success: update `resultados`, set `filtrosAplicados` from `response.filtros_aplicados`, set `usoFallback = false`, set `intentUsado = response.intent_usado`
@@ -184,18 +184,18 @@
 > Depends on: T13 complete.
 > Spec satisfied: search-ui / Requirement: Filter Auto-Population, Manual Filter Refinement, Filtered-Listing Mode, Loading and Empty States; voice-search / Requirement: Voice UX Preservation, Single Input Source Contract
 
-- [ ] **T14** — Update `src/pages/BuscarPage.tsx` — text field protagonist
+- [x] **T14** — Update `src/pages/BuscarPage.tsx` — text field protagonist
   - Ensure `texto` input is the primary search driver (submit on Enter / button click)
   - Wire input to `useBusqueda` `texto` state
   - **Verifiable**: existing filter+text flows still work; `tsc -b` + `npm run lint` pass
 
-- [ ] **T15** — Update `src/pages/BuscarPage.tsx` — filter mirroring from `filtrosAplicados`
+- [x] **T15** — Update `src/pages/BuscarPage.tsx` — filter mirroring from `filtrosAplicados`
   - When `filtrosAplicados` changes (after a hybrid search), update controlled filter form state to reflect those values
   - Only mirror when `filtrosAplicados` is non-null (i.e., don't clear filters if Gemini returned nothing)
   - Manual filter edit by user → calls `useBusqueda.buscar()` again with updated hard constraints
   - **Verifiable**: UI shows populated filter dropdowns after a NL query with extractable filters
 
-- [ ] **T16** — Update `src/pages/BuscarPage.tsx` — loading + empty states
+- [x] **T16** — Update `src/pages/BuscarPage.tsx` — loading + empty states
   - Show loading indicator while `useBusqueda.loading` is true; preserve previous results during loading (no flash to empty)
   - Show empty-state message when `resultados.length === 0` and `loading` is false
   - Do NOT show error banner when `usoFallback === true` (transparent fallback)
@@ -207,7 +207,7 @@
 > Depends on: all previous groups complete (T01–T16).
 > Standard Mode verification: lint + build + MCP queries + manual/smoke tests.
 
-- [ ] **T17** — Static analysis verification
+- [x] **T17** — Static analysis verification
   - Run `npm run lint` → zero errors
   - Run `tsc -b` (or equivalent build check) → zero type errors
   - Confirm no existing `SoftwareList` / `SoftwareCard` consumers required type casts or import changes
