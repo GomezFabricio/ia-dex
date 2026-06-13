@@ -166,6 +166,32 @@ export type Database = {
         }
         Relationships: []
       }
+      progreso_roadmap: {
+        Row: {
+          completado_at: string
+          tema_id: string
+          user_id: string
+        }
+        Insert: {
+          completado_at?: string
+          tema_id: string
+          user_id: string
+        }
+        Update: {
+          completado_at?: string
+          tema_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progreso_roadmap_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       software: {
         Row: {
           anio_lanzamiento: number | null

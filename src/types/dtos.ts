@@ -47,6 +47,14 @@ export type Evento = Omit<Tables<'eventos'>, 'tipo' | 'metadata'> & {
   metadata: Record<string, unknown>
 }
 
+export type ProgresoRoadmap = Tables<'progreso_roadmap'>
+
+// A roadmap stage: a tema plus its top featured software (rating-ranked).
+export type EtapaRoadmap = {
+  tema: Tema
+  destacados: Software[]
+}
+
 // ---------------------------------------------------------------------------
 // View DTOs (non-null coalesced shapes — see D3 in design)
 //
