@@ -17,6 +17,7 @@ export type Database = {
       clasificaciones_si: {
         Row: {
           created_at: string
+          created_by: string | null
           ejemplos: string | null
           en_que_consiste: string | null
           enlaces: Json
@@ -28,6 +29,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           ejemplos?: string | null
           en_que_consiste?: string | null
           enlaces?: Json
@@ -39,6 +41,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           ejemplos?: string | null
           en_que_consiste?: string | null
           enlaces?: Json
@@ -48,7 +51,15 @@ export type Database = {
           orden?: number
           slug?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "clasificaciones_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       eventos: {
         Row: {
@@ -131,12 +142,37 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          apellido: string | null
+          created_at: string
+          id: string
+          nombre: string | null
+          role: string
+        }
+        Insert: {
+          apellido?: string | null
+          created_at?: string
+          id: string
+          nombre?: string | null
+          role?: string
+        }
+        Update: {
+          apellido?: string | null
+          created_at?: string
+          id?: string
+          nombre?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
       software: {
         Row: {
           anio_lanzamiento: number | null
           autor_referencia: string | null
           clasificacion_si_id: string | null
           created_at: string
+          created_by: string | null
           descripcion_corta: string | null
           embedding: string | null
           fts: unknown
@@ -154,6 +190,7 @@ export type Database = {
           autor_referencia?: string | null
           clasificacion_si_id?: string | null
           created_at?: string
+          created_by?: string | null
           descripcion_corta?: string | null
           embedding?: string | null
           fts?: unknown
@@ -171,6 +208,7 @@ export type Database = {
           autor_referencia?: string | null
           clasificacion_si_id?: string | null
           created_at?: string
+          created_by?: string | null
           descripcion_corta?: string | null
           embedding?: string | null
           fts?: unknown
@@ -189,6 +227,13 @@ export type Database = {
             columns: ["clasificacion_si_id"]
             isOneToOne: false
             referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -301,6 +346,7 @@ export type Database = {
     Functions: {
       buscar_hibrido: {
         Args: {
+          adaptive_margin?: number
           match_limit?: number
           match_threshold?: number
           p_anio_desde?: number
@@ -328,6 +374,7 @@ export type Database = {
         }[]
       }
       get_embed_secret: { Args: never; Returns: string }
+      puede_gestionar_contenido: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
