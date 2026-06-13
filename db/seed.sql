@@ -64,117 +64,209 @@ insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url
 select 'algoritmos-geneticos', 'Algoritmos Genéticos', 'Los algoritmos genéticos son metaheurísticas de optimización que simulan la evolución natural: mantienen una población de soluciones candidatas, las seleccionan según su aptitud (fitness), las combinan (cruce) y las modifican aleatoriamente (mutación). Son especialmente útiles para encontrar soluciones aceptables a problemas NP-difíciles donde los métodos exactos son inviables.', 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Evolutionary_Algorithm.svg', 'Optimización de rutas logísticas, diseño evolutivo de redes neuronales (neuroevolución), scheduling de producción industrial.', '[{"titulo":"Algoritmo genético — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Algoritmo_gen%C3%A9tico"},{"titulo":"DEAP: Distributed Evolutionary Algorithms in Python — Documentación oficial","url":"https://deap.readthedocs.io/"}]'::jsonb, 9
 where not exists (select 1 from public.clasificaciones_si where slug = 'algoritmos-geneticos');
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'stockfish', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
   'Stockfish', 'Motor de ajedrez de código abierto capaz de analizar posiciones y encontrar el mejor movimiento.', 'Stockfish es uno de los motores de ajedrez más fuertes del mundo, basado en búsqueda alfa-beta con evaluaciones neuronales (NNUE). Es utilizado por plataformas como Lichess y Chess.com para análisis de partidas.', 'https://stockfishchess.org/', 'GPL-3.0', 2008, 'Tord Romstad, Marco Costalba, Joona Kiiski (comunidad open source)', 'https://www.youtube.com/watch?v=-MFanGV6ffQ', 'https://upload.wikimedia.org/wikipedia/commons/3/3a/NewLogoSF.png'
-where not exists (select 1 from public.software where nombre = 'Stockfish');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'gymnasium', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
   'Gymnasium (ex OpenAI Gym)', 'Plataforma estándar para desarrollar y comparar algoritmos de aprendizaje por refuerzo mediante entornos simulados.', 'Gymnasium provee una API unificada para entornos de RL (CartPole, MuJoCo, Atari) que permite entrenar agentes capaces de resolver tareas de búsqueda y control mediante prueba y error. Es el estándar de facto en investigación de reinforcement learning.', 'https://gymnasium.farama.org/', 'MIT', 2016, 'OpenAI / Farama Foundation', 'https://www.youtube.com/watch?v=FvuyrpzvwdI', null
-where not exists (select 1 from public.software where nombre = 'Gymnasium (ex OpenAI Gym)');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'ia-simbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'swi-prolog', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'ia-simbolica'),
   'SWI-Prolog', 'Entorno de programación lógica para implementar agentes de razonamiento, búsqueda y resolución de problemas mediante cláusulas Horn.', 'SWI-Prolog es un intérprete Prolog maduro y de uso libre, ideal para explorar técnicas de búsqueda en espacio de estados, planificación y razonamiento simbólico. Incluye herramientas para desarrollo web y aplicaciones semánticas.', 'https://www.swi-prolog.org/', 'BSD-2', 1987, 'Jan Wielemaker, Universidad de Ámsterdam', 'https://www.youtube.com/watch?v=alX00Me2gWQ', null
-where not exists (select 1 from public.software where nombre = 'SWI-Prolog');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'pygad', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
   'PyGAD', 'Biblioteca Python para implementar algoritmos genéticos aplicados a optimización y búsqueda en espacios de soluciones complejos.', 'PyGAD es una biblioteca de código abierto que permite construir algoritmos genéticos con pocas líneas de código. Soporta optimización de parámetros y puede combinarse con Keras y PyTorch para la evolución de modelos de aprendizaje automático.', 'https://pygad.readthedocs.io/', 'BSD-3-Clause', 2020, 'Ahmed Fawzy Gad', 'https://www.youtube.com/watch?v=vPdJNfT676I', null
-where not exists (select 1 from public.software where nombre = 'PyGAD');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'sistemas-expertos'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'clips', (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'sistemas-expertos'),
   'CLIPS', 'Herramienta de desarrollo de sistemas expertos basada en reglas de producción, creada originalmente por la NASA.', 'CLIPS (C Language Integrated Production System) es un lenguaje de programación basado en reglas IF-THEN que permite construir sistemas expertos. Fue desarrollado en la NASA y es de dominio público desde 1996. Incluye un motor de inferencia RETE para evaluación eficiente de reglas.', 'https://www.clipsrules.net/', 'Dominio público', 1985, 'NASA Johnson Space Center', 'https://www.youtube.com/watch?v=WhF33-cKUk8', null
-where not exists (select 1 from public.software where nombre = 'CLIPS');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'sistemas-expertos'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'protege', (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'sistemas-expertos'),
   'Protégé', 'Editor de ontologías OWL de uso libre para construir bases de conocimiento reutilizables en la web semántica.', 'Protégé es el editor de ontologías más utilizado en investigación y educación, desarrollado por Stanford University. Permite crear, visualizar y razonar sobre ontologías OWL, siendo la base de aplicaciones en bioinformática, biomedicina y web semántica.', 'https://protege.stanford.edu/', 'BSD-2', 1999, 'Stanford Center for Biomedical Informatics Research', 'https://www.youtube.com/watch?v=vHmC-rRuMYM', 'https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif'
-where not exists (select 1 from public.software where nombre = 'Protégé');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'ia-simbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'apache-jena', (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'ia-simbolica'),
   'Apache Jena', 'Framework Java de código abierto para construir aplicaciones de web semántica y datos enlazados mediante RDF, OWL y SPARQL.', 'Apache Jena es el framework de referencia para la web semántica en Java. Ofrece APIs para trabajar con grafos RDF, un motor de razonamiento OWL, una triple store persistente (TDB) y un servidor SPARQL (Fuseki), siendo ampliamente utilizado en bioinformática, bibliotecología y aplicaciones de conocimiento enlazado.', 'https://jena.apache.org/', 'Apache 2.0', 2000, 'Apache Software Foundation', 'https://www.youtube.com/watch?v=nUdHneViLp4', null
-where not exists (select 1 from public.software where nombre = 'Apache Jena');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'tensorflow', (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
   'TensorFlow', 'Plataforma de código abierto para construir y entrenar modelos de aprendizaje automático y redes neuronales a escala.', 'TensorFlow es el framework de deep learning de Google, ampliamente utilizado en investigación y producción. Ofrece un ecosistema completo que incluye Keras como API de alto nivel, herramientas de despliegue en dispositivos móviles (TF Lite) y en navegadores (TF.js).', 'https://www.tensorflow.org/', 'Apache 2.0', 2015, 'Google Brain Team', 'https://www.youtube.com/watch?v=tPYj3fFJGjk', 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg'
-where not exists (select 1 from public.software where nombre = 'TensorFlow');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'scikit-learn', (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'scikit-learn', 'Biblioteca Python de machine learning que provee implementaciones listas para usar de los algoritmos clásicos de ML.', 'scikit-learn es la biblioteca de referencia para aprendizaje automático en Python. Ofrece clasificadores, regresores, algoritmos de clustering y herramientas de preprocesamiento con una API consistente y bien documentada, ideal para prototipos y enseñanza.', 'https://scikit-learn.org/', 'BSD-3-Clause', 2007, 'David Cournapeau / comunidad open source', 'https://www.youtube.com/watch?v=0B5eIE_1vpU', 'https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg'
-where not exists (select 1 from public.software where nombre = 'scikit-learn');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'weka', (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'Weka', 'Banco de trabajo de machine learning con interfaz gráfica orientado a la exploración y enseñanza de algoritmos de aprendizaje.', 'Weka (Waikato Environment for Knowledge Analysis) es una colección de algoritmos de ML con interfaz gráfica que facilita la experimentación sin necesidad de programar. Muy utilizado en entornos académicos para comparar clasificadores, hacer minería de datos y visualizar resultados.', 'https://ml.cms.waikato.ac.nz/weka/', 'GPL-3.0', 1993, 'Universidad de Waikato, Nueva Zelanda', 'https://www.youtube.com/watch?v=TF1yh5PKaqI', 'https://upload.wikimedia.org/wikipedia/commons/0/07/Weka_%28software%29_logo.png'
-where not exists (select 1 from public.software where nombre = 'Weka');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'opencv', (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
   'OpenCV', 'Biblioteca de visión por computadora de código abierto para procesar imágenes, detectar objetos y analizar video en tiempo real.', 'OpenCV (Open Computer Vision Library) es la biblioteca de visión artificial más usada en el mundo, con más de 2 500 algoritmos optimizados. Soporta C++, Python y Java, y se integra con frameworks de deep learning para tareas como reconocimiento facial, detección de movimiento y reconstrucción 3D.', 'https://opencv.org/', 'Apache 2.0', 1999, 'Intel Corporation / OpenCV Foundation', 'https://www.youtube.com/watch?v=oXlwWbU8l2o', 'https://upload.wikimedia.org/wikipedia/commons/5/53/OpenCV_Logo_with_text.png'
-where not exists (select 1 from public.software where nombre = 'OpenCV');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'yolo', (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
   'YOLO (Ultralytics)', 'Sistema de detección de objetos en tiempo real basado en redes neuronales convolucionales capaz de identificar múltiples clases en una sola pasada.', 'YOLO (You Only Look Once) es el algoritmo de detección de objetos más popular en la actualidad. La implementación de Ultralytics (YOLOv5–YOLO11) facilita el entrenamiento con datasets propios y el despliegue en dispositivos edge, siendo ampliamente usada en vigilancia, robótica y vehículos autónomos.', 'https://github.com/ultralytics/ultralytics', 'AGPL-3.0', 2015, 'Joseph Redmon / Ultralytics', 'https://www.youtube.com/watch?v=sWEm3dIGKU8', 'https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg'
-where not exists (select 1 from public.software where nombre = 'YOLO (Ultralytics)');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'tesseract-ocr', (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'Tesseract OCR', 'Motor de reconocimiento óptico de caracteres (OCR) de código abierto capaz de extraer texto de imágenes en más de 100 idiomas.', 'Tesseract es el motor OCR open source más usado del mundo, mantenido por Google. Su versión 5 incorpora redes LSTM para mayor precisión. Se usa habitualmente junto a pytesseract en Python para extraer texto de documentos escaneados, facturas y capturas de pantalla.', 'https://github.com/tesseract-ocr/tesseract', 'Apache 2.0', 1985, 'HP Labs / Google', 'https://www.youtube.com/watch?v=gFJc6KXxOqc', null
-where not exists (select 1 from public.software where nombre = 'Tesseract OCR');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'deap', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
   'DEAP', 'Framework Python de computación evolutiva para prototipado rápido de algoritmos genéticos, estrategias evolutivas y programación genética.', 'DEAP (Distributed Evolutionary Algorithms in Python) es el framework de referencia para algoritmos evolutivos en Python. Permite diseñar operadores de selección, cruce y mutación a medida, y se integra con multiprocessing para evaluación paralela de poblaciones.', 'https://deap.readthedocs.io/', 'LGPL-3.0', 2012, 'Félix-Antoine Fortin, Marc-André Gardner / Universidad Laval', 'https://www.youtube.com/watch?v=6h5ImIy3kpA', null
-where not exists (select 1 from public.software where nombre = 'DEAP');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'or-tools', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
   'OR-Tools', 'Suite de optimización combinatoria de Google para resolver problemas de ruteo de vehículos, planificación, programación entera y restricciones.', 'OR-Tools es la suite de optimización de código abierto de Google, ganadora del campeonato internacional de programación por restricciones desde 2013. Disponible en Python, C++, Java y C#, cubre resolución de problemas de ruteo (VRP), scheduling, bin packing y programación lineal entera.', 'https://developers.google.com/optimization', 'Apache 2.0', 2010, 'Google', 'https://www.youtube.com/watch?v=D5y4meQmKyE', null
-where not exists (select 1 from public.software where nombre = 'OR-Tools');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'heuristiclab', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
   'HeuristicLab', 'Entorno gráfico para diseñar, ejecutar y analizar algoritmos heurísticos y evolutivos sin necesidad de programar desde cero.', 'HeuristicLab es un framework de código abierto con interfaz gráfica para experimentar con algoritmos evolutivos, regresión simbólica y metaheurísticas. Desarrollado por la Universidad de Linz (Austria), permite configurar visualmente operadores genéticos y comparar corridas experimentales con herramientas estadísticas integradas.', 'https://dev.heuristiclab.com/', 'GPL-3.0', 2002, 'HEAL — Heuristic and Evolutionary Algorithms Laboratory, Universidad de Linz', 'https://www.youtube.com/watch?v=dhRmLQvW_KQ', null
-where not exists (select 1 from public.software where nombre = 'HeuristicLab');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'chatgpt', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'ChatGPT', 'Asistente conversacional de propósito general basado en modelos de lenguaje de gran escala (LLMs), accesible vía web.', 'ChatGPT es el chatbot de OpenAI construido sobre los modelos GPT-4 y GPT-4o. Permite mantener conversaciones en lenguaje natural, escribir código, resumir textos y responder preguntas complejas. Es el ejemplo más reconocido de IA generativa conversacional en la actualidad.', 'https://chatgpt.com/', 'Propietaria (acceso gratuito con límites)', 2022, 'OpenAI', 'https://www.youtube.com/watch?v=_LMKslv5hPY', 'https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg'
-where not exists (select 1 from public.software where nombre = 'ChatGPT');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'rasa', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'Rasa', 'Framework de código abierto para construir chatbots y asistentes de voz con capacidades de comprensión del lenguaje natural (NLU).', 'Rasa es una plataforma empresarial para el desarrollo de agentes conversacionales que combina NLU con gestión de diálogos estructurados. Permite despliegue on-premise, integración con múltiples canales (web, WhatsApp, Slack) y personalización total del flujo conversacional.', 'https://rasa.com/', 'Apache 2.0 (open source) / Propietaria (enterprise)', 2016, 'Rasa Technologies', 'https://www.youtube.com/watch?v=hIWnpyTWsLQ', 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Rasa_nlu_horizontal_purple.svg'
-where not exists (select 1 from public.software where nombre = 'Rasa');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'spacy', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'spaCy', 'Biblioteca de procesamiento de lenguaje natural orientada a producción para tareas como reconocimiento de entidades, análisis sintáctico y clasificación de textos.', 'spaCy es una biblioteca NLP de grado industrial que ofrece pipelines entrenados para más de 70 idiomas. Es conocida por su velocidad y facilidad de uso, y es el estándar en extracción de información, análisis de sentimientos y construcción de pipelines de NLP en Python.', 'https://spacy.io/', 'MIT', 2015, 'Explosion AI', 'https://www.youtube.com/watch?v=WnGPv6HnBok', 'https://upload.wikimedia.org/wikipedia/commons/8/88/SpaCy_logo.svg'
-where not exists (select 1 from public.software where nombre = 'spaCy');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'nltk', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'NLTK', 'Plataforma educativa de procesamiento de lenguaje natural en Python con acceso a más de 50 corpus y recursos léxicos.', 'NLTK (Natural Language Toolkit) es la herramienta de referencia en la enseñanza de NLP en Python. Ofrece módulos para tokenización, stemming, etiquetado gramatical, análisis sintáctico y acceso a corpus como WordNet y Brown Corpus, ideal para aprender los fundamentos del PLN.', 'https://www.nltk.org/', 'Apache 2.0', 2001, 'Steven Bird, Edward Loper / Universidad de Pennsylvania', 'https://www.youtube.com/watch?v=5e67tbgqgLA', null
-where not exists (select 1 from public.software where nombre = 'NLTK');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'interaccion-hombre-maquina'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'whisper', (select id from public.temas where slug = 'interaccion-hombre-maquina'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
   'Whisper (OpenAI)', 'Sistema de reconocimiento de voz automático de código abierto con soporte multilingüe y alta robustez ante ruido y acentos.', 'Whisper es un modelo de reconocimiento de voz de OpenAI entrenado en 680 000 horas de audio diverso. Soporta reconocimiento y traducción en múltiples idiomas, incluyendo español. Es de código abierto (MIT) y puede ejecutarse localmente o a través de la API de OpenAI.', 'https://github.com/openai/whisper', 'MIT', 2022, 'OpenAI', 'https://www.youtube.com/watch?v=HbY51mVKrcE', 'https://upload.wikimedia.org/wikipedia/commons/6/66/OpenAI_logo_2025_%28symbol%29.svg'
-where not exists (select 1 from public.software where nombre = 'Whisper (OpenAI)');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'interaccion-hombre-maquina'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'mediapipe', (select id from public.temas where slug = 'interaccion-hombre-maquina'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
   'MediaPipe', 'Suite de soluciones de ML de Google para detección de pose, manos y gestos en tiempo real sobre imágenes, video y streams de cámara.', 'MediaPipe es el framework de Google AI Edge para aplicaciones de ML en dispositivos, con soluciones preentrenadas para reconocimiento de manos (Hand Landmark), pose corporal y rostro. Es el punto de partida natural para explorar interfaces gestuales y reconocimiento de lengua de señas.', 'https://developers.google.com/edge/mediapipe/solutions/guide', 'Apache 2.0', 2019, 'Google', 'https://www.youtube.com/watch?v=oaK74yozU9g', null
-where not exists (select 1 from public.software where nombre = 'MediaPipe');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select (select id from public.temas where slug = 'interaccion-hombre-maquina'), null,
+insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'web-speech-api', (select id from public.temas where slug = 'interaccion-hombre-maquina'), null,
   'Web Speech API', 'API nativa del navegador para integrar reconocimiento de voz y síntesis de texto en aplicaciones web sin dependencias externas.', 'La Web Speech API es un estándar del navegador que permite a las aplicaciones web acceder al micrófono del usuario para reconocimiento de voz (SpeechRecognition) y convertir texto a voz (SpeechSynthesis). Es compatible principalmente con Chrome/Edge y es la tecnología detrás del buscador por voz de esta aplicación.', 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API', 'Estándar abierto (sin licencia de software)', 2012, 'W3C / Google (implementación en Chrome)', 'https://www.youtube.com/watch?v=shq1tyUkaAk', null
-where not exists (select 1 from public.software where nombre = 'Web Speech API');
+on conflict (slug) do update set
+  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
+  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
+  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;

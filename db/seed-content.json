@@ -209,6 +209,7 @@
   ],
   "software": [
     {
+      "slug": "stockfish",
       "tema_slug": "busqueda-resolucion-problemas",
       "clasificacion_slug": "sistemas-que-actuan-racionalmente",
       "nombre": "Stockfish",
@@ -222,6 +223,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/NewLogoSF.png"
     },
     {
+      "slug": "gymnasium",
       "tema_slug": "busqueda-resolucion-problemas",
       "clasificacion_slug": "sistemas-que-actuan-racionalmente",
       "nombre": "Gymnasium (ex OpenAI Gym)",
@@ -235,6 +237,7 @@
       "imagen_url": null
     },
     {
+      "slug": "swi-prolog",
       "tema_slug": "busqueda-resolucion-problemas",
       "clasificacion_slug": "ia-simbolica",
       "nombre": "SWI-Prolog",
@@ -248,6 +251,7 @@
       "imagen_url": null
     },
     {
+      "slug": "pygad",
       "tema_slug": "busqueda-resolucion-problemas",
       "clasificacion_slug": "sistemas-que-actuan-racionalmente",
       "nombre": "PyGAD",
@@ -261,6 +265,7 @@
       "imagen_url": null
     },
     {
+      "slug": "clips",
       "tema_slug": "representacion-conocimiento",
       "clasificacion_slug": "sistemas-expertos",
       "nombre": "CLIPS",
@@ -274,6 +279,7 @@
       "imagen_url": null
     },
     {
+      "slug": "protege",
       "tema_slug": "representacion-conocimiento",
       "clasificacion_slug": "sistemas-expertos",
       "nombre": "Protégé",
@@ -287,6 +293,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif"
     },
     {
+      "slug": "apache-jena",
       "tema_slug": "representacion-conocimiento",
       "clasificacion_slug": "ia-simbolica",
       "nombre": "Apache Jena",
@@ -300,6 +307,7 @@
       "imagen_url": null
     },
     {
+      "slug": "tensorflow",
       "tema_slug": "aprendizaje-automatico",
       "clasificacion_slug": "redes-neuronales",
       "nombre": "TensorFlow",
@@ -313,6 +321,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg"
     },
     {
+      "slug": "scikit-learn",
       "tema_slug": "aprendizaje-automatico",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "scikit-learn",
@@ -326,6 +335,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg"
     },
     {
+      "slug": "weka",
       "tema_slug": "aprendizaje-automatico",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "Weka",
@@ -339,6 +349,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Weka_%28software%29_logo.png"
     },
     {
+      "slug": "opencv",
       "tema_slug": "reconocimiento-patrones-vision",
       "clasificacion_slug": "redes-neuronales",
       "nombre": "OpenCV",
@@ -352,6 +363,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/OpenCV_Logo_with_text.png"
     },
     {
+      "slug": "yolo",
       "tema_slug": "reconocimiento-patrones-vision",
       "clasificacion_slug": "redes-neuronales",
       "nombre": "YOLO (Ultralytics)",
@@ -365,6 +377,7 @@
       "imagen_url": "https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg"
     },
     {
+      "slug": "tesseract-ocr",
       "tema_slug": "reconocimiento-patrones-vision",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "Tesseract OCR",
@@ -378,6 +391,7 @@
       "imagen_url": null
     },
     {
+      "slug": "deap",
       "tema_slug": "algoritmos-geneticos-busqueda-local",
       "clasificacion_slug": "algoritmos-geneticos",
       "nombre": "DEAP",
@@ -391,6 +405,7 @@
       "imagen_url": null
     },
     {
+      "slug": "or-tools",
       "tema_slug": "algoritmos-geneticos-busqueda-local",
       "clasificacion_slug": "algoritmos-geneticos",
       "nombre": "OR-Tools",
@@ -404,6 +419,7 @@
       "imagen_url": null
     },
     {
+      "slug": "heuristiclab",
       "tema_slug": "algoritmos-geneticos-busqueda-local",
       "clasificacion_slug": "algoritmos-geneticos",
       "nombre": "HeuristicLab",
@@ -417,6 +433,7 @@
       "imagen_url": null
     },
     {
+      "slug": "chatgpt",
       "tema_slug": "bots-procesamiento-lenguaje-natural",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "ChatGPT",
@@ -430,6 +447,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg"
     },
     {
+      "slug": "rasa",
       "tema_slug": "bots-procesamiento-lenguaje-natural",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "Rasa",
@@ -443,6 +461,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Rasa_nlu_horizontal_purple.svg"
     },
     {
+      "slug": "spacy",
       "tema_slug": "bots-procesamiento-lenguaje-natural",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "spaCy",
@@ -456,6 +475,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/8/88/SpaCy_logo.svg"
     },
     {
+      "slug": "nltk",
       "tema_slug": "bots-procesamiento-lenguaje-natural",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "NLTK",
@@ -469,6 +489,7 @@
       "imagen_url": null
     },
     {
+      "slug": "whisper",
       "tema_slug": "interaccion-hombre-maquina",
       "clasificacion_slug": "ia-subsimbolica",
       "nombre": "Whisper (OpenAI)",
@@ -482,6 +503,7 @@
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/6/66/OpenAI_logo_2025_%28symbol%29.svg"
     },
     {
+      "slug": "mediapipe",
       "tema_slug": "interaccion-hombre-maquina",
       "clasificacion_slug": "redes-neuronales",
       "nombre": "MediaPipe",
@@ -495,6 +517,7 @@
       "imagen_url": null
     },
     {
+      "slug": "web-speech-api",
       "tema_slug": "interaccion-hombre-maquina",
       "clasificacion_slug": null,
       "nombre": "Web Speech API",

@@ -181,6 +181,7 @@ export type Database = {
           licencia: string | null
           nombre: string
           objetivo: string | null
+          slug: string
           tema_id: string
           url_acceso: string | null
           video_url: string | null
@@ -199,6 +200,7 @@ export type Database = {
           licencia?: string | null
           nombre: string
           objetivo?: string | null
+          slug: string
           tema_id: string
           url_acceso?: string | null
           video_url?: string | null
@@ -217,6 +219,7 @@ export type Database = {
           licencia?: string | null
           nombre?: string
           objetivo?: string | null
+          slug?: string
           tema_id?: string
           url_acceso?: string | null
           video_url?: string | null

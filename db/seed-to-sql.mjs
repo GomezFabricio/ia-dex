@@ -1,6 +1,7 @@
 // Generates db/seed.sql from db/seed-content.json.
-// Inserts are idempotent (guarded by WHERE NOT EXISTS on slug/nombre),
-// so re-running the output SQL never duplicates rows.
+// temas/clasificaciones inserts are idempotent (guarded by WHERE NOT EXISTS on slug).
+// software UPSERTS by slug (ON CONFLICT), so curated edits (video_url, descriptions,
+// theme) are reapplied to existing rows instead of skipped.
 // Usage: node db/seed-to-sql.mjs
 
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -9,6 +10,18 @@ import { fileURLToPath } from 'node:url'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 const data = JSON.parse(readFileSync(join(dir, 'seed-content.json'), 'utf8'))
+
+// Guard: slug is the software upsert key. A missing slug breaks ON CONFLICT, and a
+// duplicate would silently overwrite a different tool. Fail loudly before emitting SQL.
+const missingSlug = data.software.filter((s) => !s.slug).map((s) => s.nombre)
+if (missingSlug.length > 0) {
+  throw new Error(`Software entries missing "slug" in seed-content.json: ${missingSlug.join(', ')}`)
+}
+const softwareSlugs = data.software.map((s) => s.slug)
+const dupeSlugs = [...new Set(softwareSlugs.filter((slug, i) => softwareSlugs.indexOf(slug) !== i))]
+if (dupeSlugs.length > 0) {
+  throw new Error(`Duplicate software slug(s) in seed-content.json: ${dupeSlugs.join(', ')}`)
+}
 
 const q = (v) => {
   if (v === null || v === undefined) return 'null'
@@ -42,10 +55,14 @@ for (const s of data.software) {
     ? `(select id from public.clasificaciones_si where slug = ${q(s.clasificacion_slug)})`
     : 'null'
   lines.push(
-    `insert into public.software (tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)`,
-    `select (select id from public.temas where slug = ${q(s.tema_slug)}), ${clasSelect},`,
+    `insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)`,
+    `select ${q(s.slug)}, (select id from public.temas where slug = ${q(s.tema_slug)}), ${clasSelect},`,
     `  ${q(s.nombre)}, ${q(s.objetivo)}, ${q(s.descripcion_corta)}, ${q(s.url_acceso)}, ${q(s.licencia)}, ${q(s.anio_lanzamiento)}, ${q(s.autor_referencia)}, ${q(s.video_url)}, ${q(s.imagen_url)}`,
-    `where not exists (select 1 from public.software where nombre = ${q(s.nombre)});`,
+    `on conflict (slug) do update set`,
+    `  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,`,
+    `  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,`,
+    `  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,`,
+    `  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;`,
     ''
   )
 }
