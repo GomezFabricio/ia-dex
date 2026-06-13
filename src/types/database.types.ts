@@ -378,6 +378,26 @@ export type Database = {
       }
       get_embed_secret: { Args: never; Returns: string }
       puede_gestionar_contenido: { Args: never; Returns: boolean }
+      software_relacionados: {
+        Args: { p_limit?: number; p_software_id: string }
+        Returns: {
+          anio_lanzamiento: number
+          autor_referencia: string
+          clasificacion_si_id: string
+          created_at: string
+          created_by: string
+          descripcion_corta: string
+          id: string
+          imagen_url: string
+          licencia: string
+          nombre: string
+          objetivo: string
+          slug: string
+          tema_id: string
+          url_acceso: string
+          video_url: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

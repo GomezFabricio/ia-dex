@@ -97,3 +97,20 @@ export async function buscarInteligente(
 
   return data
 }
+
+/**
+ * Returns software semantically related to the given id via the
+ * software_relacionados RPC (cosine similarity with an adaptive cutoff).
+ * Returns an empty array when the row has no embedding yet or no neighbour falls
+ * within the margin — callers fall back to same-theme recommendations.
+ * The RPC excludes the row itself and rows without an embedding server-side.
+ */
+export async function relacionados(id: string, limit = 5): Promise<Software[]> {
+  const { data, error } = await supabase.rpc('software_relacionados', {
+    p_software_id: id,
+    p_limit: limit,
+  })
+
+  if (error) throw error
+  return data ?? []
+}
