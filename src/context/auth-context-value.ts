@@ -10,6 +10,7 @@ export type AuthContextValue = {
   user: User | null      // derived from session
   session: Session | null
   loading: boolean       // true until getSession resolves
+  passwordRecovery: boolean  // true once a PASSWORD_RECOVERY event has fired (X3)
   signOut: () => Promise<void>
 }
 
