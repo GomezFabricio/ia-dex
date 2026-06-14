@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Software } from '../../types/dtos'
 import PosterCard from './PosterCard'
@@ -43,17 +43,47 @@ export default function ContentRow({
   hideHeader = false,
 }: Props) {
   const trackRef = useRef<HTMLUListElement>(null)
+  const isGrid = layout === 'grid'
+
+  // Arrows appear ONLY when the track actually overflows (so a rail whose cards
+  // all fit shows none). A ResizeObserver keeps this in sync with viewport /
+  // content changes; its first (async) callback seeds the value — no synchronous
+  // setState in the effect body.
+  const [overflowing, setOverflowing] = useState(false)
+  useEffect(() => {
+    const track = trackRef.current
+    if (track === null || isGrid) return
+    const ro = new ResizeObserver(() => {
+      setOverflowing(track.scrollWidth - track.clientWidth > 4)
+    })
+    ro.observe(track)
+    return () => ro.disconnect()
+  }, [isGrid, items.length])
 
   if (items.length === 0) return null
 
-  const isGrid = layout === 'grid'
-  const showArrows = !isGrid && items.length > 1
+  const showArrows = !isGrid && overflowing
 
+  // Wrap-around scroll: at the right end, looping forward jumps to the start; at
+  // the start, looping back jumps to the end — an "infinite" feel without cloning.
   function scrollByDir(dir: 1 | -1) {
     const track = trackRef.current
     if (!track) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    track.scrollBy({ left: dir * track.clientWidth * 0.82, behavior: reduce ? 'auto' : 'smooth' })
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    const maxScroll = track.scrollWidth - track.clientWidth
+    // Generous edge tolerance: scroll-snap + the track's side padding rest the
+    // first/last card a few dozen px shy of 0 / maxScroll, so a tight threshold
+    // would miss the "at the edge" state and never wrap.
+    const EDGE = 40
+    const atEnd = track.scrollLeft >= maxScroll - EDGE
+    const atStart = track.scrollLeft <= EDGE
+    if (dir === 1 && atEnd) {
+      track.scrollTo({ left: 0, behavior })
+    } else if (dir === -1 && atStart) {
+      track.scrollTo({ left: maxScroll, behavior })
+    } else {
+      track.scrollBy({ left: dir * track.clientWidth * 0.82, behavior })
+    }
   }
 
   return (

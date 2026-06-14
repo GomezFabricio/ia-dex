@@ -103,7 +103,7 @@ export default function CatalogoPage() {
               </button>
             </div>
           </div>
-          <div data-rail className="flex gap-2 overflow-x-auto">
+          <div className="flex flex-wrap gap-2">
             {temas.data.map((t) => (
               <button
                 key={t.id}
