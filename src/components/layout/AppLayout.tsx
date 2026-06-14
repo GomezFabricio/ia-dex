@@ -28,6 +28,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 // else falls back to the centered, padded shell.
 function isFullBleedPath(pathname: string): boolean {
   if (pathname === '/') return true
+  if (pathname === '/roadmap') return true
   if (pathname.startsWith('/software/')) return true
   return false
 }
