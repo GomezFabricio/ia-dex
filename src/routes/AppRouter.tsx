@@ -16,9 +16,9 @@ import EstadisticasPage from '../pages/EstadisticasPage'
 
 // ---------------------------------------------------------------------------
 // AppRouter — full route table per spec §AppRouter Route Table
-// 11 named routes + 1 catch-all (404) = 12 entries total
-// Routes 1-10 are children of AppLayout (sidebar + topbar visible)
-// /login is a sibling (no layout)
+// Named routes + a catch-all (404) under AppLayout (sidebar + scroll chrome).
+// /roadmap is a placeholder stub until the redesign builds the real page.
+// /login and /restablecer are siblings (no layout).
 // ---------------------------------------------------------------------------
 
 const router = createBrowserRouter([
@@ -27,6 +27,7 @@ const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       { index: true, element: <InicioPage /> },
+      { path: 'roadmap', element: <PageStub title="Roadmap" message="Próximamente: tu camino en la IA, de los fundamentos a la IA aplicada." /> },
       { path: 'catalogo', element: <CatalogoPage /> },
       { path: 'catalogo/:temaSlug', element: <TemaPage /> },
       { path: 'software/:id', element: <SoftwareDetallePage /> },

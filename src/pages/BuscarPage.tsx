@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useBusqueda } from '../hooks/useBusqueda'
 import { useTemas } from '../hooks/useTemas'
 import { useVoz } from '../hooks/useVoz'
@@ -79,7 +80,13 @@ function applyFiltrosExtraidos(
 }
 
 export default function BuscarPage() {
-  const [form, setForm] = useState<FormState>(initialForm)
+  const [searchParams] = useSearchParams()
+  // Prefill from ?q= (handed over by the home hero command bar). Lazy initializer
+  // so it only reads the param on first render — later edits own the form state.
+  const [form, setForm] = useState<FormState>(() => ({
+    ...initialForm,
+    texto: searchParams.get('q')?.trim() ?? '',
+  }))
   const temas = useTemas()
 
   // onFiltrosExtraidos is called by useBusqueda after a successful hybrid search.
@@ -126,6 +133,19 @@ export default function BuscarPage() {
   }
 
   const voz = useVoz(handleTranscript)
+
+  // One-shot: if the home hero handed over a ?q=, run that search on mount.
+  // buscar() drives the hook's own state (not this component's state), so this is
+  // not a set-state-in-effect; empty deps make it fire exactly once.
+  useEffect(() => {
+    const q = searchParams.get('q')?.trim() ?? ''
+    if (q === '') return
+    lastSearchedTextoRef.current = q
+    const filtros = buildFiltros({ ...initialForm, texto: q })
+    lastSearchedFiltrosRef.current = JSON.stringify(filtros)
+    buscar(filtros)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

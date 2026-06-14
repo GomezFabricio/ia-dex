@@ -370,6 +370,19 @@
   display: none;
 }
 
+/* ----------------------------------------------------------------------------
+   7. SHELL + HERO — ambient motion
+   Decorative floating orbs behind the home hero and inside the frosted sidebar.
+   Plain classes (not Tailwind utilities) because they only carry an animation;
+   the float-y keyframe lives in §4. Reduced-motion (§5) freezes them.
+   -------------------------------------------------------------------------- */
+.orb-float {
+  animation: float-y 11s ease-in-out infinite;
+}
+.orb-float-2 {
+  animation: float-y 14s ease-in-out infinite reverse;
+}
+
 /* ---------------------------------------------------------------------------
    Usage notes
    - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav

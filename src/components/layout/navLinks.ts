@@ -6,6 +6,7 @@
 
 export const PRIMARY_LINKS = [
   { to: '/', label: 'Inicio', end: true },
+  { to: '/roadmap', label: 'Roadmap', end: false },
   { to: '/catalogo', label: 'Catálogo', end: false },
   { to: '/clasificaciones', label: 'Clasificaciones', end: false },
   { to: '/buscar', label: 'Buscar', end: false },

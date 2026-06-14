@@ -30,6 +30,7 @@ const iconAttrs = {
 
 const DEST_ICONS: Record<string, React.ReactNode> = {
   '/': <svg {...iconAttrs}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /></svg>,
+  '/roadmap': <svg {...iconAttrs}><circle cx="6" cy="19" r="2" /><circle cx="18" cy="5" r="2" /><path d="M6 17v-3a4 4 0 0 1 4-4h4a4 4 0 0 0 4-4" /></svg>,
   '/catalogo': <svg {...iconAttrs}><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>,
   '/clasificaciones': <svg {...iconAttrs}><path d="M12 2 2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5M2 12l10 5 10-5" /></svg>,
   '/buscar': <svg {...iconAttrs}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>,
@@ -47,7 +48,7 @@ const destLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export default function SidebarBody({ onNavigate }: Props) {
   return (
-    <div className="flex h-full flex-col">
+    <div className="relative flex h-full flex-col">
       {/* Brand — centered */}
       <div className="flex shrink-0 justify-center border-b border-border/60 px-5 py-5">
         <Link to="/" onClick={onNavigate} aria-label="IA-dex — inicio" className="inline-flex transition-opacity hover:opacity-90">
