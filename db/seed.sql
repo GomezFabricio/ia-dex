@@ -28,6 +28,98 @@ insert into public.temas (slug, nombre, descripcion, orden)
 select 'interaccion-hombre-maquina', 'Interacción Hombre-Máquina', 'Área interdisciplinaria que estudia el diseño, evaluación e implementación de sistemas interactivos para uso humano. Incorpora el reconocimiento de voz, gestos y lengua de señas como modalidades de entrada, permitiendo interfaces más naturales y accesibles entre personas y sistemas inteligentes.', 7
 where not exists (select 1 from public.temas where slug = 'interaccion-hombre-maquina');
 
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'alcance-capacidad', 'Alcance y capacidad', 'Clasifica la IA según la amplitud de tareas que puede resolver, desde sistemas especializados hasta una hipotética inteligencia general.', 1
+where not exists (select 1 from public.criterios_si where slug = 'alcance-capacidad');
+
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'russell-norvig', 'Modelos de Russell y Norvig', 'Las cuatro visiones clásicas de la IA según el cruce pensar/actuar y humano/racional.', 2
+where not exists (select 1 from public.criterios_si where slug = 'russell-norvig');
+
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'evolucion-hintze', 'Evolución (Arend Hintze)', 'Niveles evolutivos de la IA según su capacidad de memoria, comprensión y conciencia.', 3
+where not exists (select 1 from public.criterios_si where slug = 'evolucion-hintze');
+
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'tipo-aprendizaje', 'Tipo de aprendizaje (Machine Learning)', 'Cómo el sistema aprende a partir de los datos: con o sin etiquetas, por refuerzo o en profundidad.', 4
+where not exists (select 1 from public.criterios_si where slug = 'tipo-aprendizaje');
+
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'paradigma-representacion', 'Paradigma de representación del conocimiento', 'Cómo se representa el conocimiento: con símbolos y reglas explícitas o de forma implícita en estructuras matemáticas.', 5
+where not exists (select 1 from public.criterios_si where slug = 'paradigma-representacion');
+
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'naturaleza-conocimiento', 'Naturaleza y forma del conocimiento', 'Clasifica el conocimiento según su grado de abstracción, su expresabilidad y su contenido u objetivo.', 6
+where not exists (select 1 from public.criterios_si where slug = 'naturaleza-conocimiento');
+
+insert into public.criterios_si (slug, nombre, descripcion, orden)
+select 'metodo-adquisicion', 'Método de adquisición del conocimiento', 'Cómo se obtiene el conocimiento: transferido por expertos humanos (deductivo) o extraído de datos y ejemplos (inductivo).', 7
+where not exists (select 1 from public.criterios_si where slug = 'metodo-adquisicion');
+
+-- DESTRUCTIVE: removes all old clasificacion_si rows and their dependent valoraciones.
+-- User-gated — applied only after explicit OK (S1-T09).
+truncate public.clasificaciones_si cascade;
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'ia-debil-estrecha', 'IA Débil (o Estrecha)', 'Diseñada para realizar tareas específicas y limitadas. No posee comprensión general del mundo. Es el tipo de IA utilizado actualmente.', null, 'Siri, Alexa, sistemas de reconocimiento de voz, recomendadores de contenido.', 'null'::jsonb, 1
+where not exists (select 1 from public.clasificaciones_si where slug = 'ia-debil-estrecha');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'ia-fuerte-general', 'IA Fuerte (IAG)', 'Capaz de realizar cualquier tarea intelectual que pueda realizar un ser humano. Razonamiento general, adaptación y aprendizaje amplio. Actualmente es un concepto teórico.', null, '(concepto teórico — sin ejemplos implementados)', 'null'::jsonb, 2
+where not exists (select 1 from public.clasificaciones_si where slug = 'ia-fuerte-general');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'sistemas-que-piensan-como-humanos', 'Sistemas que piensan como humanos', 'Según Russell y Norvig, este enfoque busca que las máquinas reproduzcan los procesos cognitivos humanos: cómo razonamos, tomamos decisiones y resolvemos problemas. Se apoya en la psicología cognitiva y la neurociencia para modelar la mente humana computacionalmente, siendo la base de la IA cognitiva y de los modelos de memoria y atención.', null, 'Sistemas de razonamiento analógico, modelos computacionales de la memoria humana, arquitecturas cognitivas como ACT-R.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"What is AI? The four schools of thought — Medium / Otto Lang","url":"https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"}]'::jsonb, 1
+where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-piensan-como-humanos');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'sistemas-que-actuan-como-humanos', 'Sistemas que actúan como humanos', 'Este enfoque, también de Russell y Norvig, se centra en producir comportamientos indistinguibles de los humanos, independientemente de si el proceso interno es igual al humano. La prueba de Turing es el referente clásico de este paradigma. Incluye la robótica social, los avatares conversacionales y los sistemas de imitación de comportamiento humano.', null, 'Chatbots como ELIZA, robots humanoides sociales, asistentes de voz que imitan entonación humana.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"What is AI? The four schools of thought — Medium / Otto Lang","url":"https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"}]'::jsonb, 2
+where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-actuan-como-humanos');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'sistemas-que-piensan-racionalmente', 'Sistemas que piensan racionalmente', 'Este enfoque busca formalizar el razonamiento correcto mediante la lógica y las matemáticas, siguiendo leyes de inferencia válidas para llegar a conclusiones garantizadas. Se basa en la tradición logicista de la filosofía y la matemática. Está en la base de los planificadores automáticos, los sistemas de demostración de teoremas y la programación lógica.', null, 'Prolog y sus motores de inferencia, demostradores automáticos de teoremas (Coq, Lean), planificadores PDDL.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"Logic and Artificial Intelligence — Stanford Encyclopedia of Philosophy","url":"https://plato.stanford.edu/entries/logic-ai/"}]'::jsonb, 3
+where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-piensan-racionalmente');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'sistemas-que-actuan-racionalmente', 'Sistemas que actúan racionalmente', 'Es el enfoque preferido por Russell y Norvig: el agente racional actúa para maximizar su rendimiento esperado dado su conocimiento y sus capacidades, sin importar si lo hace exactamente como un humano o siguiendo un razonamiento lógico puro. Este paradigma unifica la teoría de decisiones, el aprendizaje por refuerzo y los agentes inteligentes.', null, 'Agentes de aprendizaje por refuerzo (AlphaGo, motores de ajedrez), robots autónomos, sistemas de recomendación.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"What is AI? The four schools of thought — Medium / Otto Lang","url":"https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"}]'::jsonb, 4
+where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'maquinas-reactivas', 'Máquinas Reactivas', 'No poseen memoria. Responden únicamente al estado actual del entorno. No aprenden de experiencias pasadas.', null, 'Deep Blue.', 'null'::jsonb, 1
+where not exists (select 1 from public.clasificaciones_si where slug = 'maquinas-reactivas');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'memoria-limitada', 'Memoria Limitada', 'Utilizan información reciente para mejorar sus decisiones. Aprenden de experiencias previas.', null, 'Vehículos autónomos.', 'null'::jsonb, 2
+where not exists (select 1 from public.clasificaciones_si where slug = 'memoria-limitada');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'teoria-de-la-mente', 'Teoría de la Mente', 'Comprenderían emociones, intenciones y necesidades humanas. Aún no existen plenamente.', null, '(concepto teórico)', 'null'::jsonb, 3
+where not exists (select 1 from public.clasificaciones_si where slug = 'teoria-de-la-mente');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'autoconciencia', 'Autoconciencia', 'Poseerían conciencia de sí mismas y de su existencia. Concepto teórico.', null, '(concepto teórico)', 'null'::jsonb, 4
+where not exists (select 1 from public.clasificaciones_si where slug = 'autoconciencia');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'aprendizaje-supervisado', 'Aprendizaje Supervisado', 'Aprende mediante datos etiquetados. Conoce previamente las respuestas correctas.', null, 'Filtros de spam, predicción de precios, diagnóstico asistido.', 'null'::jsonb, 1
+where not exists (select 1 from public.clasificaciones_si where slug = 'aprendizaje-supervisado');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'aprendizaje-no-supervisado', 'Aprendizaje No Supervisado', 'Trabaja con datos sin etiquetar. Busca patrones y agrupaciones ocultas.', null, 'Clustering.', 'null'::jsonb, 2
+where not exists (select 1 from public.clasificaciones_si where slug = 'aprendizaje-no-supervisado');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'aprendizaje-semi-supervisado', 'Aprendizaje Semi-supervisado', 'Combina datos etiquetados y no etiquetados. Reduce la necesidad de etiquetar grandes volúmenes.', null, 'Clasificación de páginas web con pocas etiquetas, reconocimiento de voz con audio parcialmente transcrito, detección de fraude con pocos casos confirmados.', 'null'::jsonb, 3
+where not exists (select 1 from public.clasificaciones_si where slug = 'aprendizaje-semi-supervisado');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'aprendizaje-por-refuerzo', 'Aprendizaje por Refuerzo', 'Aprende mediante recompensas y castigos. Busca maximizar una recompensa acumulada.', null, 'AlphaGo.', 'null'::jsonb, 4
+where not exists (select 1 from public.clasificaciones_si where slug = 'aprendizaje-por-refuerzo');
+
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'deep-learning', 'Aprendizaje Profundo (Deep Learning)', 'Subcampo del ML. Redes neuronales profundas con múltiples capas.', null, 'Visión por computadora, PLN, reconocimiento de voz.', 'null'::jsonb, 5
+where not exists (select 1 from public.clasificaciones_si where slug = 'deep-learning');
+
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
 select 'ia-simbolica', 'IA Simbólica', 'La IA Simbólica representa el conocimiento mediante unidades discretas y explícitas: reglas lógicas, fórmulas, relaciones y símbolos manipulables. El razonamiento se lleva a cabo aplicando operaciones formales sobre estas estructuras, de manera que las decisiones pueden explicarse paso a paso. Es el paradigma dominante desde los orígenes de la IA hasta fines del siglo XX.', 'https://upload.wikimedia.org/wikipedia/commons/5/52/Chess_Programming.svg', 'Sistemas expertos médicos como MYCIN, demostradores automáticos de teoremas, planificadores lógicos como STRIPS.', '[{"titulo":"Inteligencia artificial simbólica — Wikipedia","url":"https://es.wikipedia.org/wiki/Inteligencia_artificial_simb%C3%B3lica"},{"titulo":"Logic and Artificial Intelligence — Stanford Encyclopedia of Philosophy","url":"https://plato.stanford.edu/entries/logic-ai/"}]'::jsonb, 1
 where not exists (select 1 from public.clasificaciones_si where slug = 'ia-simbolica');
@@ -37,236 +129,561 @@ select 'ia-subsimbolica', 'IA Sub-simbólica', 'La IA Sub-simbólica (o no simb�
 where not exists (select 1 from public.clasificaciones_si where slug = 'ia-subsimbolica');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'sistemas-que-piensan-como-humanos', 'Sistemas que piensan como humanos', 'Según Russell y Norvig, este enfoque busca que las máquinas reproduzcan los procesos cognitivos humanos: cómo razonamos, tomamos decisiones y resolvemos problemas. Se apoya en la psicología cognitiva y la neurociencia para modelar la mente humana computacionalmente, siendo la base de la IA cognitiva y de los modelos de memoria y atención.', null, 'Sistemas de razonamiento analógico, modelos computacionales de la memoria humana, arquitecturas cognitivas como ACT-R.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"What is AI? The four schools of thought — Medium / Otto Lang","url":"https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"}]'::jsonb, 3
-where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-piensan-como-humanos');
+select 'conocimiento-teorico', 'Conocimiento Teórico', 'Basado en teorías, modelos y generalizaciones. Busca explicar fenómenos. (dimensión: grado de abstracción)', null, 'Las leyes de Newton aplicadas a simulación física, un modelo matemático del clima, la teoría de grafos para optimización de rutas.', 'null'::jsonb, 1
+where not exists (select 1 from public.clasificaciones_si where slug = 'conocimiento-teorico');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'sistemas-que-actuan-como-humanos', 'Sistemas que actúan como humanos', 'Este enfoque, también de Russell y Norvig, se centra en producir comportamientos indistinguibles de los humanos, independientemente de si el proceso interno es igual al humano. La prueba de Turing es el referente clásico de este paradigma. Incluye la robótica social, los avatares conversacionales y los sistemas de imitación de comportamiento humano.', null, 'Chatbots como ELIZA, robots humanoides sociales, asistentes de voz que imitan entonación humana.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"What is AI? The four schools of thought — Medium / Otto Lang","url":"https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"}]'::jsonb, 4
-where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-actuan-como-humanos');
+select 'conocimiento-empirico', 'Conocimiento Empírico', 'Basado en la experiencia directa y la observación. Surge de casos prácticos. (dimensión: grado de abstracción)', null, 'Datos de sensores de una planta industrial, registros históricos de ventas, observaciones clínicas acumuladas.', 'null'::jsonb, 2
+where not exists (select 1 from public.clasificaciones_si where slug = 'conocimiento-empirico');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'sistemas-que-piensan-racionalmente', 'Sistemas que piensan racionalmente', 'Este enfoque busca formalizar el razonamiento correcto mediante la lógica y las matemáticas, siguiendo leyes de inferencia válidas para llegar a conclusiones garantizadas. Se basa en la tradición logicista de la filosofía y la matemática. Está en la base de los planificadores automáticos, los sistemas de demostración de teoremas y la programación lógica.', null, 'Prolog y sus motores de inferencia, demostradores automáticos de teoremas (Coq, Lean), planificadores PDDL.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"Logic and Artificial Intelligence — Stanford Encyclopedia of Philosophy","url":"https://plato.stanford.edu/entries/logic-ai/"}]'::jsonb, 5
-where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-piensan-racionalmente');
+select 'conocimiento-explicito', 'Conocimiento Explícito', 'Fácil de documentar, almacenar y transmitir. (dimensión: expresabilidad)', null, 'Manuales, procedimientos, bases de conocimiento.', 'null'::jsonb, 3
+where not exists (select 1 from public.clasificaciones_si where slug = 'conocimiento-explicito');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'sistemas-que-actuan-racionalmente', 'Sistemas que actúan racionalmente', 'Es el enfoque preferido por Russell y Norvig: el agente racional actúa para maximizar su rendimiento esperado dado su conocimiento y sus capacidades, sin importar si lo hace exactamente como un humano o siguiendo un razonamiento lógico puro. Este paradigma unifica la teoría de decisiones, el aprendizaje por refuerzo y los agentes inteligentes.', null, 'Agentes de aprendizaje por refuerzo (AlphaGo, motores de ajedrez), robots autónomos, sistemas de recomendación.', '[{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"},{"titulo":"What is AI? The four schools of thought — Medium / Otto Lang","url":"https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"}]'::jsonb, 6
-where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente');
+select 'conocimiento-tacito', 'Conocimiento Tácito', 'Difícil de expresar formalmente. Basado en experiencia e intuición. (dimensión: expresabilidad)', null, 'Reconocer una cara familiar.', 'null'::jsonb, 4
+where not exists (select 1 from public.clasificaciones_si where slug = 'conocimiento-tacito');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'sistemas-expertos', 'Sistemas Expertos', 'Un sistema experto es un programa que emula el razonamiento de un especialista humano en un dominio específico, usando una base de conocimiento (reglas IF-THEN) y un motor de inferencia que aplica esas reglas a los hechos presentes. Fue la técnica de IA más exitosa comercialmente en los años 80 y 90, con aplicaciones en diagnóstico médico, configuración de equipos y análisis financiero.', 'https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif', 'MYCIN (diagnóstico de enfermedades infecciosas), XCON (configuración de computadoras DEC), CLIPS (herramienta de desarrollo de sistemas expertos de la NASA).', '[{"titulo":"Sistema experto — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Sistema_experto"},{"titulo":"CLIPS: A Tool for Building Expert Systems — Sitio oficial","url":"https://www.clipsrules.net/"}]'::jsonb, 7
-where not exists (select 1 from public.clasificaciones_si where slug = 'sistemas-expertos');
+select 'conocimiento-declarativo', 'Conocimiento Declarativo', 'Describe hechos, conceptos o relaciones. Responde qué es verdadero o falso (¿Qué?). (dimensión: contenido y objetivo)', null, 'Una base de hechos (''París es la capital de Francia''), una ontología de productos, una red semántica de relaciones.', 'null'::jsonb, 5
+where not exists (select 1 from public.clasificaciones_si where slug = 'conocimiento-declarativo');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'redes-neuronales', 'Redes Neuronales', 'Las redes neuronales artificiales son modelos computacionales inspirados en el cerebro biológico, compuestos por capas de nodos (neuronas) conectados por pesos ajustables. Aprenden transformando datos de entrada a través de funciones de activación no lineales. Las redes profundas (deep learning) con muchas capas son hoy la técnica dominante en visión, lenguaje y audio.', 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg', 'Redes convolucionales para clasificación de imágenes, transformers para traducción automática, redes generativas adversariales (GANs) para síntesis de imágenes.', '[{"titulo":"Red neuronal artificial — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Red_neuronal_artificial"},{"titulo":"But what is a neural network? — 3Blue1Brown (YouTube)","url":"https://www.youtube.com/watch?v=aircAruvnKk"}]'::jsonb, 8
-where not exists (select 1 from public.clasificaciones_si where slug = 'redes-neuronales');
+select 'conocimiento-procedimental', 'Conocimiento Procedimental', 'Describe procesos y métodos. Explica cómo realizar una tarea (¿Cómo?). (dimensión: contenido y objetivo)', null, 'El algoritmo de ordenamiento de una lista, los pasos de un protocolo de diagnóstico, una receta paso a paso.', 'null'::jsonb, 6
+where not exists (select 1 from public.clasificaciones_si where slug = 'conocimiento-procedimental');
 
 insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
-select 'algoritmos-geneticos', 'Algoritmos Genéticos', 'Los algoritmos genéticos son metaheurísticas de optimización que simulan la evolución natural: mantienen una población de soluciones candidatas, las seleccionan según su aptitud (fitness), las combinan (cruce) y las modifican aleatoriamente (mutación). Son especialmente útiles para encontrar soluciones aceptables a problemas NP-difíciles donde los métodos exactos son inviables.', 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Evolutionary_Algorithm.svg', 'Optimización de rutas logísticas, diseño evolutivo de redes neuronales (neuroevolución), scheduling de producción industrial.', '[{"titulo":"Algoritmo genético — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Algoritmo_gen%C3%A9tico"},{"titulo":"DEAP: Distributed Evolutionary Algorithms in Python — Documentación oficial","url":"https://deap.readthedocs.io/"}]'::jsonb, 9
-where not exists (select 1 from public.clasificaciones_si where slug = 'algoritmos-geneticos');
+select 'aprendizaje-deductivo', 'Aprendizaje Deductivo', 'El conocimiento es transferido directamente por expertos humanos. Característico de los sistemas expertos. Basado en reglas definidas manualmente.', null, 'Sistemas expertos como MYCIN, motores de reglas de negocio, bases de conocimiento con reglas if-then definidas por especialistas.', 'null'::jsonb, 1
+where not exists (select 1 from public.clasificaciones_si where slug = 'aprendizaje-deductivo');
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'stockfish', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
-  'Stockfish', 'Motor de ajedrez de código abierto capaz de analizar posiciones y encontrar el mejor movimiento.', 'Stockfish es uno de los motores de ajedrez más fuertes del mundo, basado en búsqueda alfa-beta con evaluaciones neuronales (NNUE). Es utilizado por plataformas como Lichess y Chess.com para análisis de partidas.', 'https://stockfishchess.org/', 'GPL-3.0', 2008, 'Tord Romstad, Marco Costalba, Joona Kiiski (comunidad open source)', 'https://www.youtube.com/watch?v=-MFanGV6ffQ', 'https://upload.wikimedia.org/wikipedia/commons/3/3a/NewLogoSF.png'
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
+insert into public.clasificaciones_si (slug, nombre, en_que_consiste, imagen_url, ejemplos, enlaces, orden)
+select 'aprendizaje-inductivo', 'Aprendizaje Inductivo', 'El sistema extrae conocimiento a partir de datos y ejemplos. Característico de Machine Learning, redes neuronales, minería de datos.', null, 'Un clasificador de spam entrenado con miles de correos, un modelo de visión que aprende de ejemplos etiquetados, árboles de decisión sobre datos históricos.', 'null'::jsonb, 2
+where not exists (select 1 from public.clasificaciones_si where slug = 'aprendizaje-inductivo');
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'gymnasium', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
+-- Wire criterio_id for all 25 categories (UPDATE after both insert blocks).
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'alcance-capacidad')
+where slug = 'ia-debil-estrecha';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'alcance-capacidad')
+where slug = 'ia-fuerte-general';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'russell-norvig')
+where slug = 'sistemas-que-piensan-como-humanos';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'russell-norvig')
+where slug = 'sistemas-que-actuan-como-humanos';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'russell-norvig')
+where slug = 'sistemas-que-piensan-racionalmente';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'russell-norvig')
+where slug = 'sistemas-que-actuan-racionalmente';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'evolucion-hintze')
+where slug = 'maquinas-reactivas';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'evolucion-hintze')
+where slug = 'memoria-limitada';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'evolucion-hintze')
+where slug = 'teoria-de-la-mente';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'evolucion-hintze')
+where slug = 'autoconciencia';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'tipo-aprendizaje')
+where slug = 'aprendizaje-supervisado';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'tipo-aprendizaje')
+where slug = 'aprendizaje-no-supervisado';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'tipo-aprendizaje')
+where slug = 'aprendizaje-semi-supervisado';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'tipo-aprendizaje')
+where slug = 'aprendizaje-por-refuerzo';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'tipo-aprendizaje')
+where slug = 'deep-learning';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'paradigma-representacion')
+where slug = 'ia-simbolica';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'paradigma-representacion')
+where slug = 'ia-subsimbolica';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'naturaleza-conocimiento')
+where slug = 'conocimiento-teorico';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'naturaleza-conocimiento')
+where slug = 'conocimiento-empirico';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'naturaleza-conocimiento')
+where slug = 'conocimiento-explicito';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'naturaleza-conocimiento')
+where slug = 'conocimiento-tacito';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'naturaleza-conocimiento')
+where slug = 'conocimiento-declarativo';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'naturaleza-conocimiento')
+where slug = 'conocimiento-procedimental';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'metodo-adquisicion')
+where slug = 'aprendizaje-deductivo';
+
+update public.clasificaciones_si
+set criterio_id = (select id from public.criterios_si where slug = 'metodo-adquisicion')
+where slug = 'aprendizaje-inductivo';
+
+-- DESTRUCTIVE: removes the 16 retired software rows and their dependent data.
+-- User-gated — applied only after explicit OK (S1-T09).
+-- valoraciones (no FK) are deleted first; software_clasificaciones cascade automatically.
+delete from public.valoraciones
+where contenido_tipo = 'software'
+  and contenido_id in (select id from public.software where slug <> all(array['gymnasium', 'protege', 'tensorflow', 'opencv', 'or-tools', 'chatgpt', 'whisper']));
+
+delete from public.software where slug <> all(array['gymnasium', 'protege', 'tensorflow', 'opencv', 'or-tools', 'chatgpt', 'whisper']);
+
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'gymnasium', (select id from public.temas where slug = 'busqueda-resolucion-problemas'),
   'Gymnasium (ex OpenAI Gym)', 'Plataforma estándar para desarrollar y comparar algoritmos de aprendizaje por refuerzo mediante entornos simulados.', 'Gymnasium provee una API unificada para entornos de RL (CartPole, MuJoCo, Atari) que permite entrenar agentes capaces de resolver tareas de búsqueda y control mediante prueba y error. Es el estándar de facto en investigación de reinforcement learning.', 'https://gymnasium.farama.org/', 'MIT', 2016, 'OpenAI / Farama Foundation', 'https://www.youtube.com/watch?v=FvuyrpzvwdI', null
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'swi-prolog', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'ia-simbolica'),
-  'SWI-Prolog', 'Entorno de programación lógica para implementar agentes de razonamiento, búsqueda y resolución de problemas mediante cláusulas Horn.', 'SWI-Prolog es un intérprete Prolog maduro y de uso libre, ideal para explorar técnicas de búsqueda en espacio de estados, planificación y razonamiento simbólico. Incluye herramientas para desarrollo web y aplicaciones semánticas.', 'https://www.swi-prolog.org/', 'BSD-2', 1987, 'Jan Wielemaker, Universidad de Ámsterdam', 'https://www.youtube.com/watch?v=alX00Me2gWQ', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'pygad', (select id from public.temas where slug = 'busqueda-resolucion-problemas'), (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente'),
-  'PyGAD', 'Biblioteca Python para implementar algoritmos genéticos aplicados a optimización y búsqueda en espacios de soluciones complejos.', 'PyGAD es una biblioteca de código abierto que permite construir algoritmos genéticos con pocas líneas de código. Soporta optimización de parámetros y puede combinarse con Keras y PyTorch para la evolución de modelos de aprendizaje automático.', 'https://pygad.readthedocs.io/', 'BSD-3-Clause', 2020, 'Ahmed Fawzy Gad', 'https://www.youtube.com/watch?v=vPdJNfT676I', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'clips', (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'sistemas-expertos'),
-  'CLIPS', 'Herramienta de desarrollo de sistemas expertos basada en reglas de producción, creada originalmente por la NASA.', 'CLIPS (C Language Integrated Production System) es un lenguaje de programación basado en reglas IF-THEN que permite construir sistemas expertos. Fue desarrollado en la NASA y es de dominio público desde 1996. Incluye un motor de inferencia RETE para evaluación eficiente de reglas.', 'https://www.clipsrules.net/', 'Dominio público', 1985, 'NASA Johnson Space Center', 'https://www.youtube.com/watch?v=WhF33-cKUk8', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'protege', (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'sistemas-expertos'),
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'protege', (select id from public.temas where slug = 'representacion-conocimiento'),
   'Protégé', 'Editor de ontologías OWL de uso libre para construir bases de conocimiento reutilizables en la web semántica.', 'Protégé es el editor de ontologías más utilizado en investigación y educación, desarrollado por Stanford University. Permite crear, visualizar y razonar sobre ontologías OWL, siendo la base de aplicaciones en bioinformática, biomedicina y web semántica.', 'https://protege.stanford.edu/', 'BSD-2', 1999, 'Stanford Center for Biomedical Informatics Research', 'https://www.youtube.com/watch?v=vHmC-rRuMYM', 'https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif'
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'apache-jena', (select id from public.temas where slug = 'representacion-conocimiento'), (select id from public.clasificaciones_si where slug = 'ia-simbolica'),
-  'Apache Jena', 'Framework Java de código abierto para construir aplicaciones de web semántica y datos enlazados mediante RDF, OWL y SPARQL.', 'Apache Jena es el framework de referencia para la web semántica en Java. Ofrece APIs para trabajar con grafos RDF, un motor de razonamiento OWL, una triple store persistente (TDB) y un servidor SPARQL (Fuseki), siendo ampliamente utilizado en bioinformática, bibliotecología y aplicaciones de conocimiento enlazado.', 'https://jena.apache.org/', 'Apache 2.0', 2000, 'Apache Software Foundation', 'https://www.youtube.com/watch?v=nUdHneViLp4', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'tensorflow', (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'tensorflow', (select id from public.temas where slug = 'aprendizaje-automatico'),
   'TensorFlow', 'Plataforma de código abierto para construir y entrenar modelos de aprendizaje automático y redes neuronales a escala.', 'TensorFlow es el framework de deep learning de Google, ampliamente utilizado en investigación y producción. Ofrece un ecosistema completo que incluye Keras como API de alto nivel, herramientas de despliegue en dispositivos móviles (TF Lite) y en navegadores (TF.js).', 'https://www.tensorflow.org/', 'Apache 2.0', 2015, 'Google Brain Team', 'https://www.youtube.com/watch?v=tPYj3fFJGjk', 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg'
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'scikit-learn', (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
-  'scikit-learn', 'Biblioteca Python de machine learning que provee implementaciones listas para usar de los algoritmos clásicos de ML.', 'scikit-learn es la biblioteca de referencia para aprendizaje automático en Python. Ofrece clasificadores, regresores, algoritmos de clustering y herramientas de preprocesamiento con una API consistente y bien documentada, ideal para prototipos y enseñanza.', 'https://scikit-learn.org/', 'BSD-3-Clause', 2007, 'David Cournapeau / comunidad open source', 'https://www.youtube.com/watch?v=0B5eIE_1vpU', 'https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg'
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'weka', (select id from public.temas where slug = 'aprendizaje-automatico'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
-  'Weka', 'Banco de trabajo de machine learning con interfaz gráfica orientado a la exploración y enseñanza de algoritmos de aprendizaje.', 'Weka (Waikato Environment for Knowledge Analysis) es una colección de algoritmos de ML con interfaz gráfica que facilita la experimentación sin necesidad de programar. Muy utilizado en entornos académicos para comparar clasificadores, hacer minería de datos y visualizar resultados.', 'https://ml.cms.waikato.ac.nz/weka/', 'GPL-3.0', 1993, 'Universidad de Waikato, Nueva Zelanda', 'https://www.youtube.com/watch?v=TF1yh5PKaqI', 'https://upload.wikimedia.org/wikipedia/commons/0/07/Weka_%28software%29_logo.png'
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'opencv', (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'opencv', (select id from public.temas where slug = 'reconocimiento-patrones-vision'),
   'OpenCV', 'Biblioteca de visión por computadora de código abierto para procesar imágenes, detectar objetos y analizar video en tiempo real.', 'OpenCV (Open Computer Vision Library) es la biblioteca de visión artificial más usada en el mundo, con más de 2 500 algoritmos optimizados. Soporta C++, Python y Java, y se integra con frameworks de deep learning para tareas como reconocimiento facial, detección de movimiento y reconstrucción 3D.', 'https://opencv.org/', 'Apache 2.0', 1999, 'Intel Corporation / OpenCV Foundation', 'https://www.youtube.com/watch?v=oXlwWbU8l2o', 'https://upload.wikimedia.org/wikipedia/commons/5/53/OpenCV_Logo_with_text.png'
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'yolo', (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
-  'YOLO (Ultralytics)', 'Sistema de detección de objetos en tiempo real basado en redes neuronales convolucionales capaz de identificar múltiples clases en una sola pasada.', 'YOLO (You Only Look Once) es el algoritmo de detección de objetos más popular en la actualidad. La implementación de Ultralytics (YOLOv5–YOLO11) facilita el entrenamiento con datasets propios y el despliegue en dispositivos edge, siendo ampliamente usada en vigilancia, robótica y vehículos autónomos.', 'https://github.com/ultralytics/ultralytics', 'AGPL-3.0', 2015, 'Joseph Redmon / Ultralytics', 'https://www.youtube.com/watch?v=sWEm3dIGKU8', 'https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg'
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'tesseract-ocr', (select id from public.temas where slug = 'reconocimiento-patrones-vision'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
-  'Tesseract OCR', 'Motor de reconocimiento óptico de caracteres (OCR) de código abierto capaz de extraer texto de imágenes en más de 100 idiomas.', 'Tesseract es el motor OCR open source más usado del mundo, mantenido por Google. Su versión 5 incorpora redes LSTM para mayor precisión. Se usa habitualmente junto a pytesseract en Python para extraer texto de documentos escaneados, facturas y capturas de pantalla.', 'https://github.com/tesseract-ocr/tesseract', 'Apache 2.0', 1985, 'HP Labs / Google', 'https://www.youtube.com/watch?v=gFJc6KXxOqc', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'deap', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
-  'DEAP', 'Framework Python de computación evolutiva para prototipado rápido de algoritmos genéticos, estrategias evolutivas y programación genética.', 'DEAP (Distributed Evolutionary Algorithms in Python) es el framework de referencia para algoritmos evolutivos en Python. Permite diseñar operadores de selección, cruce y mutación a medida, y se integra con multiprocessing para evaluación paralela de poblaciones.', 'https://deap.readthedocs.io/', 'LGPL-3.0', 2012, 'Félix-Antoine Fortin, Marc-André Gardner / Universidad Laval', 'https://www.youtube.com/watch?v=6h5ImIy3kpA', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'or-tools', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'or-tools', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'),
   'OR-Tools', 'Suite de optimización combinatoria de Google para resolver problemas de ruteo de vehículos, planificación, programación entera y restricciones.', 'OR-Tools es la suite de optimización de código abierto de Google, ganadora del campeonato internacional de programación por restricciones desde 2013. Disponible en Python, C++, Java y C#, cubre resolución de problemas de ruteo (VRP), scheduling, bin packing y programación lineal entera.', 'https://developers.google.com/optimization', 'Apache 2.0', 2010, 'Google', 'https://www.youtube.com/watch?v=D5y4meQmKyE', null
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'heuristiclab', (select id from public.temas where slug = 'algoritmos-geneticos-busqueda-local'), (select id from public.clasificaciones_si where slug = 'algoritmos-geneticos'),
-  'HeuristicLab', 'Entorno gráfico para diseñar, ejecutar y analizar algoritmos heurísticos y evolutivos sin necesidad de programar desde cero.', 'HeuristicLab es un framework de código abierto con interfaz gráfica para experimentar con algoritmos evolutivos, regresión simbólica y metaheurísticas. Desarrollado por la Universidad de Linz (Austria), permite configurar visualmente operadores genéticos y comparar corridas experimentales con herramientas estadísticas integradas.', 'https://dev.heuristiclab.com/', 'GPL-3.0', 2002, 'HEAL — Heuristic and Evolutionary Algorithms Laboratory, Universidad de Linz', 'https://www.youtube.com/watch?v=dhRmLQvW_KQ', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'chatgpt', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'chatgpt', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'),
   'ChatGPT', 'Asistente conversacional de propósito general basado en modelos de lenguaje de gran escala (LLMs), accesible vía web.', 'ChatGPT es el chatbot de OpenAI construido sobre los modelos GPT-4 y GPT-4o. Permite mantener conversaciones en lenguaje natural, escribir código, resumir textos y responder preguntas complejas. Es el ejemplo más reconocido de IA generativa conversacional en la actualidad.', 'https://chatgpt.com/', 'Propietaria (acceso gratuito con límites)', 2022, 'OpenAI', 'https://www.youtube.com/watch?v=_LMKslv5hPY', 'https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg'
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'rasa', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
-  'Rasa', 'Framework de código abierto para construir chatbots y asistentes de voz con capacidades de comprensión del lenguaje natural (NLU).', 'Rasa es una plataforma empresarial para el desarrollo de agentes conversacionales que combina NLU con gestión de diálogos estructurados. Permite despliegue on-premise, integración con múltiples canales (web, WhatsApp, Slack) y personalización total del flujo conversacional.', 'https://rasa.com/', 'Apache 2.0 (open source) / Propietaria (enterprise)', 2016, 'Rasa Technologies', 'https://www.youtube.com/watch?v=hIWnpyTWsLQ', 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Rasa_nlu_horizontal_purple.svg'
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'spacy', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
-  'spaCy', 'Biblioteca de procesamiento de lenguaje natural orientada a producción para tareas como reconocimiento de entidades, análisis sintáctico y clasificación de textos.', 'spaCy es una biblioteca NLP de grado industrial que ofrece pipelines entrenados para más de 70 idiomas. Es conocida por su velocidad y facilidad de uso, y es el estándar en extracción de información, análisis de sentimientos y construcción de pipelines de NLP en Python.', 'https://spacy.io/', 'MIT', 2015, 'Explosion AI', 'https://www.youtube.com/watch?v=WnGPv6HnBok', 'https://upload.wikimedia.org/wikipedia/commons/8/88/SpaCy_logo.svg'
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'nltk', (select id from public.temas where slug = 'bots-procesamiento-lenguaje-natural'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
-  'NLTK', 'Plataforma educativa de procesamiento de lenguaje natural en Python con acceso a más de 50 corpus y recursos léxicos.', 'NLTK (Natural Language Toolkit) es la herramienta de referencia en la enseñanza de NLP en Python. Ofrece módulos para tokenización, stemming, etiquetado gramatical, análisis sintáctico y acceso a corpus como WordNet y Brown Corpus, ideal para aprender los fundamentos del PLN.', 'https://www.nltk.org/', 'Apache 2.0', 2001, 'Steven Bird, Edward Loper / Universidad de Pennsylvania', 'https://www.youtube.com/watch?v=5e67tbgqgLA', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
-
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'whisper', (select id from public.temas where slug = 'interaccion-hombre-maquina'), (select id from public.clasificaciones_si where slug = 'ia-subsimbolica'),
+insert into public.software (slug, tema_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
+select 'whisper', (select id from public.temas where slug = 'interaccion-hombre-maquina'),
   'Whisper (OpenAI)', 'Sistema de reconocimiento de voz automático de código abierto con soporte multilingüe y alta robustez ante ruido y acentos.', 'Whisper es un modelo de reconocimiento de voz de OpenAI entrenado en 680 000 horas de audio diverso. Soporta reconocimiento y traducción en múltiples idiomas, incluyendo español. Es de código abierto (MIT) y puede ejecutarse localmente o a través de la API de OpenAI.', 'https://github.com/openai/whisper', 'MIT', 2022, 'OpenAI', 'https://www.youtube.com/watch?v=HbY51mVKrcE', 'https://upload.wikimedia.org/wikipedia/commons/6/66/OpenAI_logo_2025_%28symbol%29.svg'
 on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
+  tema_id = excluded.tema_id,
   nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
   url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
   autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'mediapipe', (select id from public.temas where slug = 'interaccion-hombre-maquina'), (select id from public.clasificaciones_si where slug = 'redes-neuronales'),
-  'MediaPipe', 'Suite de soluciones de ML de Google para detección de pose, manos y gestos en tiempo real sobre imágenes, video y streams de cámara.', 'MediaPipe es el framework de Google AI Edge para aplicaciones de ML en dispositivos, con soluciones preentrenadas para reconocimiento de manos (Hand Landmark), pose corporal y rostro. Es el punto de partida natural para explorar interfaces gestuales y reconocimiento de lengua de señas.', 'https://developers.google.com/edge/mediapipe/solutions/guide', 'Apache 2.0', 2019, 'Google', 'https://www.youtube.com/watch?v=oaK74yozU9g', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
+-- Junction: software_clasificaciones (M2M, one row per tool × category).
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
 
-insert into public.software (slug, tema_id, clasificacion_si_id, nombre, objetivo, descripcion_corta, url_acceso, licencia, anio_lanzamiento, autor_referencia, video_url, imagen_url)
-select 'web-speech-api', (select id from public.temas where slug = 'interaccion-hombre-maquina'), null,
-  'Web Speech API', 'API nativa del navegador para integrar reconocimiento de voz y síntesis de texto en aplicaciones web sin dependencias externas.', 'La Web Speech API es un estándar del navegador que permite a las aplicaciones web acceder al micrófono del usuario para reconocimiento de voz (SpeechRecognition) y convertir texto a voz (SpeechSynthesis). Es compatible principalmente con Chrome/Edge y es la tecnología detrás del buscador por voz de esta aplicación.', 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API', 'Estándar abierto (sin licencia de software)', 2012, 'W3C / Google (implementación en Chrome)', 'https://www.youtube.com/watch?v=shq1tyUkaAk', null
-on conflict (slug) do update set
-  tema_id = excluded.tema_id, clasificacion_si_id = excluded.clasificacion_si_id,
-  nombre = excluded.nombre, objetivo = excluded.objetivo, descripcion_corta = excluded.descripcion_corta,
-  url_acceso = excluded.url_acceso, licencia = excluded.licencia, anio_lanzamiento = excluded.anio_lanzamiento,
-  autor_referencia = excluded.autor_referencia, video_url = excluded.video_url, imagen_url = excluded.imagen_url;
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'memoria-limitada')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-por-refuerzo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'ia-subsimbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-inductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-empirico')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'gymnasium'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-procedimental')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-piensan-racionalmente')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'maquinas-reactivas')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'ia-simbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-deductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-declarativo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'protege'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-explicito')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'memoria-limitada')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'deep-learning')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-supervisado')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'ia-subsimbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-inductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-empirico')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'tensorflow'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-procedimental')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'maquinas-reactivas')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-supervisado')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'deep-learning')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'ia-subsimbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-inductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-empirico')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'opencv'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-procedimental')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'maquinas-reactivas')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'ia-simbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-deductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-procedimental')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'or-tools'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-teorico')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-como-humanos')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'memoria-limitada')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-supervisado')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-por-refuerzo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'deep-learning')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'ia-subsimbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-inductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-empirico')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'chatgpt'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-tacito')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'sistemas-que-actuan-racionalmente')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'memoria-limitada')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-supervisado')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'deep-learning')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'ia-subsimbolica')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'aprendizaje-inductivo')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-empirico')
+on conflict do nothing;
+
+insert into public.software_clasificaciones (software_id, clasificacion_si_id)
+select
+  (select id from public.software where slug = 'whisper'),
+  (select id from public.clasificaciones_si where slug = 'conocimiento-procedimental')
+on conflict do nothing;
