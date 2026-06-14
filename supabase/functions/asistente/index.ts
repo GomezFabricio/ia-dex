@@ -25,7 +25,10 @@ function handleOptions(req: Request): Response | null {
   return null;
 }
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
+// Dedicated key for the assistant so its traffic doesn't eat the buscar EF's
+// quota. Falls back to the shared GEMINI_API_KEY if the dedicated secret isn't set.
+const GEMINI_API_KEY =
+  Deno.env.get('GEMINI_API_KEY_ASISTENTE') ?? Deno.env.get('GEMINI_API_KEY') ?? '';
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
 const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') ?? 'gemini-2.0-flash-lite';
 const GEMINI_TIMEOUT_MS = 8000;
