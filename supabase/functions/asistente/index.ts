@@ -6,8 +6,8 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
  *
  * 1. Parse request: { pregunta, historial?, pagina? }
  * 2. Load a compact grounding context (software + temas + SI taxonomy) from the DB
- * 3. Call Gemini (primary → fallback model, then one retry pass with 600ms backoff)
- *    to answer as a didactic AI tutor in Rioplatense Spanish, returning { respuesta, fuentes[] }
+ * 3. Call Gemini (primary → fallback model — one attempt each) to answer as a
+ *    didactic AI tutor in Rioplatense Spanish, returning { respuesta, fuentes[] }
  * 4. Return the answer (degrades to a friendly transient-fail message on full exhaustion)
  *
  * Auth: public (anon key); CORS: wildcard. Mirrors the buscar EF patterns
@@ -31,10 +31,9 @@ const GEMINI_API_KEY =
   Deno.env.get('GEMINI_API_KEY_ASISTENTE') ?? Deno.env.get('GEMINI_API_KEY') ?? '';
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
 const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') ?? 'gemini-2.0-flash-lite';
-// Per-attempt timeout. Two passes × 2 models + 600ms backoff must stay under ~10s
-// so the frontend 12s service timeout is never hit.
-const GEMINI_TIMEOUT_MS = 4000;
-const RETRY_BACKOFF_MS = 600;
+// Per-attempt timeout. Gemini takes ~4-5s with the full grounding context; 8s gives
+// adequate margin. Worst case: 2 models × 8s = 16s → frontend budget is 18s.
+const GEMINI_TIMEOUT_MS = 8000;
 
 interface HistMsg {
   role: 'user' | 'assistant';
@@ -186,14 +185,7 @@ Devolvé un JSON con esta estructura exacta:
 
   const models = [GEMINI_MODEL, GEMINI_FALLBACK_MODEL];
 
-  // Pass 1: try each model once.
-  for (const model of models) {
-    const out = await tryModel(model);
-    if (out !== null) return out;
-  }
-
-  // Pass 2: both failed (likely transient 429). Wait briefly then try once more.
-  await new Promise((r) => setTimeout(r, RETRY_BACKOFF_MS));
+  // Single pass: try primary then fallback — one attempt per model.
   for (const model of models) {
     const out = await tryModel(model);
     if (out !== null) return out;
