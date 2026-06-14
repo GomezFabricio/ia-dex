@@ -30,6 +30,7 @@ function isFullBleedPath(pathname: string): boolean {
   if (pathname === '/') return true
   if (pathname === '/roadmap') return true
   if (pathname.startsWith('/software/')) return true
+  if (pathname.startsWith('/clasificaciones/')) return true
   return false
 }
 
