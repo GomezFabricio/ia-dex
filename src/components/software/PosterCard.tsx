@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Software } from '../../types/dtos'
 import { useImageOk } from '../../hooks/useImageOk'
+import { hueFor, washFor } from '../../lib/hue'
 
 // ---------------------------------------------------------------------------
 // PosterCard — the rail (poster) variant of a software card.
@@ -16,9 +17,9 @@ import { useImageOk } from '../../hooks/useImageOk'
 // card (scale + accent border + glow), Ken-Burns-zooms the artwork, and reveals
 // the peek. Driven by the `.poster-*` CSS classes that ship in IA-dex's design.
 //
-// Theme-agnostic: the per-card "wash" is derived from the accent TOKENS
-// (--color-accent / -2 / -3), so it adapts to light/dark automatically instead
-// of the prototype's hardcoded hex.
+// Theme-agnostic: the per-card "wash" is derived from the accent TOKENS via the
+// shared lib/hue helpers, so it adapts to light/dark automatically instead of
+// the prototype's hardcoded hex.
 // ---------------------------------------------------------------------------
 
 type Props = {
@@ -27,24 +28,6 @@ type Props = {
   dex?: number
   /** Resolved tema name, shown as the bottom kicker. Omitted when undefined. */
   temaNombre?: string
-}
-
-// The three brand accents, as CSS-var references so the wash follows the theme.
-const HUES = ['var(--color-accent)', 'var(--color-accent-2)', 'var(--color-accent-3)'] as const
-
-// Deterministic hue pick so cards aren't monotone but stay stable per software.
-function hueFor(seed: string): string {
-  let h = 0
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0
-  return HUES[h % HUES.length]
-}
-
-// Per-card ambient wash (mirrors washFor() in the design prototype).
-function washFor(hue: string): string {
-  return (
-    `radial-gradient(135% 120% at 26% 0%, color-mix(in oklab, ${hue} 60%, transparent), transparent 64%), ` +
-    `linear-gradient(155deg, color-mix(in oklab, ${hue} 30%, transparent), transparent 72%)`
-  )
 }
 
 export default function PosterCard({ software, dex, temaNombre }: Props) {

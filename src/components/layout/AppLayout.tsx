@@ -23,13 +23,19 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 // ---------------------------------------------------------------------------
 
 // Routes whose page owns a full-bleed (edge-to-edge) layout. As redesign phases
-// land their heroes, add the route here. Everything else gets the padded shell.
-const FULL_BLEED_PATHS = new Set(['/'])
+// land their heroes, extend this predicate. Detail routes are matched by prefix
+// (e.g. /software/:id), so it can't be a plain Set of exact paths. Everything
+// else falls back to the centered, padded shell.
+function isFullBleedPath(pathname: string): boolean {
+  if (pathname === '/') return true
+  if (pathname.startsWith('/software/')) return true
+  return false
+}
 
 export default function AppLayout() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const { pathname } = useLocation()
-  const isFullBleed = FULL_BLEED_PATHS.has(pathname)
+  const isFullBleed = isFullBleedPath(pathname)
 
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [docked, setDocked] = useState(false)

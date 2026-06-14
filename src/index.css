@@ -383,6 +383,11 @@
   animation: float-y 14s ease-in-out infinite reverse;
 }
 
+/* Primary hero CTA — gently breathing glow (the cta-pulse keyframe is in §4). */
+.cta-pulse {
+  animation: cta-pulse 2.6s ease-in-out infinite;
+}
+
 /* ---------------------------------------------------------------------------
    Usage notes
    - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav
