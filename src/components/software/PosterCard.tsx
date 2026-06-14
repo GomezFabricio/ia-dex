@@ -32,8 +32,8 @@ type Props = {
 
 export default function PosterCard({ software, dex, temaNombre }: Props) {
   const { id, nombre, imagen_url, video_url, objetivo, licencia, anio_lanzamiento, tema_id } = software
-  // Same 200px threshold as SoftwareCard / the ficha banner, so an image either
-  // shows everywhere or the lettered placeholder shows everywhere (consistency).
+  // Same 200px threshold used across the app, so an image either shows
+  // everywhere or the lettered placeholder shows everywhere (consistency).
   const img = useImageOk(imagen_url, 200)
 
   const hue = hueFor(tema_id || id)

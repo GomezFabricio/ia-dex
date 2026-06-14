@@ -1,11 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useBusqueda } from '../hooks/useBusqueda'
 import { useTemas } from '../hooks/useTemas'
 import { useVoz } from '../hooks/useVoz'
-import type { FiltrosBusqueda, FiltrosExtraidos } from '../types/dtos'
-import SoftwareList from '../components/software/SoftwareList'
+import type { FiltrosBusqueda, FiltrosExtraidos, Software } from '../types/dtos'
+import PosterCard from '../components/software/PosterCard'
 import VoiceSearchOverlay from '../components/busqueda/VoiceSearchOverlay'
+
+// Results as a poster grid (mirrors the catalog/tema grid). Module-scope so the
+// resolver is passed in rather than re-derived per render of the page body.
+function ResultsGrid({
+  items,
+  temaNombrePorId,
+}: {
+  items: Software[]
+  temaNombrePorId: (temaId: string) => string | undefined
+}) {
+  return (
+    <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(165px,1fr))] gap-4">
+      {items.map((sw, i) => (
+        <li key={sw.id}>
+          <PosterCard software={sw} dex={i + 1} temaNombre={temaNombrePorId(sw.tema_id)} />
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 // ---------------------------------------------------------------------------
 // BuscarPage — hybrid NLP search page.
@@ -183,9 +203,20 @@ export default function BuscarPage() {
     }
   }
 
+  // tema_id → tema.nombre resolver for the result poster kickers.
+  const temaNombrePorId = useMemo(() => {
+    const byId = new Map(temas.data.map((t) => [t.id, t.nombre]))
+    return (temaId: string) => byId.get(temaId)
+  }, [temas.data])
+
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-text">Buscar</h1>
+    <div className="flex flex-col gap-6 pt-4">
+      <div className="flex flex-col gap-2">
+        <p className="dex-label text-[11px] text-accent-2">Buscar · Lenguaje natural o filtros</p>
+        <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] font-bold tracking-[-0.02em] text-text">
+          Encontrá tu herramienta
+        </h1>
+      </div>
 
       {/* Listening overlay — open while recognition runs; cancel stops it.
           Closes automatically when a transcript arrives or recognition ends
@@ -199,7 +230,7 @@ export default function BuscarPage() {
       {/* Filter form card */}
       <form
         onSubmit={handleSubmit}
-        className="bg-surface rounded-lg p-4 flex flex-col gap-4"
+        className="flex flex-col gap-4 rounded-2xl border border-border bg-surface/55 p-5 backdrop-blur-md"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Texto — primary search driver, spans both columns */}
@@ -221,7 +252,7 @@ export default function BuscarPage() {
                   setForm((prev) => ({ ...prev, texto: e.target.value }))
                   voz.clearError()
                 }}
-                className="flex-1 bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+                className="flex-1 rounded-lg border border-border bg-bg/60 px-3 py-2 text-text placeholder-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
               />
               {/* Mic button — rendered only when voice is supported (Spec 2) */}
               {voz.isSupported && (
@@ -291,7 +322,7 @@ export default function BuscarPage() {
               id="buscar-tema"
               value={form.temaId}
               onChange={(e) => handleSelectFilterChange({ temaId: e.target.value })}
-              className="bg-bg border border-border rounded px-3 py-2 text-text focus:outline-none focus:border-accent"
+              className="rounded-lg border border-border bg-bg/60 px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
             >
               <option value="">Todos los temas</option>
               {temas.data.map((tema) => (
@@ -317,7 +348,7 @@ export default function BuscarPage() {
               value={form.licencia}
               onChange={(e) => handleTextFilterChange({ licencia: e.target.value })}
               onBlur={(e) => handleTextFilterBlur({ licencia: e.target.value })}
-              className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+              className="rounded-lg border border-border bg-bg/60 px-3 py-2 text-text placeholder-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
             />
           </div>
 
@@ -335,7 +366,7 @@ export default function BuscarPage() {
               value={form.anioDesde}
               onChange={(e) => handleTextFilterChange({ anioDesde: e.target.value })}
               onBlur={(e) => handleTextFilterBlur({ anioDesde: e.target.value })}
-              className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+              className="rounded-lg border border-border bg-bg/60 px-3 py-2 text-text placeholder-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
             />
           </div>
 
@@ -353,14 +384,14 @@ export default function BuscarPage() {
               value={form.anioHasta}
               onChange={(e) => handleTextFilterChange({ anioHasta: e.target.value })}
               onBlur={(e) => handleTextFilterBlur({ anioHasta: e.target.value })}
-              className="bg-bg border border-border rounded px-3 py-2 text-text placeholder-muted focus:outline-none focus:border-accent"
+              className="rounded-lg border border-border bg-bg/60 px-3 py-2 text-text placeholder-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
             />
           </div>
         </div>
 
         <button
           type="submit"
-          className="self-start bg-accent text-bg rounded px-4 py-2 font-semibold hover:opacity-90 transition-opacity"
+          className="dex-label self-start rounded-lg bg-accent px-5 py-2.5 text-[11px] text-on-accent shadow-glow transition-transform hover:-translate-y-0.5"
         >
           Buscar
         </button>
@@ -375,7 +406,7 @@ export default function BuscarPage() {
 
         {/* Loading — preserve previous results, show spinner text below */}
         {hasSearched && loading && results.length > 0 && (
-          <SoftwareList items={results} />
+          <ResultsGrid items={results} temaNombrePorId={temaNombrePorId} />
         )}
         {hasSearched && loading && (
           <p className="text-muted">Buscando…</p>
@@ -410,12 +441,10 @@ export default function BuscarPage() {
         {/* Results */}
         {hasSearched && !loading && error === null && results.length > 0 && (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-muted">
-              {results.length === 1
-                ? '1 resultado'
-                : `${results.length} resultados`}
+            <p className="dex-label text-[11px] text-muted">
+              {results.length === 1 ? '1 resultado' : `${results.length} resultados`}
             </p>
-            <SoftwareList items={results} />
+            <ResultsGrid items={results} temaNombrePorId={temaNombrePorId} />
           </div>
         )}
       </div>
