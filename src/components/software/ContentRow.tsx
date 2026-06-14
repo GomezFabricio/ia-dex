@@ -28,6 +28,8 @@ type Props = {
   layout?: 'rail' | 'grid'
   /** 1-based catalog number of the first item (rails can continue numbering). */
   dexStart?: number
+  /** Hide the built-in header (caller renders its own); titulo still labels the region. */
+  hideHeader?: boolean
 }
 
 export default function ContentRow({
@@ -38,6 +40,7 @@ export default function ContentRow({
   temaNombrePorId,
   layout = 'rail',
   dexStart = 1,
+  hideHeader = false,
 }: Props) {
   const trackRef = useRef<HTMLUListElement>(null)
 
@@ -56,6 +59,7 @@ export default function ContentRow({
   return (
     <section role="region" aria-label={titulo} className="relative">
       {/* Header */}
+      {!hideHeader && (
       <header className="flex items-center gap-3 px-4 pb-3.5 sm:px-8">
         <span
           className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
@@ -76,6 +80,7 @@ export default function ContentRow({
           </Link>
         )}
       </header>
+      )}
 
       {isGrid ? (
         <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-4 px-4 pb-4 sm:px-8">

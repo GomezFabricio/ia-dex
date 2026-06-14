@@ -21,6 +21,34 @@ export async function listarPorTema(temaId: string): Promise<Software[]> {
 }
 
 /**
+ * Returns every software in the catalogue, ordered by nombre asc.
+ * Used by the Catálogo grid view and aggregate counts.
+ */
+export async function listarTodos(): Promise<Software[]> {
+  const { data, error } = await supabase
+    .from('software')
+    .select('*')
+    .order('nombre')
+
+  if (error) throw error
+  return data ?? []
+}
+
+/**
+ * Returns all software linked to a clasificacion_si, ordered by nombre asc.
+ */
+export async function listarPorClasificacion(clasificacionId: string): Promise<Software[]> {
+  const { data, error } = await supabase
+    .from('software')
+    .select('*')
+    .eq('clasificacion_si_id', clasificacionId)
+    .order('nombre')
+
+  if (error) throw error
+  return data ?? []
+}
+
+/**
  * Returns a single Software by id, or null when not found.
  */
 export async function obtenerSoftware(id: string): Promise<Software | null> {
