@@ -57,17 +57,27 @@ export default function AsistenteWidget() {
     setAttn(false)
   }
 
+  // Capture current page context: h1 + pathname + main text (max ~1800 chars).
+  const getPageContext = (): string | undefined => {
+    const h1 = document.querySelector('main h1')?.textContent?.trim() ?? ''
+    const mainText = (document.querySelector('main') as HTMLElement | null)?.innerText
+      ?.trim()
+      ?.slice(0, 1800) ?? ''
+    if (!h1 && !mainText) return undefined
+    const header = `Página: ${h1 || '(sin título)'} (${pathname})`
+    return mainText ? `${header}\nContenido:\n${mainText}` : header
+  }
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     const q = input.trim()
     if (q === '') return
-    enviar(q)
+    enviar(q, getPageContext())
     setInput('')
   }
 
   const resumir = () => {
-    const h1 = document.querySelector('main h1')?.textContent?.trim() ?? ''
-    enviar('Resumime esta página', `${h1} (${pathname})`)
+    enviar('Resumime esta página', getPageContext())
   }
 
   // Closed — breathing FAB with attention dot.

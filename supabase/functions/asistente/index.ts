@@ -5,10 +5,10 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
  * asistente — IA-dex conversational assistant edge function.
  *
  * 1. Parse request: { pregunta, historial?, pagina? }
- * 2. Load a compact catalogue context (software + temas) for grounding
- * 3. Call Gemini (primary → fallback model) to answer in Rioplatense Spanish,
- *    grounded in the catalogue, returning { respuesta, fuentes[] }
- * 4. Return the answer (degrades to a friendly message on Gemini failure)
+ * 2. Load a compact grounding context (software + temas + SI taxonomy) from the DB
+ * 3. Call Gemini (primary → fallback model, then one retry pass with 600ms backoff)
+ *    to answer as a didactic AI tutor in Rioplatense Spanish, returning { respuesta, fuentes[] }
+ * 4. Return the answer (degrades to a friendly transient-fail message on full exhaustion)
  *
  * Auth: public (anon key); CORS: wildcard. Mirrors the buscar EF patterns
  * (inlined CORS, primary/fallback Gemini models, per-attempt timeout).
@@ -31,7 +31,10 @@ const GEMINI_API_KEY =
   Deno.env.get('GEMINI_API_KEY_ASISTENTE') ?? Deno.env.get('GEMINI_API_KEY') ?? '';
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-lite';
 const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') ?? 'gemini-2.0-flash-lite';
-const GEMINI_TIMEOUT_MS = 8000;
+// Per-attempt timeout. Two passes × 2 models + 600ms backoff must stay under ~10s
+// so the frontend 12s service timeout is never hit.
+const GEMINI_TIMEOUT_MS = 4000;
+const RETRY_BACKOFF_MS = 600;
 
 interface HistMsg {
   role: 'user' | 'assistant';
@@ -58,16 +61,63 @@ interface TemaCtx {
   id: string;
   nombre: string;
 }
+interface CriterioCtx {
+  id: string;
+  nombre: string;
+  descripcion: string | null;
+  orden: number;
+}
+interface ClasifCtx {
+  nombre: string;
+  en_que_consiste: string | null;
+  ejemplos: string | null;
+  criterio_id: string;
+  orden: number;
+}
 
 // Build a compact grounding string the model can cite from.
-function buildContexto(software: SoftwareCtx[], temas: TemaCtx[]): string {
+function buildContexto(
+  software: SoftwareCtx[],
+  temas: TemaCtx[],
+  criterios: CriterioCtx[],
+  clasificaciones: ClasifCtx[],
+): string {
   const temaNombre = new Map(temas.map((t) => [t.id, t.nombre]));
-  const lines = software.map((s) => {
+
+  // Catalog tools section
+  const toolLines = software.map((s) => {
     const tema = temaNombre.get(s.tema_id) ?? '—';
     const obj = (s.objetivo ?? '').slice(0, 140);
     return `- ${s.nombre} (tema: ${tema})${obj ? `: ${obj}` : ''}`;
   });
-  return `Temas del curso: ${temas.map((t) => t.nombre).join(', ')}.\n\nHerramientas del catálogo:\n${lines.join('\n')}`;
+
+  // SI taxonomy section — grouped by criterio (axis)
+  const clasifByCriterio = new Map<string, ClasifCtx[]>();
+  for (const c of clasificaciones) {
+    if (!clasifByCriterio.has(c.criterio_id)) clasifByCriterio.set(c.criterio_id, []);
+    clasifByCriterio.get(c.criterio_id)!.push(c);
+  }
+
+  const taxLines: string[] = [];
+  for (const criterio of criterios) {
+    const cats = (clasifByCriterio.get(criterio.id) ?? []).sort((a, b) => a.orden - b.orden);
+    if (cats.length === 0) continue;
+    taxLines.push(`Eje "${criterio.nombre}":`);
+    for (const cat of cats) {
+      const desc = (cat.en_que_consiste ?? '').slice(0, 160);
+      taxLines.push(`  • ${cat.nombre}${desc ? ` — ${desc}` : ''}`);
+    }
+  }
+
+  return [
+    `Temas del curso: ${temas.map((t) => t.nombre).join(', ')}.`,
+    '',
+    'Clasificaciones de IA por eje:',
+    taxLines.join('\n'),
+    '',
+    'Herramientas del catálogo:',
+    toolLines.join('\n'),
+  ].join('\n');
 }
 
 async function ask(req: AsistenteRequest, contexto: string): Promise<AsistenteResult | null> {
@@ -76,7 +126,9 @@ async function ask(req: AsistenteRequest, contexto: string): Promise<AsistenteRe
     .map((m) => `${m.role === 'user' ? 'Usuario' : 'Asistente'}: ${m.text}`)
     .join('\n');
 
-  const prompt = `Sos el asistente de IA-dex, un índice de software de inteligencia artificial catalogado por temas del curso. Respondé en español rioplatense (voseo), de forma clara, breve y didáctica. Basate SOLO en el catálogo que sigue; si algo no está en el catálogo, decílo y sugerí lo más cercano. Cuando recomiendes herramientas o temas del catálogo, listá sus nombres exactos en "fuentes".
+  const prompt = `Sos el asistente de IA-dex, una guía educativa de inteligencia artificial para estudiantes de un curso de Sistemas Inteligentes. Respondé en español rioplatense (voseo), claro, breve y didáctico.
+
+Usá el material del curso que sigue (temas, clasificaciones de IA por eje, y herramientas del catálogo) como BASE para explicar conceptos de IA (qué es, tipos, clasificaciones, formas de aprendizaje, etc.) y para recomendar herramientas. Si te preguntan algo de IA que no está explícito en el material, explicalo igual con tu conocimiento general de IA, de forma didáctica — pero NO inventes herramientas que no estén en el catálogo. Si te pasan el contexto de una página (pagina), usalo para responder sobre lo que el usuario está viendo. Cuando menciones herramientas, clasificaciones o temas del catálogo, poné sus nombres EXACTOS en "fuentes".
 
 ${contexto}
 
@@ -85,7 +137,7 @@ Pregunta del usuario: "${req.pregunta}"
 
 Devolvé un JSON con esta estructura exacta:
 - respuesta: tu respuesta en español rioplatense (string)
-- fuentes: array de nombres EXACTOS de herramientas o temas del catálogo que mencionaste (puede ser vacío)`;
+- fuentes: array de nombres EXACTOS de herramientas, clasificaciones o temas del catálogo que mencionaste (puede ser vacío)`;
 
   const schema = {
     type: 'object',
@@ -132,10 +184,21 @@ Devolvé un JSON con esta estructura exacta:
     }
   };
 
-  for (const model of [GEMINI_MODEL, GEMINI_FALLBACK_MODEL]) {
+  const models = [GEMINI_MODEL, GEMINI_FALLBACK_MODEL];
+
+  // Pass 1: try each model once.
+  for (const model of models) {
     const out = await tryModel(model);
     if (out !== null) return out;
   }
+
+  // Pass 2: both failed (likely transient 429). Wait briefly then try once more.
+  await new Promise((r) => setTimeout(r, RETRY_BACKOFF_MS));
+  for (const model of models) {
+    const out = await tryModel(model);
+    if (out !== null) return out;
+  }
+
   return null;
 }
 
@@ -155,21 +218,25 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!);
 
-    const [swRes, temasRes] = await Promise.all([
+    const [swRes, temasRes, criteriosRes, clasificacionesRes] = await Promise.all([
       supabase.from('software').select('nombre, objetivo, tema_id'),
       supabase.from('temas').select('id, nombre').order('orden'),
+      supabase.from('criterios_si').select('id, nombre, descripcion, orden').order('orden'),
+      supabase.from('clasificaciones_si').select('nombre, en_que_consiste, ejemplos, criterio_id, orden').order('orden'),
     ]);
 
     const software = (swRes.data ?? []) as SoftwareCtx[];
     const temas = (temasRes.data ?? []) as TemaCtx[];
-    const contexto = buildContexto(software, temas);
+    const criterios = (criteriosRes.data ?? []) as CriterioCtx[];
+    const clasificaciones = (clasificacionesRes.data ?? []) as ClasifCtx[];
+    const contexto = buildContexto(software, temas, criterios, clasificaciones);
 
     const result = await ask(body, contexto);
 
     const payload: AsistenteResult =
       result ?? {
         respuesta:
-          'Perdoná, ahora mismo no puedo procesar la consulta. Probá de nuevo en un momento.',
+          'Uy, estoy con mucha demanda en este momento 😅. Probá de nuevo en unos segundos.',
         fuentes: [],
       };
 
