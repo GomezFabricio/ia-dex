@@ -1,14 +1,35 @@
 import { useSoftwarePopulares } from '../hooks/useSoftwarePopulares'
 import { useMejorValorados } from '../hooks/useMejorValorados'
+import { useSoftwareTodos } from '../hooks/useSoftwareTodos'
+import { useTemas } from '../hooks/useTemas'
+import { useClasificaciones } from '../hooks/useClasificaciones'
+import { useCountUp } from '../hooks/useCountUp'
 import RankingListPopular from '../components/software/RankingListPopular'
 import RankingListRating from '../components/software/RankingListRating'
 
 // ---------------------------------------------------------------------------
-// EstadisticasPage — top-10 rankings by views and rating.
-// Two independent sections, each with its own D4 state quartet (loading /
-// error+retry / empty / data). <ol> semantics via RankingList wrappers.
-// Section is a local non-exported helper — deliberately not shared.
+// EstadisticasPage — "cine-neural" catalogue numbers (redesign).
+// Full-bleed hero + a count-up stat grid (tools / temas / clasificaciones / total
+// views) + the podio (top-10 by views and by rating). Recreates the estadísticas
+// screen from the design handoff. Each ranking keeps its D4 state quartet.
 // ---------------------------------------------------------------------------
+
+// 128400 → "128.4k"
+function fmtNum(n: number): string {
+  return n >= 1000 ? (n / 1000).toFixed(1).replace('.0', '') + 'k' : String(n)
+}
+
+function StatCard({ value, label, format }: { value: number; label: string; format?: boolean }) {
+  const animated = useCountUp(value)
+  return (
+    <div className="reveal rounded-2xl border border-border bg-surface/55 p-6">
+      <div className="dex-label text-[46px] font-bold leading-none text-text">
+        {format ? fmtNum(animated) : animated}
+      </div>
+      <div className="dex-label mt-3 text-[10px] text-muted">{label}</div>
+    </div>
+  )
+}
 
 type SectionProps = {
   titulo: string
@@ -22,74 +43,88 @@ type SectionProps = {
 
 function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, children }: SectionProps) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="font-display flex items-center gap-2.5 text-lg font-semibold text-text">
-        <span className="h-4 w-1 shrink-0 rounded-full bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
-        {titulo}
-      </h2>
+    <section className="rounded-[18px] border border-border bg-surface/50 p-2">
+      <h2 className="dex-label px-4 pb-2.5 pt-3.5 text-[10px] text-muted">{titulo}</h2>
 
-      {loading && <p className="text-muted">Cargando…</p>}
+      {loading && <p className="px-4 pb-3 text-muted">Cargando…</p>}
 
       {!loading && error !== null && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 px-4 pb-3">
           <p className="text-muted">No se pudieron cargar los datos</p>
-          <button
-            type="button"
-            onClick={refetch}
-            className="text-accent hover:text-text self-start transition-colors"
-          >
+          <button type="button" onClick={refetch} className="self-start text-accent transition-colors hover:text-text">
             Reintentar
           </button>
         </div>
       )}
 
-      {!loading && error === null && isEmpty && (
-        <p className="text-muted">{emptyMessage}</p>
-      )}
+      {!loading && error === null && isEmpty && <p className="px-4 pb-3 text-muted">{emptyMessage}</p>}
 
       {!loading && error === null && !isEmpty && children}
     </section>
   )
 }
 
-// ---------------------------------------------------------------------------
-
 export default function EstadisticasPage() {
-  const populares = useSoftwarePopulares(10)
+  const populares = useSoftwarePopulares(100)
   const mejorValorados = useMejorValorados(10)
+  const todos = useSoftwareTodos()
+  const temas = useTemas()
+  const clasifs = useClasificaciones()
+
+  const totalVistas = populares.data.reduce((acc, item) => acc + (item.vistas ?? 0), 0)
+  const topVistos = populares.data.slice(0, 10)
 
   return (
-    <div className="flex flex-col gap-6 pt-4">
-      <div className="flex flex-col gap-2">
-        <p className="dex-label text-[11px] text-accent-2">Estadísticas · El catálogo en números</p>
-        <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] font-bold tracking-[-0.02em] text-text">
-          Rankings
-        </h1>
-        <p className="text-sm text-muted">El top del catálogo por vistas y por valoración.</p>
+    <div className="flex flex-col">
+      {/* Hero */}
+      <section className="relative overflow-hidden px-6 pt-24 pb-6 sm:px-8 lg:px-12">
+        <div
+          aria-hidden="true"
+          className="dex-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent)]"
+        />
+        <div className="relative mx-auto max-w-[1400px]">
+          <p className="dex-label mb-3.5 text-[11px] text-accent-2">Estadísticas del índice</p>
+          <h1 className="font-display text-[clamp(2rem,4.5vw,3rem)] font-bold tracking-[-0.02em] text-text">
+            El catálogo en números
+          </h1>
+        </div>
+      </section>
+
+      {/* Stat cards */}
+      <div className="mx-auto w-full max-w-[1400px] px-6 pb-2 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4">
+          <StatCard value={todos.data.length} label="Herramientas indexadas" />
+          <StatCard value={temas.data.length} label="Temas pedagógicos" />
+          <StatCard value={clasifs.data.length} label="Clasificaciones de SI" />
+          <StatCard value={totalVistas} label="Vistas totales" format />
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Section
-          titulo="Software más visto"
-          loading={populares.loading}
-          error={populares.error}
-          refetch={populares.refetch}
-          isEmpty={populares.data.length === 0}
-          emptyMessage="Aún no hay visitas registradas."
-        >
-          <RankingListPopular items={populares.data} />
-        </Section>
+      {/* Podio */}
+      <div className="mx-auto w-full max-w-[1400px] px-6 py-8 pb-16 sm:px-8 lg:px-12">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Section
+            titulo="Más vistos"
+            loading={populares.loading}
+            error={populares.error}
+            refetch={populares.refetch}
+            isEmpty={topVistos.length === 0}
+            emptyMessage="Aún no hay visitas registradas."
+          >
+            <RankingListPopular items={topVistos} />
+          </Section>
 
-        <Section
-          titulo="Software mejor valorado"
-          loading={mejorValorados.loading}
-          error={mejorValorados.error}
-          refetch={mejorValorados.refetch}
-          isEmpty={mejorValorados.data.length === 0}
-          emptyMessage="Aún no hay valoraciones registradas."
-        >
-          <RankingListRating items={mejorValorados.data} />
-        </Section>
+          <Section
+            titulo="Mejor valorados"
+            loading={mejorValorados.loading}
+            error={mejorValorados.error}
+            refetch={mejorValorados.refetch}
+            isEmpty={mejorValorados.data.length === 0}
+            emptyMessage="Aún no hay valoraciones registradas."
+          >
+            <RankingListRating items={mejorValorados.data} />
+          </Section>
+        </div>
       </div>
     </div>
   )
