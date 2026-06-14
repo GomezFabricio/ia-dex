@@ -148,7 +148,8 @@ export default function ForoTemaPage() {
 
           {/* Mensajes list */}
           <section className="flex flex-col gap-3">
-            <h2 className="font-display text-lg font-semibold text-text">
+            <h2 className="font-display flex items-center gap-2.5 text-lg font-semibold text-text">
+              <span className="h-4 w-1 shrink-0 rounded-full bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
               {mensajes.length === 0 ? 'Sin respuestas' : `${mensajes.length} respuesta${mensajes.length !== 1 ? 's' : ''}`}
             </h2>
             {mensajes.length > 0 && (
