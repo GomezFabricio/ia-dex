@@ -319,6 +319,57 @@
   }
 }
 
+/* ----------------------------------------------------------------------------
+   6. POSTER RAIL — card hover/focus choreography + scroll track
+   The PosterCard markup is in React; these are the motion/state classes it
+   relies on. Hover effects are gated behind @media(hover:hover) so touch
+   devices don't get stuck-hover; keyboard users get the SAME reveal via
+   :focus-within (a11y). transition is scoped to transform/shadow/border —
+   never `all` — so paint stays cheap.
+   -------------------------------------------------------------------------- */
+.poster-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.poster-img {
+  transition: transform 0.45s ease;
+}
+.poster-peek {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* Keyboard a11y: reveal the peek when focus enters the card (any device). */
+.poster-card:focus-within .poster-peek {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Pointer devices only — avoid sticky :hover on touch. */
+@media (hover: hover) {
+  .poster-card:hover {
+    transform: scale(1.06);
+    z-index: 20;
+    border-color: color-mix(in oklab, var(--color-accent) 60%, transparent);
+    box-shadow: var(--shadow-glow);
+  }
+  .poster-card:hover .poster-img {
+    transform: scale(1.09);
+  }
+  .poster-card:hover .poster-peek {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Horizontal rail track: hide the scrollbar (chrome handled by snap + arrows). */
+[data-rail] {
+  scrollbar-width: none;
+}
+[data-rail]::-webkit-scrollbar {
+  display: none;
+}
+
 /* ---------------------------------------------------------------------------
    Usage notes
    - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav

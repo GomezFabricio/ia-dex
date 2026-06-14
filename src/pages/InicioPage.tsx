@@ -1,16 +1,23 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useSoftwarePopulares } from '../hooks/useSoftwarePopulares'
 import { useMejorValorados } from '../hooks/useMejorValorados'
 import { useRecomendacionesGlobales } from '../hooks/useRecomendacionesGlobales'
+import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
+import { useTemas } from '../hooks/useTemas'
+import type { Tema } from '../types/dtos'
 import RankingListPopular from '../components/software/RankingListPopular'
 import RankingListRating from '../components/software/RankingListRating'
-import SoftwareList from '../components/software/SoftwareList'
+import ContentRow from '../components/software/ContentRow'
 
 // ---------------------------------------------------------------------------
-// InicioPage — home dashboard.
-// Three independent sections, each with its own D4 state quartet (loading /
-// error+retry / empty / data). A failure in one section MUST NOT affect others.
-// Section is a local non-exported helper — deliberately not shared.
+// InicioPage — "cine-neural" home.
+// Software lists are now Netflix-style horizontal rails (ContentRow + PosterCard);
+// the popularity/rating leaderboards stay as the "Podio" rankings (they use
+// ranking DTOs that lack the full Software fields a poster needs).
+// Each section keeps its own D4 state quartet (loading / error+retry / empty /
+// data) so a failure in one rail NEVER takes down the others.
+// Section + TemaRail are local non-exported helpers — deliberately not shared.
 // ---------------------------------------------------------------------------
 
 type SectionProps = {
@@ -34,7 +41,7 @@ function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, child
         {titulo}
       </h2>
 
-      {loading && <p className="text-muted">Cargando…</p>}
+      {loading && <div className="skeleton h-24 w-full rounded-xl" aria-hidden="true" />}
 
       {!loading && error !== null && (
         <div className="flex flex-col gap-2">
@@ -55,6 +62,29 @@ function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, child
 
       {!loading && error === null && !isEmpty && children}
     </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// TemaRail — one rail per tema. Lives in its own component so each tema gets an
+// isolated useSoftwarePorTema fetch (hooks can't run in a loop). Renders nothing
+// while loading / on error / when empty — the home stays clean and a single
+// tema's failure can't break the page. ContentRow already returns null on [].
+// ---------------------------------------------------------------------------
+
+function TemaRail({ tema, temaNombrePorId }: { tema: Tema; temaNombrePorId: (id: string) => string | undefined }) {
+  const { data, loading, error } = useSoftwarePorTema(tema.id)
+
+  if (loading || error !== null || data.length === 0) return null
+
+  return (
+    <ContentRow
+      titulo={tema.nombre}
+      items={data}
+      count={`${data.length} herramientas`}
+      verTodoHref={`/catalogo/${tema.slug}`}
+      temaNombrePorId={temaNombrePorId}
+    />
   )
 }
 
@@ -110,10 +140,17 @@ const QUICK_LINKS = [
 export default function InicioPage() {
   const populares = useSoftwarePopulares(5)
   const mejorValorados = useMejorValorados(5)
-  const recomendaciones = useRecomendacionesGlobales(5)
+  const recomendaciones = useRecomendacionesGlobales(12)
+  const temas = useTemas()
+
+  // tema_id → tema.nombre resolver for poster kickers (built once per data change).
+  const temaNombrePorId = useMemo(() => {
+    const byId = new Map(temas.data.map((t) => [t.id, t.nombre]))
+    return (id: string) => byId.get(id)
+  }, [temas.data])
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       {/* Welcome hero */}
       <section className="relative overflow-hidden rounded-3xl border border-border bg-surface p-8 sm:p-10">
         <div
@@ -145,7 +182,7 @@ export default function InicioPage() {
           <div className="flex flex-wrap gap-3">
             <Link
               to="/catalogo"
-              className="rounded-lg bg-accent px-5 py-2.5 font-semibold text-bg no-underline shadow-glow transition-transform hover:-translate-y-0.5"
+              className="rounded-lg bg-accent px-5 py-2.5 font-semibold text-on-accent no-underline shadow-glow transition-transform hover:-translate-y-0.5"
             >
               Explorar catálogo
             </Link>
@@ -176,7 +213,37 @@ export default function InicioPage() {
         </div>
       </section>
 
-      {/* Ranking sections — 2-column grid on large screens */}
+      {/* Featured rail — full-bleed within the page column */}
+      {!recomendaciones.loading && recomendaciones.error === null && recomendaciones.data.length > 0 && (
+        <ContentRow
+          titulo="Populares del catálogo"
+          items={recomendaciones.data}
+          verTodoHref="/catalogo"
+          temaNombrePorId={temaNombrePorId}
+        />
+      )}
+      {recomendaciones.loading && (
+        <div className="skeleton mx-4 h-72 rounded-xl sm:mx-8" aria-hidden="true" />
+      )}
+      {!recomendaciones.loading && recomendaciones.error !== null && (
+        <div className="flex flex-col gap-2 px-4 sm:px-8">
+          <p className="text-muted">No se pudieron cargar los datos</p>
+          <button
+            type="button"
+            onClick={recomendaciones.refetch}
+            className="text-accent hover:text-text self-start transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      {/* Per-tema rails — one isolated fetch each, render only when they have data */}
+      {temas.data.map((tema) => (
+        <TemaRail key={tema.id} tema={tema} temaNombrePorId={temaNombrePorId} />
+      ))}
+
+      {/* Podio — popularity & rating leaderboards (ranking DTOs, not posters) */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Section
           titulo="Más vistos"
@@ -200,18 +267,6 @@ export default function InicioPage() {
           <RankingListRating items={mejorValorados.data} />
         </Section>
       </div>
-
-      {/* Recos — full width; SoftwareList owns its internal grid */}
-      <Section
-        titulo="Populares del catálogo"
-        loading={recomendaciones.loading}
-        error={recomendaciones.error}
-        refetch={recomendaciones.refetch}
-        isEmpty={recomendaciones.data.length === 0}
-        emptyMessage="No hay software cargado todavía."
-      >
-        <SoftwareList items={recomendaciones.data} />
-      </Section>
     </div>
   )
 }
