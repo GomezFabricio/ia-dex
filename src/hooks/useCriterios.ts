@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useReducer } from 'react'
-import type { ClasificacionConCriterio } from '../types/dtos'
+import type { CriterioSI } from '../types/dtos'
 import * as clasificacionesService from '../services/clasificacionesService'
 
 // ---------------------------------------------------------------------------
-// useClasificaciones — fetches all clasificaciones with active-flag stale guard
-// Return shape per design D4/D5: { data, loading, error, refetch }
-// State managed via useReducer to avoid synchronous setState inside effect body.
+// useCriterios — fetches all criterios_si ordered by orden
+// Return shape: { data, loading, error, refetch }
+// State managed via useReducer (canonical 4-action reducer pattern).
 // ---------------------------------------------------------------------------
 
 type State = {
-  data: ClasificacionConCriterio[]
+  data: CriterioSI[]
   loading: boolean
   error: Error | null
   version: number
@@ -17,7 +17,7 @@ type State = {
 
 type Action =
   | { type: 'refetch' }
-  | { type: 'success'; payload: ClasificacionConCriterio[] }
+  | { type: 'success'; payload: CriterioSI[] }
   | { type: 'error'; payload: Error }
 
 const initialState: State = {
@@ -38,8 +38,8 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useClasificaciones(): {
-  data: ClasificacionConCriterio[]
+export function useCriterios(): {
+  data: CriterioSI[]
   loading: boolean
   error: Error | null
   refetch: () => void
@@ -50,7 +50,7 @@ export function useClasificaciones(): {
     let active = true
 
     clasificacionesService
-      .listarClasificaciones()
+      .listarCriterios()
       .then((items) => {
         if (active) dispatch({ type: 'success', payload: items })
       })

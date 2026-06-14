@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          criterio_id: string
           ejemplos: string | null
           en_que_consiste: string | null
           enlaces: Json
@@ -30,6 +31,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          criterio_id: string
           ejemplos?: string | null
           en_que_consiste?: string | null
           enlaces?: Json
@@ -42,6 +44,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          criterio_id?: string
           ejemplos?: string | null
           en_que_consiste?: string | null
           enlaces?: Json
@@ -54,6 +57,51 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "clasificaciones_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clasificaciones_si_criterio_id_fkey"
+            columns: ["criterio_id"]
+            isOneToOne: false
+            referencedRelation: "criterios_si"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criterios_si: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          descripcion: string | null
+          id: string
+          nombre: string
+          orden: number
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          orden?: number
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          orden?: number
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criterios_si_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -196,7 +244,6 @@ export type Database = {
         Row: {
           anio_lanzamiento: number | null
           autor_referencia: string | null
-          clasificacion_si_id: string | null
           created_at: string
           created_by: string | null
           descripcion_corta: string | null
@@ -215,7 +262,6 @@ export type Database = {
         Insert: {
           anio_lanzamiento?: number | null
           autor_referencia?: string | null
-          clasificacion_si_id?: string | null
           created_at?: string
           created_by?: string | null
           descripcion_corta?: string | null
@@ -234,7 +280,6 @@ export type Database = {
         Update: {
           anio_lanzamiento?: number | null
           autor_referencia?: string | null
-          clasificacion_si_id?: string | null
           created_at?: string
           created_by?: string | null
           descripcion_corta?: string | null
@@ -252,13 +297,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "software_clasificacion_si_id_fkey"
-            columns: ["clasificacion_si_id"]
-            isOneToOne: false
-            referencedRelation: "clasificaciones_si"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "software_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -271,6 +309,50 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "temas"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      software_clasificaciones: {
+        Row: {
+          clasificacion_si_id: string
+          software_id: string
+        }
+        Insert: {
+          clasificacion_si_id: string
+          software_id: string
+        }
+        Update: {
+          clasificacion_si_id?: string
+          software_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "software_clasificaciones_clasificacion_si_id_fkey"
+            columns: ["clasificacion_si_id"]
+            isOneToOne: false
+            referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_clasificaciones_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "software"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_clasificaciones_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "v_software_populares"
+            referencedColumns: ["software_id"]
+          },
+          {
+            foreignKeyName: "software_clasificaciones_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "v_software_rating"
+            referencedColumns: ["software_id"]
           },
         ]
       }
@@ -389,7 +471,6 @@ export type Database = {
         Returns: {
           anio_lanzamiento: number
           autor_referencia: string
-          clasificacion_si_id: string
           created_at: string
           descripcion_corta: string
           id: string
@@ -409,7 +490,6 @@ export type Database = {
         Returns: {
           anio_lanzamiento: number
           autor_referencia: string
-          clasificacion_si_id: string
           created_at: string
           created_by: string
           descripcion_corta: string

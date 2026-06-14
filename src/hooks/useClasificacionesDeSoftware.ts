@@ -3,9 +3,9 @@ import type { ClasificacionConCriterio } from '../types/dtos'
 import * as clasificacionesService from '../services/clasificacionesService'
 
 // ---------------------------------------------------------------------------
-// useClasificaciones — fetches all clasificaciones with active-flag stale guard
-// Return shape per design D4/D5: { data, loading, error, refetch }
-// State managed via useReducer to avoid synchronous setState inside effect body.
+// useClasificacionesDeSoftware — clasificaciones_si linked to a software via M2M.
+// Skip variant: softwareId undefined → success([]) (dependency not ready).
+// Canonical 4-action reducer. Return shape: { data, loading, error, refetch }
 // ---------------------------------------------------------------------------
 
 type State = {
@@ -16,6 +16,7 @@ type State = {
 }
 
 type Action =
+  | { type: 'pending' }
   | { type: 'refetch' }
   | { type: 'success'; payload: ClasificacionConCriterio[] }
   | { type: 'error'; payload: Error }
@@ -29,6 +30,8 @@ const initialState: State = {
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'pending':
+      return { ...state, data: [], loading: true, error: null }
     case 'refetch':
       return { ...state, loading: true, error: null, version: state.version + 1 }
     case 'success':
@@ -38,7 +41,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useClasificaciones(): {
+export function useClasificacionesDeSoftware(softwareId?: string): {
   data: ClasificacionConCriterio[]
   loading: boolean
   error: Error | null
@@ -49,8 +52,15 @@ export function useClasificaciones(): {
   useEffect(() => {
     let active = true
 
+    if (softwareId === undefined) {
+      dispatch({ type: 'success', payload: [] })
+      return
+    }
+
+    dispatch({ type: 'pending' })
+
     clasificacionesService
-      .listarClasificaciones()
+      .listarClasificacionesDeSoftware(softwareId)
       .then((items) => {
         if (active) dispatch({ type: 'success', payload: items })
       })
@@ -65,7 +75,7 @@ export function useClasificaciones(): {
     return () => {
       active = false
     }
-  }, [state.version])
+  }, [softwareId, state.version])
 
   const refetch = useCallback(() => dispatch({ type: 'refetch' }), [])
 

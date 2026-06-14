@@ -1,10 +1,12 @@
 import { supabase } from '../lib/supabase'
 import type {
   Software,
+  ClasificacionConCriterio,
   FiltrosBusqueda,
   BusquedaInteligenteRequest,
   BusquedaInteligenteResponse,
 } from '../types/dtos'
+import * as clasificacionesService from './clasificacionesService'
 
 /**
  * Returns all software belonging to the given temaId, ordered by nombre asc.
@@ -35,17 +37,32 @@ export async function listarTodos(): Promise<Software[]> {
 }
 
 /**
- * Returns all software linked to a clasificacion_si, ordered by nombre asc.
+ * Returns all software linked to a clasificacion_si via the M2M junction,
+ * ordered by nombre asc.
  */
 export async function listarPorClasificacion(clasificacionId: string): Promise<Software[]> {
   const { data, error } = await supabase
-    .from('software')
-    .select('*')
+    .from('software_clasificaciones')
+    .select('software(*)')
     .eq('clasificacion_si_id', clasificacionId)
-    .order('nombre')
 
   if (error) throw error
-  return data ?? []
+
+  const rows = (data ?? []) as Array<{ software: Software | null }>
+  return rows
+    .map((r) => r.software)
+    .filter((s): s is Software => s !== null)
+    .sort((a, b) => a.nombre.localeCompare(b.nombre))
+}
+
+/**
+ * Returns all clasificaciones_si linked to the given softwareId via the junction,
+ * with criterio embedded. Delegates to clasificacionesService.
+ */
+export async function listarClasificacionesDeSoftware(
+  softwareId: string,
+): Promise<ClasificacionConCriterio[]> {
+  return clasificacionesService.listarClasificacionesDeSoftware(softwareId)
 }
 
 /**
@@ -56,6 +73,21 @@ export async function obtenerSoftware(id: string): Promise<Software | null> {
     .from('software')
     .select('*')
     .eq('id', id)
+    .maybeSingle()
+
+  if (error) throw error
+  return data ?? null
+}
+
+/**
+ * Returns a single Software by slug, or null when not found.
+ * slug is UNIQUE NOT NULL so maybeSingle() is safe here.
+ */
+export async function obtenerPorSlug(slug: string): Promise<Software | null> {
+  const { data, error } = await supabase
+    .from('software')
+    .select('*')
+    .eq('slug', slug)
     .maybeSingle()
 
   if (error) throw error

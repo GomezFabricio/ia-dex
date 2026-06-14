@@ -32,6 +32,10 @@ export type ClasificacionSI = Omit<Tables<'clasificaciones_si'>, 'enlaces'> & {
   enlaces: Enlace[]
 }
 
+export type CriterioSI = Tables<'criterios_si'>
+
+export type ClasificacionConCriterio = ClasificacionSI & { criterio: CriterioSI }
+
 // Valoracion narrows `contenido_tipo` from string to the known union.
 export type Valoracion = Omit<Tables<'valoraciones'>, 'contenido_tipo'> & {
   contenido_tipo: ContenidoTipo
