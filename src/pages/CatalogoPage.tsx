@@ -10,10 +10,13 @@ export default function CatalogoPage() {
   const { data, loading, error, refetch } = useTemas()
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-display text-3xl font-bold text-text">Catálogo</h1>
-        <p className="text-sm text-muted">Explorá el software por tema del curso.</p>
+    <div className="flex flex-col gap-6 pt-4">
+      <div className="flex flex-col gap-2">
+        <p className="dex-label text-[11px] text-accent-2">Catálogo · Temas del curso</p>
+        <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] font-bold tracking-[-0.02em] text-text">
+          Explorá por tema
+        </h1>
+        <p className="text-sm text-muted">El software de IA, organizado por los temas del curso.</p>
       </div>
 
       {loading && <p className="text-muted">Cargando…</p>}
