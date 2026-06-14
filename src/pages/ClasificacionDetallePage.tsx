@@ -1,6 +1,10 @@
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useClasificacion } from '../hooks/useClasificacion'
+import { useSoftwarePorClasificacion } from '../hooks/useSoftwarePorClasificacion'
+import { useTemas } from '../hooks/useTemas'
 import StarRating from '../components/ui/StarRating'
+import ContentRow from '../components/software/ContentRow'
 import { hueFor, washFor } from '../lib/hue'
 
 // ---------------------------------------------------------------------------
@@ -17,6 +21,14 @@ export default function ClasificacionDetallePage() {
   const slug = slugParam ?? ''
 
   const { data, loading, error, refetch } = useClasificacion(slug)
+  const tools = useSoftwarePorClasificacion(data?.id)
+  const temas = useTemas()
+
+  // tema_id → tema.nombre resolver for the tool rail poster kickers.
+  const temaNombrePorId = useMemo(() => {
+    const byId = new Map(temas.data.map((t) => [t.id, t.nombre]))
+    return (temaId: string) => byId.get(temaId)
+  }, [temas.data])
 
   // Loading state
   if (loading) {
@@ -117,7 +129,7 @@ export default function ClasificacionDetallePage() {
       </section>
 
       {/* Ejemplos + enlaces — centered content column */}
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-6 pb-16 sm:px-8 lg:px-12">
+      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-6 pb-8 sm:px-8 lg:px-12">
         {/* Ejemplos callout */}
         <div className="reveal flex items-start gap-3.5 rounded-2xl border border-accent/30 bg-accent/[0.12] p-5">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0 text-accent-strong" aria-hidden="true">
@@ -152,6 +164,18 @@ export default function ClasificacionDetallePage() {
           </section>
         )}
       </div>
+
+      {/* Herramientas de esta categoría — semantic tool rail (software ↔ clasificacion_si) */}
+      {!tools.loading && tools.error === null && tools.data.length > 0 && (
+        <div className="pb-16 pt-2">
+          <ContentRow
+            titulo="Herramientas de esta categoría"
+            items={tools.data}
+            count={`${tools.data.length} herramientas`}
+            temaNombrePorId={temaNombrePorId}
+          />
+        </div>
+      )}
     </div>
   )
 }
