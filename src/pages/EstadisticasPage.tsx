@@ -23,7 +23,10 @@ type SectionProps = {
 function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, children }: SectionProps) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold text-text">{titulo}</h2>
+      <h2 className="font-display flex items-center gap-2.5 text-lg font-semibold text-text">
+        <span className="h-4 w-1 shrink-0 rounded-full bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
+        {titulo}
+      </h2>
 
       {loading && <p className="text-muted">Cargando…</p>}
 
@@ -56,10 +59,13 @@ export default function EstadisticasPage() {
   const mejorValorados = useMejorValorados(10)
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-text">Estadísticas</h1>
-        <p className="text-muted">Rankings de vistas y valoraciones del catálogo.</p>
+    <div className="flex flex-col gap-6 pt-4">
+      <div className="flex flex-col gap-2">
+        <p className="dex-label text-[11px] text-accent-2">Estadísticas · El catálogo en números</p>
+        <h1 className="font-display text-[clamp(2rem,4vw,2.75rem)] font-bold tracking-[-0.02em] text-text">
+          Rankings
+        </h1>
+        <p className="text-sm text-muted">El top del catálogo por vistas y por valoración.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
