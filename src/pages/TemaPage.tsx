@@ -1,19 +1,27 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTema } from '../hooks/useTema'
 import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
-import { useClasificaciones } from '../hooks/useClasificaciones'
-import ContentRow from '../components/software/ContentRow'
+import { useClasificacionesPorSoftwareIds } from '../hooks/useClasificacionesPorSoftwareIds'
+import PosterCard from '../components/software/PosterCard'
 import StarRating from '../components/ui/StarRating'
-import type { Software } from '../types/dtos'
+import type { ClasificacionConCriterio, CriterioSI } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
-// TemaPage — "cine-neural" tema detail (redesign).
-// Full-bleed ghost-number hero (big tema número + name + description + rating)
-// over Netflix rails: the tema's software grouped by clasificación de SI, plus a
-// catch-all rail for tools without one. Recreates the tema screen from the design
-// handoff. Both hooks run unconditionally; software uses the skip variant until
-// tema.id resolves. D4 states: loading / error+retry / not-found / data.
+// TemaPage — "cine-neural" tema detail (si-taxonomy S3 rewrite, UX rev 2).
+// Full-bleed ghost-number hero + software grid: each tool appears ONCE with its
+// SI categories rendered as chips grouped per axis below the card.
+// Replaces the per-axis-rail model (each software appeared in every axis rail
+// it belonged to — M2M meant a single tool showed 6-7× per tema page).
+//
+// Data flow:
+//   useTema(slug)                           → tema meta
+//   useSoftwarePorTema(tema.id)             → Software[] (tema's tools)
+//   useClasificacionesPorSoftwareIds(ids)   → Map<swId, ClasificacionConCriterio[]>
+//
+// Each PosterCard receives the software once; SIChipGroups renders the axis
+// chips from the per-software junction slice. D4 states: loading / error+retry
+// / not-found / data.
 // ---------------------------------------------------------------------------
 
 export default function TemaPage() {
@@ -22,31 +30,15 @@ export default function TemaPage() {
 
   const tema = useTema(slug)
   const software = useSoftwarePorTema(tema.data?.id)
-  const clasifs = useClasificaciones()
 
-  // Group the tema's software into rails by clasificación; tools without one fall
-  // into a final "Otras herramientas" rail. Rebuilt only when data changes.
-  const rails = useMemo(() => {
-    const byClasif = new Map<string, Software[]>()
-    const sinClasif: Software[] = []
-    for (const sw of software.data) {
-      if (sw.clasificacion_si_id !== null && sw.clasificacion_si_id !== undefined) {
-        const arr = byClasif.get(sw.clasificacion_si_id) ?? []
-        arr.push(sw)
-        byClasif.set(sw.clasificacion_si_id, arr)
-      } else {
-        sinClasif.push(sw)
-      }
-    }
-    const nombrePorId = new Map(clasifs.data.map((c) => [c.id, c.nombre]))
-    const out = [...byClasif.entries()].map(([cid, items]) => ({
-      key: cid,
-      titulo: nombrePorId.get(cid) ?? 'Clasificación de SI',
-      items,
-    }))
-    if (sinClasif.length > 0) out.push({ key: 'sin', titulo: 'Otras herramientas', items: sinClasif })
-    return out
-  }, [software.data, clasifs.data])
+  // Batch junction fetch — skip until software list is ready.
+  const softwareIds = useMemo(
+    () => software.data.map((sw) => sw.id),
+    [software.data],
+  )
+  const junctionMap = useClasificacionesPorSoftwareIds(
+    software.loading ? [] : softwareIds,
+  )
 
   // Loading state
   if (tema.loading) {
@@ -112,10 +104,14 @@ export default function TemaPage() {
         </div>
       </section>
 
-      {/* Rails */}
-      <div className="flex flex-col gap-2 pb-16 pt-4">
-        {software.loading && <div className="skeleton mx-4 h-72 rounded-2xl sm:mx-8" aria-hidden="true" />}
+      {/* Software grid — each tool shown exactly once with per-axis SI chips */}
+      <div className="pb-16 pt-4">
+        {/* Loading skeleton */}
+        {(software.loading || junctionMap.loading) && (
+          <div className="skeleton mx-4 h-72 rounded-2xl sm:mx-8" aria-hidden="true" />
+        )}
 
+        {/* Error */}
         {!software.loading && software.error !== null && (
           <div className="mx-auto flex max-w-[1400px] flex-col gap-2 px-4 sm:px-8">
             <p className="text-muted">No se pudieron cargar los datos</p>
@@ -125,23 +121,137 @@ export default function TemaPage() {
           </div>
         )}
 
+        {/* Empty */}
         {!software.loading && software.error === null && software.data.length === 0 && (
           <p className="mx-auto max-w-[1400px] px-4 text-muted sm:px-8">
             Este tema no tiene software cargado todavía.
           </p>
         )}
 
+        {/* Data — one card per software, chips below each */}
         {!software.loading &&
+          !junctionMap.loading &&
           software.error === null &&
-          rails.map((rail) => (
-            <ContentRow
-              key={rail.key}
-              titulo={rail.titulo}
-              items={rail.items}
-              count={`${rail.items.length} herramientas`}
-            />
-          ))}
+          software.data.length > 0 && (
+            <div className="mx-auto max-w-[1400px] px-4 sm:px-8">
+              <header className="mb-4 flex items-center gap-3">
+                <span
+                  className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                  aria-hidden="true"
+                />
+                <h2 className="font-display m-0 text-xl font-semibold tracking-[-0.015em] text-text">
+                  Herramientas
+                </h2>
+                <span className="dex-label rounded-full border border-border px-[9px] py-[3px] text-[10px] text-muted">
+                  {software.data.length} {software.data.length === 1 ? 'herramienta' : 'herramientas'}
+                </span>
+              </header>
+
+              <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
+                {software.data.map((sw, i) => {
+                  const clasifs = junctionMap.data.get(sw.id) ?? []
+                  return (
+                    <li key={sw.id} className="flex flex-col gap-3">
+                      <PosterCard software={sw} dex={i + 1} />
+                      {clasifs.length > 0 && (
+                        <CollapsibleSIChips softwareId={sw.id} clasificaciones={clasifs} />
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )}
       </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// CollapsibleSIChips — wraps SIChipGroups behind a toggle button.
+// Folded by default; expands on click revealing per-axis chips.
+// Each card manages its own open/closed state (local, no shared context).
+// ---------------------------------------------------------------------------
+
+function CollapsibleSIChips({
+  softwareId,
+  clasificaciones,
+}: {
+  softwareId: string
+  clasificaciones: ClasificacionConCriterio[]
+}) {
+  const [open, setOpen] = useState(false)
+  const panelId = `si-chips-${softwareId}`
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="flex w-full items-center gap-1.5 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-surface/60"
+      >
+        <span className="dex-label text-[9px] text-accent-2">Clasificación SI</span>
+        <svg
+          aria-hidden="true"
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`shrink-0 text-accent-2 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        >
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open && (
+        <div id={panelId} className="mt-1.5">
+          <SIChipGroups clasificaciones={clasificaciones} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// SIChipGroups — per-axis SI classification chip groups (reused from
+// SoftwareDetallePage pattern). Groups ClasificacionConCriterio[] by criterio.id,
+// ordered by criterio.orden. Renders nothing when array is empty.
+// ---------------------------------------------------------------------------
+
+function SIChipGroups({ clasificaciones }: { clasificaciones: ClasificacionConCriterio[] }) {
+  const groups = useMemo(() => {
+    const byAxis = new Map<string, { criterio: CriterioSI; items: ClasificacionConCriterio[] }>()
+    for (const c of clasificaciones) {
+      const key = c.criterio.id
+      if (!byAxis.has(key)) {
+        byAxis.set(key, { criterio: c.criterio, items: [] })
+      }
+      byAxis.get(key)!.items.push(c)
+    }
+    return [...byAxis.values()].sort((a, b) => a.criterio.orden - b.criterio.orden)
+  }, [clasificaciones])
+
+  if (groups.length === 0) return null
+
+  return (
+    <div className="flex flex-col gap-2">
+      {groups.map(({ criterio, items }) => (
+        <div key={criterio.id}>
+          <div className="dex-label mb-1.5 text-[9px] text-accent-2">{criterio.nombre}</div>
+          <div className="flex flex-wrap gap-1.5">
+            {items.map((cat) => (
+              <span
+                key={cat.id}
+                className="dex-label rounded-full border border-border bg-surface/70 px-2 py-0.5 text-[9px] text-text"
+              >
+                {cat.nombre}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

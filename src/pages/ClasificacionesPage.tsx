@@ -1,19 +1,27 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useClasificaciones } from '../hooks/useClasificaciones'
-import { useSoftwareTodos } from '../hooks/useSoftwareTodos'
+import { useCriterios } from '../hooks/useCriterios'
+import { useClasificacionCount } from '../hooks/useClasificacionCount'
 import { hueFor, washFor } from '../lib/hue'
-import type { ClasificacionSI } from '../types/dtos'
+import type { ClasificacionConCriterio } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
-// ClasificacionesPage — "cine-neural" SI-classification index (redesign).
-// Full-bleed hero + a grid of poster-style tiles: each clasificación as a 7:5
-// wash tile with a ghost number, name, tool count and "Explorar →". Recreates
-// the clasif-list screen from the design handoff. Tool counts come from one
-// all-software fetch (no per-tile query). D4: loading / error+retry / empty / data.
+// ClasificacionesPage — "cine-neural" SI-classification index (si-taxonomy S3).
+// Full-bleed hero + 7 axis sections (one per criterio ordered by `orden`), each
+// containing the ClasifTile grid for categories of that axis. Tool counts come
+// from the software_clasificaciones junction (no per-tile query). D4 states.
 // ---------------------------------------------------------------------------
 
-function ClasifTile({ clasif, index, count }: { clasif: ClasificacionSI; index: number; count: number }) {
+function ClasifTile({
+  clasif,
+  index,
+  count,
+}: {
+  clasif: ClasificacionConCriterio
+  index: number
+  count: number
+}) {
   const wash = washFor(hueFor(clasif.id))
 
   return (
@@ -31,9 +39,9 @@ function ClasifTile({ clasif, index, count }: { clasif: ClasificacionSI; index: 
       </span>
       <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 p-5">
         <span className="dex-label text-[9px] text-accent-2">Clasificación SI</span>
-        <h2 className="font-display text-lg font-semibold leading-tight tracking-[-0.01em] text-text">
+        <h3 className="font-display text-lg font-semibold leading-tight tracking-[-0.01em] text-text">
           {clasif.nombre}
-        </h2>
+        </h3>
         <span className="dex-label text-[9px] text-muted">
           {count} {count === 1 ? 'herramienta' : 'herramientas'} · Concepto
         </span>
@@ -47,18 +55,30 @@ function ClasifTile({ clasif, index, count }: { clasif: ClasificacionSI; index: 
 
 export default function ClasificacionesPage() {
   const { data, loading, error, refetch } = useClasificaciones()
-  const todos = useSoftwareTodos()
+  const criterios = useCriterios()
+  const countMap = useClasificacionCount()
 
-  // clasificacion_si_id → tool count, from one all-software fetch.
-  const countPorClasif = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const sw of todos.data) {
-      if (sw.clasificacion_si_id !== null && sw.clasificacion_si_id !== undefined) {
-        counts.set(sw.clasificacion_si_id, (counts.get(sw.clasificacion_si_id) ?? 0) + 1)
-      }
+  const clasificaciones = data
+
+  // Group categories by criterio_id for section rendering.
+  const porCriterio = useMemo(() => {
+    const m = new Map<string, ClasificacionConCriterio[]>()
+    for (const c of clasificaciones) {
+      if (!c.criterio_id) continue
+      const arr = m.get(c.criterio_id) ?? []
+      arr.push(c)
+      m.set(c.criterio_id, arr)
     }
-    return counts
-  }, [todos.data])
+    return m
+  }, [clasificaciones])
+
+  const isLoading = loading || criterios.loading || countMap.loading
+  const hasError = error !== null || criterios.error !== null || countMap.error !== null
+  const retryAll = () => {
+    refetch()
+    criterios.refetch()
+    countMap.refetch()
+  }
 
   return (
     <div className="flex flex-col">
@@ -74,7 +94,7 @@ export default function ClasificacionesPage() {
         />
         <div className="relative mx-auto max-w-[1400px]">
           <p className="dex-label mb-3.5 text-[11px] text-accent-2">
-            Sistemas Inteligentes · {data.length} conceptos
+            Sistemas Inteligentes · {clasificaciones.length} conceptos
           </p>
           <h1 className="font-display mb-3.5 text-[clamp(2.25rem,5vw,3.4rem)] font-bold tracking-[-0.02em] text-text">
             Clasificaciones de SI
@@ -86,31 +106,52 @@ export default function ClasificacionesPage() {
         </div>
       </section>
 
-      {/* Tiles */}
+      {/* Sections by axis */}
       <div className="mx-auto w-full max-w-[1400px] px-6 pb-16 sm:px-8 lg:px-12">
-        {loading && <div className="skeleton h-80 w-full rounded-2xl" aria-hidden="true" />}
+        {isLoading && <div className="skeleton h-80 w-full rounded-2xl" aria-hidden="true" />}
 
-        {!loading && error !== null && (
+        {!isLoading && hasError && (
           <div className="flex flex-col gap-2">
             <p className="text-muted">No se pudieron cargar los datos</p>
-            <button type="button" onClick={refetch} className="self-start text-accent transition-colors hover:text-text">
+            <button
+              type="button"
+              onClick={retryAll}
+              className="self-start text-accent transition-colors hover:text-text"
+            >
               Reintentar
             </button>
           </div>
         )}
 
-        {!loading && error === null && data.length === 0 && (
+        {!isLoading && !hasError && clasificaciones.length === 0 && (
           <p className="text-muted">No hay clasificaciones disponibles todavía.</p>
         )}
 
-        {!loading && error === null && data.length > 0 && (
-          <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
-            {data.map((c, i) => (
-              <li key={c.id}>
-                <ClasifTile clasif={c} index={i + 1} count={countPorClasif.get(c.id) ?? 0} />
-              </li>
-            ))}
-          </ul>
+        {!isLoading && !hasError && clasificaciones.length > 0 && (
+          <div className="flex flex-col gap-10">
+            {criterios.data.map((criterio) => {
+              const items = porCriterio.get(criterio.id) ?? []
+              if (items.length === 0) return null
+              return (
+                <section key={criterio.id}>
+                  <h2 className="font-display mb-5 text-[clamp(1.1rem,2.5vw,1.4rem)] font-semibold tracking-[-0.01em] text-text">
+                    {criterio.nombre}
+                  </h2>
+                  <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+                    {items.map((c, i) => (
+                      <li key={c.id}>
+                        <ClasifTile
+                          clasif={c}
+                          index={i + 1}
+                          count={countMap.data.get(c.id) ?? 0}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            })}
+          </div>
         )}
       </div>
     </div>

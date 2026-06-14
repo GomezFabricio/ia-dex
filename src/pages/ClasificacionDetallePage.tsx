@@ -6,6 +6,7 @@ import { useTemas } from '../hooks/useTemas'
 import StarRating from '../components/ui/StarRating'
 import ContentRow from '../components/software/ContentRow'
 import { hueFor, washFor } from '../lib/hue'
+import type { ClasificacionConCriterio } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
 // ClasificacionDetallePage — "cine-neural" SI-classification ficha (phase 7).
@@ -67,9 +68,10 @@ export default function ClasificacionDetallePage() {
     )
   }
 
-  // Data present
-  const enlacesFiltrados = data.enlaces.filter((e) => e.url)
-  const wash = washFor(hueFor(data.id))
+  // Data present — cast to ClasificacionConCriterio (criterio is embedded by the service)
+  const clasif = data as ClasificacionConCriterio
+  const enlacesFiltrados = clasif.enlaces.filter((e) => e.url)
+  const wash = washFor(hueFor(clasif.id))
 
   return (
     <div className="flex flex-col">
@@ -87,14 +89,16 @@ export default function ClasificacionDetallePage() {
         <div className="relative mx-auto grid max-w-[1400px] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
           {/* Concept */}
           <div>
-            <p className="dex-label mb-4 text-[11px] text-accent-2">Clasificación de SI · Concepto</p>
+            <p className="dex-label mb-4 text-[11px] text-accent-2">
+              {clasif.criterio?.nombre ?? 'Clasificación de SI'} → {clasif.nombre}
+            </p>
             <h1 className="font-display mb-5 text-[clamp(2.25rem,5vw,3.4rem)] font-bold leading-[1.07] tracking-[-0.02em] text-text">
-              {data.nombre}
+              {clasif.nombre}
             </h1>
             <p className="mb-5 max-w-[560px] text-body-lg leading-relaxed text-muted">
-              {data.en_que_consiste ?? '—'}
+              {clasif.en_que_consiste ?? '—'}
             </p>
-            <StarRating key={data.id} tipo="clasificacion_si" contenidoId={data.id} />
+            <StarRating key={clasif.id} tipo="clasificacion_si" contenidoId={clasif.id} />
           </div>
 
           {/* Diagram panel */}
@@ -106,10 +110,10 @@ export default function ClasificacionDetallePage() {
             />
             <div className="glow-ring relative grid aspect-[4/3] place-items-center overflow-hidden rounded-[20px] border border-border-strong bg-bg/50 backdrop-blur-sm">
               <div aria-hidden="true" className="dex-grid absolute inset-0 opacity-50" />
-              {data.imagen_url !== null && data.imagen_url !== undefined ? (
+              {clasif.imagen_url !== null && clasif.imagen_url !== undefined ? (
                 <img
-                  src={data.imagen_url}
-                  alt={data.nombre}
+                  src={clasif.imagen_url}
+                  alt={clasif.nombre}
                   className="relative max-h-[80%] max-w-[80%] object-contain drop-shadow-lg"
                 />
               ) : (
@@ -118,7 +122,7 @@ export default function ClasificacionDetallePage() {
                     className="font-display text-[clamp(4rem,10vw,5.25rem)] font-bold leading-none"
                     style={{ color: 'color-mix(in oklab, var(--color-accent) 45%, transparent)' }}
                   >
-                    {data.nombre.charAt(0)}
+                    {clasif.nombre.charAt(0)}
                   </div>
                   <div className="dex-label mt-3.5 text-[10px] text-muted">Diagrama · concepto</div>
                 </div>
@@ -137,7 +141,7 @@ export default function ClasificacionDetallePage() {
           </svg>
           <div>
             <div className="dex-label mb-1.5 text-[10px] text-accent-strong">Ejemplos</div>
-            <p className="leading-relaxed text-text">{data.ejemplos ?? '—'}</p>
+            <p className="leading-relaxed text-text">{clasif.ejemplos ?? '—'}</p>
           </div>
         </div>
 
