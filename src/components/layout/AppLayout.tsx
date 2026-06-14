@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import MobileNav from './MobileNav'
 import ThemeToggle from '../ui/ThemeToggle'
+import AsistenteWidget from '../asistente/AsistenteWidget'
 import { buildBreadcrumb } from './breadcrumb'
 import { RequireAuthProvider } from '../../context/RequireAuthProvider'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
@@ -103,6 +104,9 @@ export default function AppLayout() {
             </div>
           )}
         </main>
+
+        {/* Floating Gemini assistant — available on every route */}
+        <AsistenteWidget />
       </div>
     </RequireAuthProvider>
   )

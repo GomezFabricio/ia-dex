@@ -56,6 +56,29 @@ export type EtapaRoadmap = {
 }
 
 // ---------------------------------------------------------------------------
+// Asistente (Gemini-grounded chat) DTOs
+// ---------------------------------------------------------------------------
+
+export type AsistenteRol = 'user' | 'assistant'
+
+export type AsistenteMensaje = {
+  role: AsistenteRol
+  text: string
+  fuentes?: string[]
+}
+
+export type AsistenteRequest = {
+  pregunta: string
+  historial?: { role: AsistenteRol; text: string }[]
+  pagina?: string
+}
+
+export type AsistenteResponse = {
+  respuesta: string
+  fuentes: string[]
+}
+
+// ---------------------------------------------------------------------------
 // View DTOs (non-null coalesced shapes — see D3 in design)
 //
 // Note on cantidad_votos vs cantidad:

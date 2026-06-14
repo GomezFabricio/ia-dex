@@ -388,6 +388,18 @@
   animation: cta-pulse 2.6s ease-in-out infinite;
 }
 
+/* Assistant FAB — idle breathing ring (breathe keyframe in §4) + attention dot. */
+.gfab-idle {
+  animation: breathe 3.4s ease-out infinite;
+}
+.attn-dot {
+  animation: pop-in 0.25s ease-out both;
+}
+@keyframes pop-in {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
 /* ---------------------------------------------------------------------------
    Usage notes
    - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav
