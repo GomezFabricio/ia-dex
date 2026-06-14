@@ -89,7 +89,7 @@ export default function AppLayout() {
             >
               {buildBreadcrumb(pathname)}
             </span>
-            {isDesktop && <ThemeToggle />}
+            <ThemeToggle />
           </div>
 
           {/* Page content. Full-bleed pages render edge-to-edge and pull up under

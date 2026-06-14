@@ -400,6 +400,18 @@
   to { transform: scale(1); }
 }
 
+/* Podio ranking rows — the accent rank bar grows on hover (pointer devices). */
+.rank-bar {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+@media (hover: hover) {
+  .ranking-row:hover .rank-bar {
+    transform: scaleX(1);
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Usage notes
    - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav

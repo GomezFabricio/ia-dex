@@ -90,13 +90,20 @@ export default function CatalogoPage() {
         </div>
       </section>
 
-      {/* Sticky toolbar — tema chips + view toggle */}
+      {/* Sticky toolbar — view toggle on its own row, then tema chips full-width */}
       <div className="sticky top-14 z-20 border-b border-border bg-bg/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-8">
-          <div
-            data-rail
-            className="flex min-w-0 flex-1 gap-2 overflow-x-auto [mask-image:linear-gradient(to_right,black_92%,transparent)]"
-          >
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-2.5 px-4 py-3 sm:px-8">
+          <div className="flex justify-end">
+            <div className="flex shrink-0 gap-1 rounded-[11px] border border-border bg-surface-2 p-1">
+              <button type="button" onClick={() => setView('rieles')} className={seg(view === 'rieles')}>
+                Rieles
+              </button>
+              <button type="button" onClick={() => setView('grid')} className={seg(view === 'grid')}>
+                Cuadrícula
+              </button>
+            </div>
+          </div>
+          <div data-rail className="flex gap-2 overflow-x-auto">
             {temas.data.map((t) => (
               <button
                 key={t.id}
@@ -107,14 +114,6 @@ export default function CatalogoPage() {
                 {t.nombre}
               </button>
             ))}
-          </div>
-          <div className="ml-auto flex shrink-0 gap-1 rounded-[11px] border border-border bg-surface-2 p-1">
-            <button type="button" onClick={() => setView('rieles')} className={seg(view === 'rieles')}>
-              Rieles
-            </button>
-            <button type="button" onClick={() => setView('grid')} className={seg(view === 'grid')}>
-              Cuadrícula
-            </button>
           </div>
         </div>
       </div>

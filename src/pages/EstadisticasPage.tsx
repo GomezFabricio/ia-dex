@@ -1,11 +1,11 @@
+import { Link } from 'react-router-dom'
 import { useSoftwarePopulares } from '../hooks/useSoftwarePopulares'
 import { useMejorValorados } from '../hooks/useMejorValorados'
 import { useSoftwareTodos } from '../hooks/useSoftwareTodos'
 import { useTemas } from '../hooks/useTemas'
 import { useClasificaciones } from '../hooks/useClasificaciones'
 import { useCountUp } from '../hooks/useCountUp'
-import RankingListPopular from '../components/software/RankingListPopular'
-import RankingListRating from '../components/software/RankingListRating'
+import { hueFor, washFor } from '../lib/hue'
 
 // ---------------------------------------------------------------------------
 // EstadisticasPage — "cine-neural" catalogue numbers (redesign).
@@ -28,6 +28,41 @@ function StatCard({ value, label, format }: { value: number; label: string; form
       </div>
       <div className="dex-label mt-3 text-[10px] text-muted">{label}</div>
     </div>
+  )
+}
+
+// Cine podio row — ghost rank + wash initial tile + name + metric (hover rank bar).
+function PodioRow({
+  rank,
+  softwareId,
+  nombre,
+  metric,
+}: {
+  rank: number
+  softwareId: string
+  nombre: string
+  metric: string
+}) {
+  const wash = washFor(hueFor(softwareId))
+  return (
+    <Link
+      to={`/software/${softwareId}`}
+      className="ranking-row relative flex items-center gap-4 overflow-hidden rounded-xl px-4 py-3 no-underline transition-colors hover:bg-surface-2"
+    >
+      <span className="rank-bar absolute bottom-2 left-0 top-2 w-[3px] rounded bg-accent-2" aria-hidden="true" />
+      <span className="font-display w-[46px] shrink-0 text-center text-[40px] font-bold leading-none text-[color-mix(in_oklab,var(--color-accent-2)_32%,transparent)]">
+        {rank}
+      </span>
+      <span
+        className="font-display grid h-[60px] w-[46px] shrink-0 place-items-center rounded-[9px] border border-border text-[22px] font-bold text-[#EAEDFB]"
+        style={{ background: wash }}
+        aria-hidden="true"
+      >
+        {nombre.charAt(0)}
+      </span>
+      <span className="font-display min-w-0 flex-1 truncate text-[15px] font-semibold text-text">{nombre}</span>
+      <span className="dex-label shrink-0 text-[11px] text-accent-2">{metric}</span>
+    </Link>
   )
 }
 
@@ -111,7 +146,17 @@ export default function EstadisticasPage() {
             isEmpty={topVistos.length === 0}
             emptyMessage="Aún no hay visitas registradas."
           >
-            <RankingListPopular items={topVistos} />
+            <div className="flex flex-col">
+              {topVistos.map((item, i) => (
+                <PodioRow
+                  key={item.software_id}
+                  rank={i + 1}
+                  softwareId={item.software_id}
+                  nombre={item.nombre}
+                  metric={`${fmtNum(item.vistas ?? 0)} vistas`}
+                />
+              ))}
+            </div>
           </Section>
 
           <Section
@@ -122,7 +167,17 @@ export default function EstadisticasPage() {
             isEmpty={mejorValorados.data.length === 0}
             emptyMessage="Aún no hay valoraciones registradas."
           >
-            <RankingListRating items={mejorValorados.data} />
+            <div className="flex flex-col">
+              {mejorValorados.data.map((item, i) => (
+                <PodioRow
+                  key={item.software_id}
+                  rank={i + 1}
+                  softwareId={item.software_id}
+                  nombre={item.nombre}
+                  metric={`${(item.promedio ?? 0).toFixed(1)} ★`}
+                />
+              ))}
+            </div>
           </Section>
         </div>
       </div>
