@@ -4,6 +4,7 @@ import { useForoTema } from '../hooks/useForoTema'
 import { useAuth } from '../hooks/useAuth'
 import MensajeItem from '../components/foro/MensajeItem'
 import { formatFecha } from '../lib/date'
+import { hueFor, washFor } from '../lib/hue'
 import * as foroService from '../services/foroService'
 
 // ---------------------------------------------------------------------------
@@ -112,6 +113,8 @@ export default function ForoTemaPage() {
 
   const temaIsOwn = currentUserId !== null && tema.user_id === currentUserId
   const temaAuthorLabel = temaIsOwn ? 'vos' : `Usuario ${tema.user_id.slice(0, 8)}`
+  const temaWash = washFor(hueFor(tema.user_id))
+  const temaInitial = (temaIsOwn ? 'V' : tema.user_id.charAt(0)).toUpperCase()
 
   return (
     <div className="flex flex-col gap-6">
@@ -123,27 +126,44 @@ export default function ForoTemaPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_19rem]">
         {/* Main — conversation */}
         <div className="order-1 flex flex-col gap-6">
-          {/* Tema header */}
-          <div className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5">
-            <div className="flex items-start justify-between gap-4">
-              <h1 className="font-display text-2xl font-bold text-text">{tema.titulo}</h1>
-              {temaIsOwn && (
-                <button
-                  type="button"
-                  onClick={() => { void handleEliminarTema() }}
-                  disabled={eliminandoTema}
-                  className="shrink-0 text-sm text-error transition-opacity hover:opacity-80 disabled:opacity-50"
-                >
-                  {eliminandoTema ? 'Eliminando…' : 'Eliminar tema'}
-                </button>
+          {/* Title */}
+          <div>
+            <span className="dex-label inline-block rounded-full border border-accent/25 bg-accent/[0.12] px-2 py-[3px] text-[9px] text-accent-strong">
+              Discusión
+            </span>
+            <h1 className="font-display mt-3 text-[clamp(1.6rem,3.5vw,2.2rem)] font-bold tracking-[-0.02em] text-text">
+              {tema.titulo}
+            </h1>
+          </div>
+
+          {/* OP card — accent-highlighted */}
+          <div className="flex gap-3.5 rounded-2xl border border-accent/35 bg-accent/[0.08] p-4">
+            <span
+              className="font-display grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl border border-border text-[14px] font-bold text-[#EAEDFB]"
+              style={{ background: temaWash }}
+              aria-hidden="true"
+            >
+              {temaInitial}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex items-baseline gap-2">
+                <span className="font-display text-sm font-semibold text-text">{temaAuthorLabel}</span>
+                <span className="dex-label text-[9px] text-faint">autor · OP · {formatFecha(tema.created_at)}</span>
+                {temaIsOwn && (
+                  <button
+                    type="button"
+                    onClick={() => { void handleEliminarTema() }}
+                    disabled={eliminandoTema}
+                    className="ml-auto shrink-0 text-xs text-error transition-opacity hover:opacity-80 disabled:opacity-50"
+                  >
+                    {eliminandoTema ? 'Eliminando…' : 'Eliminar'}
+                  </button>
+                )}
+              </div>
+              {tema.cuerpo !== null && tema.cuerpo !== '' && (
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-text">{tema.cuerpo}</p>
               )}
             </div>
-            <p className="dex-label text-[11px] text-muted">
-              {temaAuthorLabel} · {formatFecha(tema.created_at)}
-            </p>
-            {tema.cuerpo !== null && tema.cuerpo !== '' && (
-              <p className="mt-2 whitespace-pre-wrap text-text">{tema.cuerpo}</p>
-            )}
           </div>
 
           {/* Mensajes list */}
