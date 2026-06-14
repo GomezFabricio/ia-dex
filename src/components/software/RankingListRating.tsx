@@ -21,9 +21,11 @@ function formatRating(promedio: number, cantidadVotos: number): string {
 
 type Props = {
   items: SoftwareRating[]
+  /** id → slug lookup built by the parent from useSoftwareTodos(). */
+  slugMap: ReadonlyMap<string, string>
 }
 
-export default function RankingListRating({ items }: Props) {
+export default function RankingListRating({ items, slugMap }: Props) {
   if (items.length === 0) return null
 
   return (
@@ -32,7 +34,7 @@ export default function RankingListRating({ items }: Props) {
         <RankingRow
           key={item.software_id}
           position={index + 1}
-          softwareId={item.software_id}
+          softwareSlug={slugMap.get(item.software_id) ?? item.software_id}
           nombre={item.nombre}
           metricText={formatRating(item.promedio, item.cantidad_votos)}
         />

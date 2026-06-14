@@ -4,6 +4,7 @@ import { useSoftwarePopulares } from '../hooks/useSoftwarePopulares'
 import { useMejorValorados } from '../hooks/useMejorValorados'
 import { useRecomendacionesGlobales } from '../hooks/useRecomendacionesGlobales'
 import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
+import { useSoftwareTodos } from '../hooks/useSoftwareTodos'
 import { useTemas } from '../hooks/useTemas'
 import type { Tema } from '../types/dtos'
 import RankingListPopular from '../components/software/RankingListPopular'
@@ -142,12 +143,19 @@ export default function InicioPage() {
   const mejorValorados = useMejorValorados(5)
   const recomendaciones = useRecomendacionesGlobales(12)
   const temas = useTemas()
+  const todos = useSoftwareTodos()
 
   // tema_id → tema.nombre resolver for poster kickers (built once per data change).
   const temaNombrePorId = useMemo(() => {
     const byId = new Map(temas.data.map((t) => [t.id, t.nombre]))
     return (id: string) => byId.get(id)
   }, [temas.data])
+
+  // id → slug lookup for ranking rows (views only carry software_id/UUID).
+  const slugMap = useMemo(
+    () => new Map(todos.data.map((s) => [s.id, s.slug])),
+    [todos.data],
+  )
 
   // Hero command bar → hand the query to the search page via ?q=.
   const navigate = useNavigate()
@@ -294,7 +302,7 @@ export default function InicioPage() {
             isEmpty={populares.data.length === 0}
             emptyMessage="Aún no hay visitas registradas."
           >
-            <RankingListPopular items={populares.data} />
+            <RankingListPopular items={populares.data} slugMap={slugMap} />
           </Section>
 
           <Section
@@ -305,7 +313,7 @@ export default function InicioPage() {
             isEmpty={mejorValorados.data.length === 0}
             emptyMessage="Aún no hay valoraciones registradas."
           >
-            <RankingListRating items={mejorValorados.data} />
+            <RankingListRating items={mejorValorados.data} slugMap={slugMap} />
           </Section>
         </div>
       </div>

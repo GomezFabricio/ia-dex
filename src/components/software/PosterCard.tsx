@@ -5,7 +5,7 @@ import { hueFor, washFor } from '../../lib/hue'
 
 // ---------------------------------------------------------------------------
 // PosterCard — the rail (poster) variant of a software card.
-// Netflix-style 3:4 poster linking to /software/:id. Recreates the
+// Netflix-style 3:4 poster linking to /software/:slug. Recreates the
 // "cine-neural" poster anatomy from the design handoff (Rail.dc.html):
 //   - layered placeholder (dex-grid + theme wash + giant initial) when no
 //     usable image, OR a blurred-cover + image when imagen_url passes useImageOk
@@ -31,18 +31,18 @@ type Props = {
 }
 
 export default function PosterCard({ software, dex, temaNombre }: Props) {
-  const { id, nombre, imagen_url, video_url, objetivo, licencia, anio_lanzamiento, tema_id } = software
+  const { slug, nombre, imagen_url, video_url, objetivo, licencia, anio_lanzamiento, tema_id } = software
   // Same 200px threshold used across the app, so an image either shows
   // everywhere or the lettered placeholder shows everywhere (consistency).
   const img = useImageOk(imagen_url, 200)
 
-  const hue = hueFor(tema_id || id)
+  const hue = hueFor(tema_id || slug)
   const wash = washFor(hue)
   const initial = nombre.charAt(0)
 
   return (
     <Link
-      to={`/software/${id}`}
+      to={`/software/${slug}`}
       aria-label={`${nombre}, ver ficha`}
       className="poster-card group/poster relative block overflow-hidden rounded-xl border border-border bg-surface no-underline outline-none transition-[transform,box-shadow,border-color] duration-200 focus-visible:scale-[1.06] focus-visible:border-accent/60 focus-visible:shadow-glow"
     >

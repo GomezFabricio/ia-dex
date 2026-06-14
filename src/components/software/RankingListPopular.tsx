@@ -16,9 +16,11 @@ function formatVistas(vistas: number): string {
 
 type Props = {
   items: SoftwarePopular[]
+  /** id → slug lookup built by the parent from useSoftwareTodos(). */
+  slugMap: ReadonlyMap<string, string>
 }
 
-export default function RankingListPopular({ items }: Props) {
+export default function RankingListPopular({ items, slugMap }: Props) {
   if (items.length === 0) return null
 
   return (
@@ -27,7 +29,7 @@ export default function RankingListPopular({ items }: Props) {
         <RankingRow
           key={item.software_id}
           position={index + 1}
-          softwareId={item.software_id}
+          softwareSlug={slugMap.get(item.software_id) ?? item.software_id}
           nombre={item.nombre}
           metricText={formatVistas(item.vistas)}
         />

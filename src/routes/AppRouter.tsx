@@ -30,7 +30,7 @@ const router = createBrowserRouter([
       { path: 'roadmap', element: <RoadmapPage /> },
       { path: 'catalogo', element: <CatalogoPage /> },
       { path: 'catalogo/:temaSlug', element: <TemaPage /> },
-      { path: 'software/:id', element: <SoftwareDetallePage /> },
+      { path: 'software/:slug', element: <SoftwareDetallePage /> },
       { path: 'clasificaciones', element: <ClasificacionesPage /> },
       { path: 'clasificaciones/:slug', element: <ClasificacionDetallePage /> },
       { path: 'buscar', element: <BuscarPage /> },

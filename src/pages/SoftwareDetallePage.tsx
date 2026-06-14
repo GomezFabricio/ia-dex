@@ -5,11 +5,13 @@ import { useRelacionados } from '../hooks/useRelacionados'
 import { useRecomendaciones } from '../hooks/useRecomendaciones'
 import { useTemas } from '../hooks/useTemas'
 import { useImageOk } from '../hooks/useImageOk'
+import { useClasificacionesDeSoftware } from '../hooks/useClasificacionesDeSoftware'
 import VideoEmbed from '../components/software/VideoEmbed'
 import ContentRow from '../components/software/ContentRow'
 import StarRating from '../components/ui/StarRating'
 import { hueFor, washFor } from '../lib/hue'
 import * as eventosService from '../services/eventosService'
+import type { ClasificacionConCriterio, CriterioSI } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
 // SoftwareDetallePage — "cine-neural" software ficha (redesign phase 5).
@@ -28,13 +30,16 @@ import * as eventosService from '../services/eventosService'
 // ---------------------------------------------------------------------------
 
 export default function SoftwareDetallePage() {
-  const { id } = useParams<{ id: string }>()
-  const softwareId = id ?? ''
+  const { slug } = useParams<{ slug: string }>()
+  const softwareSlug = slug ?? ''
 
-  const software = useSoftware(softwareId)
+  const software = useSoftware(softwareSlug)
+  // Once resolved, use the UUID for hooks that require an id (relacionados, clasificaciones, evento).
+  const softwareId = software.data?.id ?? ''
   const relacionados = useRelacionados(softwareId === '' ? undefined : softwareId)
   const recos = useRecomendaciones(software.data?.tema_id, softwareId)
   const temas = useTemas()
+  const clasificacionesSI = useClasificacionesDeSoftware(softwareId === '' ? undefined : softwareId)
 
   // Cover-art gate: hide low-res raster images (they would upscale into a blurry
   // backdrop) and fall back to the wash + lettered placeholder. SVGs always pass.
@@ -50,10 +55,11 @@ export default function SoftwareDetallePage() {
   const videoRef = useRef<HTMLElement>(null)
   const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
-  // Vista event — exactly once per softwareId (dedupes StrictMode + remounts).
+  // Vista event — exactly once per resolved softwareId (dedupes StrictMode + remounts).
+  // Fires only after the slug resolves to an id so the FK in eventos is valid.
   const vistaRegistrada = useRef<string | null>(null)
   useEffect(() => {
-    if (vistaRegistrada.current === softwareId) return
+    if (softwareId === '' || vistaRegistrada.current === softwareId) return
     vistaRegistrada.current = softwareId
     void eventosService.registrarEvento({ tipo: 'vista', software_id: softwareId })
   }, [softwareId])
@@ -208,6 +214,11 @@ export default function SoftwareDetallePage() {
           </dl>
         </div>
 
+        {/* SI Classification chips — grouped by criterio axis (additive, no existing chip replaced) */}
+        {!clasificacionesSI.loading && clasificacionesSI.data.length > 0 && (
+          <SIChipGroups clasificaciones={clasificacionesSI.data} />
+        )}
+
         {sw.video_url !== null && sw.video_url !== undefined && (
           <section ref={videoRef} id="sw-video" className="reveal mt-8 scroll-mt-20">
             <h2 className="font-display mb-3.5 flex items-center gap-3 text-xl font-semibold text-text">
@@ -226,6 +237,58 @@ export default function SoftwareDetallePage() {
         <ContentRow titulo="Relacionados" items={railItems} temaNombrePorId={temaNombrePorId} />
       </div>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// SIChipGroups — per-axis SI classification chip groups.
+// Groups ClasificacionConCriterio[] by criterio.id, ordered by criterio.orden.
+// Renders one labelled group per axis with one dex-label chip per category.
+// Renders nothing when the array is empty (no empty container).
+// ---------------------------------------------------------------------------
+
+function SIChipGroups({ clasificaciones }: { clasificaciones: ClasificacionConCriterio[] }) {
+  const groups = useMemo(() => {
+    const byAxis = new Map<string, { criterio: CriterioSI; items: ClasificacionConCriterio[] }>()
+    for (const c of clasificaciones) {
+      const key = c.criterio.id
+      if (!byAxis.has(key)) {
+        byAxis.set(key, { criterio: c.criterio, items: [] })
+      }
+      byAxis.get(key)!.items.push(c)
+    }
+    return [...byAxis.values()].sort((a, b) => a.criterio.orden - b.criterio.orden)
+  }, [clasificaciones])
+
+  if (groups.length === 0) return null
+
+  return (
+    <section className="reveal mt-8">
+      <h2 className="font-display mb-4 flex items-center gap-3 text-xl font-semibold text-text">
+        <span
+          className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+          aria-hidden="true"
+        />
+        Clasificaciones de SI
+      </h2>
+      <div className="flex flex-col gap-4">
+        {groups.map(({ criterio, items }) => (
+          <div key={criterio.id}>
+            <div className="dex-label mb-2 text-[10px] text-accent-2">{criterio.nombre}</div>
+            <div className="flex flex-wrap gap-2">
+              {items.map((cat) => (
+                <span
+                  key={cat.id}
+                  className="dex-label rounded-full border border-border bg-surface/70 px-2.5 py-1 text-[10px] text-text"
+                >
+                  {cat.nombre}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 

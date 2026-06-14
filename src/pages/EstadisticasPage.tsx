@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useSoftwarePopulares } from '../hooks/useSoftwarePopulares'
 import { useMejorValorados } from '../hooks/useMejorValorados'
@@ -34,19 +35,19 @@ function StatCard({ value, label, format }: { value: number; label: string; form
 // Cine podio row — ghost rank + wash initial tile + name + metric (hover rank bar).
 function PodioRow({
   rank,
-  softwareId,
+  softwareSlug,
   nombre,
   metric,
 }: {
   rank: number
-  softwareId: string
+  softwareSlug: string
   nombre: string
   metric: string
 }) {
-  const wash = washFor(hueFor(softwareId))
+  const wash = washFor(hueFor(softwareSlug))
   return (
     <Link
-      to={`/software/${softwareId}`}
+      to={`/software/${softwareSlug}`}
       className="ranking-row relative flex items-center gap-4 overflow-hidden rounded-xl px-4 py-3 no-underline transition-colors hover:bg-surface-2"
     >
       <span className="rank-bar absolute bottom-2 left-0 top-2 w-[3px] rounded bg-accent-2" aria-hidden="true" />
@@ -106,6 +107,12 @@ export default function EstadisticasPage() {
   const temas = useTemas()
   const clasifs = useClasificaciones()
 
+  // id → slug lookup for podio rows (ranking views only carry software_id/UUID).
+  const slugMap = useMemo(
+    () => new Map(todos.data.map((s) => [s.id, s.slug])),
+    [todos.data],
+  )
+
   const totalVistas = populares.data.reduce((acc, item) => acc + (item.vistas ?? 0), 0)
   const topVistos = populares.data.slice(0, 10)
 
@@ -151,7 +158,7 @@ export default function EstadisticasPage() {
                 <PodioRow
                   key={item.software_id}
                   rank={i + 1}
-                  softwareId={item.software_id}
+                  softwareSlug={slugMap.get(item.software_id) ?? item.software_id}
                   nombre={item.nombre}
                   metric={`${fmtNum(item.vistas ?? 0)} vistas`}
                 />
@@ -172,7 +179,7 @@ export default function EstadisticasPage() {
                 <PodioRow
                   key={item.software_id}
                   rank={i + 1}
-                  softwareId={item.software_id}
+                  softwareSlug={slugMap.get(item.software_id) ?? item.software_id}
                   nombre={item.nombre}
                   metric={`${(item.promedio ?? 0).toFixed(1)} ★`}
                 />
