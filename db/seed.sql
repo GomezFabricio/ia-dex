@@ -1185,3 +1185,74 @@ select
   (select id from public.software where slug = 'hugging-face'),
   (select id from public.clasificaciones_si where slug = 'conocimiento-procedimental')
 on conflict do nothing;
+
+-- Publicaciones (blog entries, idempotent by slug).
+insert into public.publicaciones (slug, titulo, cuerpo, imagen_url, video_url, enlaces, tema_id, clasificacion_si_id, estado)
+values (
+  'que-es-un-sistema-inteligente', '¿Qué es un sistema inteligente?', 'Un sistema inteligente es un programa o dispositivo capaz de percibir su entorno, procesar esa información y actuar de manera que maximiza la probabilidad de alcanzar sus objetivos. A diferencia de un programa tradicional, no sigue únicamente una secuencia fija de instrucciones: puede adaptarse, aprender y tomar decisiones en situaciones que no fueron explícitamente programadas.
+
+La inteligencia artificial es el campo de la informática que estudia y construye estos sistemas. Desde sus orígenes en la década de 1950, la IA ha pasado por múltiples ciclos de entusiasmo y escepticismo, pero en las últimas dos décadas el avance en poder de cómputo y la disponibilidad de grandes volúmenes de datos han transformado ideas teóricas en aplicaciones concretas.
+
+Hoy, los sistemas inteligentes están presentes en el reconocimiento de voz de tu teléfono, en los algoritmos que ordenan tu feed de noticias y en los modelos que asisten a médicos en el diagnóstico de imágenes. Entender qué son y cómo funcionan es el primer paso para usarlos con criterio.',
+  null, null, '[{"titulo":"Inteligencia artificial — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Inteligencia_artificial"},{"titulo":"Artificial Intelligence: A Modern Approach — Sitio oficial AIMA","url":"https://aima.cs.berkeley.edu/"}]'::jsonb,
+  (select id from public.temas where slug = 'introduccion-ia'),
+  null,
+  'publicado'
+)
+on conflict (slug) do nothing;
+
+insert into public.publicaciones (slug, titulo, cuerpo, imagen_url, video_url, enlaces, tema_id, clasificacion_si_id, estado)
+values (
+  'como-aprende-una-maquina', 'Cómo aprende una máquina: una introducción al aprendizaje automático', 'Cuando hablamos de que una máquina "aprende", no nos referimos a que adquiere conciencia ni que comprende el mundo como lo hace una persona. Lo que ocurre es más preciso: el sistema ajusta sus parámetros internos a partir de ejemplos, de forma que mejora su desempeño en una tarea sin que nadie le haya dado la respuesta exacta para cada caso nuevo.
+
+El aprendizaje automático (machine learning) engloba tres grandes paradigmas. En el aprendizaje supervisado, el sistema recibe pares de entrada y salida etiquetados —por ejemplo, miles de fotos de gatos y perros con su etiqueta correspondiente— y aprende a generalizar para clasificar imágenes que nunca ha visto. En el aprendizaje no supervisado, no hay etiquetas: el algoritmo busca patrones y agrupaciones por sí solo. Y en el aprendizaje por refuerzo, el agente aprende mediante prueba y error, recibiendo recompensas cuando toma buenas decisiones.
+
+Entender estos paradigmas es fundamental antes de entrar en redes neuronales o modelos de lenguaje. Son los cimientos conceptuales sobre los que se construye todo lo demás, y confundirlos lleva a elegir la herramienta equivocada para el problema.',
+  null, null, '[{"titulo":"Aprendizaje automático — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Aprendizaje_autom%C3%A1tico"},{"titulo":"Machine Learning — Google Developers","url":"https://developers.google.com/machine-learning/crash-course/ml-intro"}]'::jsonb,
+  (select id from public.temas where slug = 'aprendizaje-automatico'),
+  null,
+  'publicado'
+)
+on conflict (slug) do nothing;
+
+insert into public.publicaciones (slug, titulo, cuerpo, imagen_url, video_url, enlaces, tema_id, clasificacion_si_id, estado)
+values (
+  'ia-debil-en-la-vida-cotidiana', 'La IA Débil que usás todos los días', 'La IA Débil —también llamada IA Estrecha o Narrow AI— es el tipo de inteligencia artificial que existe hoy. No es débil en el sentido de ser poco capaz: puede superar a cualquier humano en la tarea específica para la que fue diseñada. Es "débil" porque no puede trasladar ese conocimiento a otro dominio.
+
+Cuando le pedís a tu teléfono que reconozca una canción, cuando Netflix te recomienda una serie, cuando el correo filtra el spam antes de que lo veas, o cuando el GPS recalcula la ruta en tiempo real: todos esos son ejemplos de IA Débil en acción. Cada uno de esos sistemas es extraordinariamente especializado y completamente incapaz de hacer lo que hace el de al lado.
+
+Reconocer esto importa porque desmitifica la IA y te da una perspectiva más realista sobre lo que la tecnología puede y no puede hacer hoy. La IA Fuerte —un sistema con capacidades cognitivas generales como las humanas— sigue siendo un concepto teórico, no una realidad presente.',
+  null, null, '[{"titulo":"IA débil — Wikipedia en español","url":"https://es.wikipedia.org/wiki/Inteligencia_artificial_d%C3%A9bil"}]'::jsonb,
+  null,
+  (select id from public.clasificaciones_si where slug = 'ia-debil-estrecha'),
+  'publicado'
+)
+on conflict (slug) do nothing;
+
+insert into public.publicaciones (slug, titulo, cuerpo, imagen_url, video_url, enlaces, tema_id, clasificacion_si_id, estado)
+values (
+  'bienvenidos-al-blog-ia-dex', 'Bienvenidos al blog de ia-dex', 'Este blog nace con un propósito concreto: acercar los conceptos de la inteligencia artificial a quienes están dando sus primeros pasos en el campo, sin sacrificar el rigor ni caer en la simplificación vacía. Cada artículo va a estar anclado en un tema o clasificación del catálogo de ia-dex, de modo que lo que leas acá tenga un correlato directo con el software, los conceptos y los recursos que encontrás en la plataforma.
+
+Lo que vas a encontrar acá son explicaciones de conceptos fundamentales, análisis de herramientas, contexto histórico y reflexiones sobre el impacto de la IA en distintos ámbitos. No vamos a seguir el hype ni a publicar por publicar: cada entrada tiene que sumar algo real a tu comprensión del campo.
+
+Si acabás de llegar a ia-dex, te recomendamos empezar por el tema "Introducción a los sistemas inteligentes y la IA" en el catálogo. Y si tenés preguntas, sugerencias o querés que cubramos algún tema en particular, estamos atentos.',
+  null, null, '[]'::jsonb,
+  null,
+  null,
+  'publicado'
+)
+on conflict (slug) do nothing;
+
+insert into public.publicaciones (slug, titulo, cuerpo, imagen_url, video_url, enlaces, tema_id, clasificacion_si_id, estado)
+values (
+  'roadmap-2026-borrador', 'Roadmap 2026 (borrador)', 'Este es un borrador interno de las mejoras planificadas para ia-dex durante 2026. El contenido aquí es provisional y no representa un compromiso público.
+
+Entre las iniciativas en evaluación se encuentran la incorporación de nuevos temas al catálogo —con foco en ética de la IA y sistemas multiagente—, la expansión de la sección de software con herramientas de visión por computadora y PLN, y la posibilidad de abrir un espacio de contribuciones de la comunidad para enriquecer las descripciones y ejemplos.
+
+Este artículo permanecerá en estado de borrador hasta que el roadmap esté confirmado. No es visible en el feed público.',
+  null, null, '[]'::jsonb,
+  null,
+  null,
+  'borrador'
+)
+on conflict (slug) do nothing;

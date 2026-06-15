@@ -165,9 +165,38 @@ for (const s of data.software) {
   }
 }
 
+// ── Publicaciones — idempotent by slug ───────────────────────────────────────
+// ON CONFLICT DO NOTHING: seeded posts are never overwritten; editorial edits
+// made directly in the DB survive re-runs. autor_id is intentionally omitted
+// (defaults to NULL; the UI shows an "Equipo ia-dex" fallback in that case).
+// tema_id and clasificacion_si_id are resolved via subquery so FK integrity is
+// guaranteed even across idempotent re-runs after the referenced rows exist.
+lines.push(`-- Publicaciones (blog entries, idempotent by slug).`)
+for (const p of (data.publicaciones ?? [])) {
+  const temaIdExpr = p.tema_slug
+    ? `(select id from public.temas where slug = ${q(p.tema_slug)})`
+    : 'null'
+  const clasificIdExpr = p.clasificacion_slug
+    ? `(select id from public.clasificaciones_si where slug = ${q(p.clasificacion_slug)})`
+    : 'null'
+  lines.push(
+    `insert into public.publicaciones (slug, titulo, cuerpo, imagen_url, video_url, enlaces, tema_id, clasificacion_si_id, estado)`,
+    `values (`,
+    `  ${q(p.slug)}, ${q(p.titulo)}, ${q(p.cuerpo)},`,
+    `  ${q(p.imagen_url)}, ${q(p.video_url)}, ${qJson(p.enlaces)},`,
+    `  ${temaIdExpr},`,
+    `  ${clasificIdExpr},`,
+    `  ${q(p.estado)}`,
+    `)`,
+    `on conflict (slug) do nothing;`,
+    ''
+  )
+}
+
 writeFileSync(join(dir, 'seed.sql'), lines.join('\n'))
 console.log(
   `seed.sql written: ${data.temas.length} temas, ${data.criterios.length} criterios, ` +
   `${data.clasificaciones_si.length} clasificaciones, ${data.software.length} software, ` +
-  `${data.software.reduce((n, s) => n + (s.clasificaciones_slugs?.length ?? 0), 0)} junction rows`
+  `${data.software.reduce((n, s) => n + (s.clasificaciones_slugs?.length ?? 0), 0)} junction rows, ` +
+  `${(data.publicaciones ?? []).length} publicaciones`
 )
