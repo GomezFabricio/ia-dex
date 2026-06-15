@@ -125,7 +125,7 @@ export default function ContentRow({
           <ul
             ref={trackRef}
             data-rail
-            className="flex snap-x snap-mandatory list-none gap-4 overflow-x-auto scroll-smooth px-4 pb-6 pr-[12%] sm:px-8"
+            className="flex snap-x snap-mandatory list-none gap-4 overflow-x-auto scroll-smooth scroll-pl-4 px-4 pb-6 pr-[12%] sm:scroll-pl-8 sm:px-8"
           >
             {items.map((sw, i) => (
               <li key={sw.id} className="w-[clamp(200px,60vw,260px)] shrink-0 snap-start">

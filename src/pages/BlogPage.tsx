@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { usePublicaciones } from '../hooks/usePublicaciones'
+import { useIsAdmin } from '../hooks/useIsAdmin'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
 import type { PublicacionConAutor } from '../types/dtos'
@@ -63,6 +64,7 @@ function PublicacionCard({ pub }: { pub: PublicacionConAutor }) {
 
 export default function BlogPage() {
   const { data, loading, error, refetch } = usePublicaciones()
+  const isAdmin = useIsAdmin()
 
   return (
     <div className="flex flex-col">
@@ -77,7 +79,21 @@ export default function BlogPage() {
           className="orb-float-2 pointer-events-none absolute -right-12 -top-32 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent-2)_55%,transparent),transparent_65%)] opacity-30 blur-[100px]"
         />
         <div className="relative mx-auto max-w-[1400px]">
-          <p className="dex-label mb-3.5 text-[11px] text-accent-2">Blog · Contenido didáctico</p>
+          <div className="mb-3.5 flex items-center justify-between gap-3">
+            <p className="dex-label text-[11px] text-accent-2">Blog · Contenido didáctico</p>
+            {isAdmin && (
+              <Link
+                to="/admin/publicaciones"
+                className="dex-label inline-flex shrink-0 items-center gap-1.5 rounded-[10px] border border-border bg-surface/70 px-3.5 py-2 text-[10px] text-text no-underline backdrop-blur-md transition-colors hover:border-accent/60 hover:text-accent-strong"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                Gestionar
+              </Link>
+            )}
+          </div>
           <h1 className="font-display mb-3.5 text-[clamp(2.25rem,5vw,3.4rem)] font-bold tracking-[-0.02em] text-text">
             Publicaciones
           </h1>
