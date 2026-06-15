@@ -46,6 +46,7 @@ export default function PublicacionFormPage() {
   const [temaId, setTemaId] = useState('')
   const [clasificacionId, setClasificacionId] = useState('')
   const [estado, setEstado] = useState<Estado>('borrador')
+  const [firma, setFirma] = useState('')
 
   // --- Select options ------------------------------------------------------
   const [temas, setTemas] = useState<Tema[]>([])
@@ -102,6 +103,7 @@ export default function PublicacionFormPage() {
         setTemaId(pub.tema_id ?? '')
         setClasificacionId(pub.clasificacion_si_id ?? '')
         setEstado(pub.estado === 'publicado' ? 'publicado' : 'borrador')
+        setFirma(pub.firma ?? '')
         setLoading(false)
       })
       .catch((err: unknown) => {
@@ -191,6 +193,7 @@ export default function PublicacionFormPage() {
           tema_id: temaId === '' ? null : temaId,
           clasificacion_si_id: clasificacionId === '' ? null : clasificacionId,
           estado,
+          firma: firma.trim() === '' ? null : firma.trim(),
         }
         await publicacionesService.editar(idParam, patch)
       } else {
@@ -205,6 +208,7 @@ export default function PublicacionFormPage() {
           tema_id: temaId === '' ? null : temaId,
           clasificacion_si_id: clasificacionId === '' ? null : clasificacionId,
           estado,
+          firma: firma.trim() === '' ? null : firma.trim(),
         }
         await publicacionesService.crear(input)
       }
@@ -434,6 +438,24 @@ export default function PublicacionFormPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Firma — optional byline override (autor_id stays the true creator) */}
+        <div className="flex flex-col gap-1">
+          <label htmlFor="firma" className="text-muted text-sm">
+            Firma (opcional)
+          </label>
+          <input
+            id="firma"
+            type="text"
+            value={firma}
+            onChange={(e) => setFirma(e.target.value)}
+            className={inputClass}
+            placeholder="Equipo ia-dex"
+          />
+          <span className="text-xs text-muted">
+            Cómo se muestra el autor. Vacío = tu nombre de perfil, o «Equipo ia-dex» si no lo tenés cargado.
+          </span>
         </div>
 
         {/* Estado */}

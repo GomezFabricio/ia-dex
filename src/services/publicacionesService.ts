@@ -73,12 +73,19 @@ async function resolverAutores(
     }
   }
 
-  return rows.map((row) => ({
-    ...row,
-    autorNombre:
-      (row.autor_id !== null ? nombrePorId.get(row.autor_id) : undefined) ??
-      AUTOR_FALLBACK,
-  }))
+  return rows.map((row) => {
+    // Display precedence: firma (byline override) → author profile name → fallback.
+    const firma = row.firma?.trim()
+    const desdeAutor =
+      row.autor_id !== null ? nombrePorId.get(row.autor_id) : undefined
+    return {
+      ...row,
+      autorNombre:
+        (firma !== undefined && firma !== '' ? firma : undefined) ??
+        desdeAutor ??
+        AUTOR_FALLBACK,
+    }
+  })
 }
 
 /**

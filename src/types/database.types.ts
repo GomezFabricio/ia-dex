@@ -262,6 +262,7 @@ export type Database = {
           cuerpo: string | null
           enlaces: Json
           estado: string
+          firma: string | null
           id: string
           imagen_url: string | null
           slug: string
@@ -277,6 +278,7 @@ export type Database = {
           cuerpo?: string | null
           enlaces?: Json
           estado?: string
+          firma?: string | null
           id?: string
           imagen_url?: string | null
           slug: string
@@ -292,6 +294,7 @@ export type Database = {
           cuerpo?: string | null
           enlaces?: Json
           estado?: string
+          firma?: string | null
           id?: string
           imagen_url?: string | null
           slug?: string
