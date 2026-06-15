@@ -27,6 +27,7 @@ export type Database = {
           nombre: string
           orden: number
           slug: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -40,6 +41,7 @@ export type Database = {
           nombre: string
           orden?: number
           slug: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -53,6 +55,7 @@ export type Database = {
           nombre?: string
           orden?: number
           slug?: string
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -468,6 +471,7 @@ export type Database = {
           nombre: string
           orden: number
           slug: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -476,6 +480,7 @@ export type Database = {
           nombre: string
           orden?: number
           slug: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -484,6 +489,7 @@ export type Database = {
           nombre?: string
           orden?: number
           slug?: string
+          video_url?: string | null
         }
         Relationships: []
       }
