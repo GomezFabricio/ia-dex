@@ -32,6 +32,10 @@ export type ClasificacionSI = Omit<Tables<'clasificaciones_si'>, 'enlaces'> & {
   enlaces: Enlace[]
 }
 
+export type CriterioSI = Tables<'criterios_si'>
+
+export type ClasificacionConCriterio = ClasificacionSI & { criterio: CriterioSI }
+
 // Valoracion narrows `contenido_tipo` from string to the known union.
 export type Valoracion = Omit<Tables<'valoraciones'>, 'contenido_tipo'> & {
   contenido_tipo: ContenidoTipo
@@ -45,6 +49,37 @@ export type MensajeForo = Tables<'mensajes_foro'>
 export type Evento = Omit<Tables<'eventos'>, 'tipo' | 'metadata'> & {
   tipo: EventoTipo
   metadata: Record<string, unknown>
+}
+
+export type ProgresoRoadmap = Tables<'progreso_roadmap'>
+
+// A roadmap stage: a tema plus its top featured software (rating-ranked).
+export type EtapaRoadmap = {
+  tema: Tema
+  destacados: Software[]
+}
+
+// ---------------------------------------------------------------------------
+// Asistente (Gemini-grounded chat) DTOs
+// ---------------------------------------------------------------------------
+
+export type AsistenteRol = 'user' | 'assistant'
+
+export type AsistenteMensaje = {
+  role: AsistenteRol
+  text: string
+  fuentes?: string[]
+}
+
+export type AsistenteRequest = {
+  pregunta: string
+  historial?: { role: AsistenteRol; text: string }[]
+  pagina?: string
+}
+
+export type AsistenteResponse = {
+  respuesta: string
+  fuentes: string[]
 }
 
 // ---------------------------------------------------------------------------

@@ -3,9 +3,9 @@ import type { Software } from '../types/dtos'
 import * as softwareService from '../services/softwareService'
 
 // ---------------------------------------------------------------------------
-// useSoftware — fetches a single Software by id with active-flag stale guard
+// useSoftware — fetches a single Software by slug with active-flag stale guard.
 // Follows the canonical 4-action reducer template (D1 in design).
-// `pending` action dispatched at effect start resets stale data on id change.
+// `pending` action dispatched at effect start resets stale data on slug change.
 // Return shape: { data, loading, error, refetch }
 // ---------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export function useSoftware(id: string): {
+export function useSoftware(slug: string): {
   data: Software | null
   loading: boolean
   error: Error | null
@@ -56,7 +56,7 @@ export function useSoftware(id: string): {
     dispatch({ type: 'pending' })
 
     softwareService
-      .obtenerSoftware(id)
+      .obtenerPorSlug(slug)
       .then((item) => {
         if (active) dispatch({ type: 'success', payload: item })
       })
@@ -71,7 +71,7 @@ export function useSoftware(id: string): {
     return () => {
       active = false
     }
-  }, [id, state.version])
+  }, [slug, state.version])
 
   const refetch = useCallback(() => dispatch({ type: 'refetch' }), [])
 

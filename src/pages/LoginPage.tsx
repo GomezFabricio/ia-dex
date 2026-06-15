@@ -39,6 +39,8 @@ export default function LoginPage() {
   const [mode, setMode] = useState<Mode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [nombre, setNombre] = useState('')
+  const [apellido, setApellido] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [resetSent, setResetSent] = useState(false)
@@ -49,6 +51,8 @@ export default function LoginPage() {
     setErrorMsg(null)
     setResetSent(false)
     setConfirmationSent(false)
+    setNombre('')
+    setApellido('')
   }
 
   function goToReset() {
@@ -101,7 +105,11 @@ export default function LoginPage() {
           return
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({ email, password })
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { nombre, apellido } },
+        })
         if (error) {
           setErrorMsg(mapAuthError(error.code))
           return
@@ -171,6 +179,41 @@ export default function LoginPage() {
               placeholder="tu@correo.com"
             />
           </div>
+
+          {mode === 'signup' && (
+            <>
+              <div className="flex flex-col gap-1">
+                <label htmlFor="nombre" className="text-muted text-sm">
+                  Nombre
+                </label>
+                <input
+                  id="nombre"
+                  type="text"
+                  required
+                  autoComplete="given-name"
+                  value={nombre}
+                  onChange={e => setNombre(e.target.value)}
+                  className="bg-bg border border-border text-text rounded-lg px-3 py-2 placeholder:text-muted transition-colors focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
+                  placeholder="Tu nombre"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label htmlFor="apellido" className="text-muted text-sm">
+                  Apellido
+                </label>
+                <input
+                  id="apellido"
+                  type="text"
+                  required
+                  autoComplete="family-name"
+                  value={apellido}
+                  onChange={e => setApellido(e.target.value)}
+                  className="bg-bg border border-border text-text rounded-lg px-3 py-2 placeholder:text-muted transition-colors focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
+                  placeholder="Tu apellido"
+                />
+              </div>
+            </>
+          )}
 
           {!isReset && (
             <div className="flex flex-col gap-1">

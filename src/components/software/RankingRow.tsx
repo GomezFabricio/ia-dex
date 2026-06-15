@@ -8,12 +8,12 @@ import { Link } from 'react-router-dom'
 
 type Props = {
   position: number
-  softwareId: string
+  softwareSlug: string
   nombre: string
   metricText: string
 }
 
-export default function RankingRow({ position, softwareId, nombre, metricText }: Props) {
+export default function RankingRow({ position, softwareSlug, nombre, metricText }: Props) {
   return (
     <li className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-surface/60">
       <span
@@ -24,7 +24,7 @@ export default function RankingRow({ position, softwareId, nombre, metricText }:
         {String(position).padStart(2, '0')}
       </span>
       <Link
-        to={`/software/${softwareId}`}
+        to={`/software/${softwareSlug}`}
         className="flex-1 text-text no-underline transition-colors group-hover:text-accent-strong"
       >
         {nombre}

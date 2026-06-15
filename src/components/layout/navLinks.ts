@@ -4,8 +4,16 @@
 // (their pages list temas / clasificaciones), so the sidebar stays clean.
 // ---------------------------------------------------------------------------
 
-export const PRIMARY_LINKS = [
+export type PrimaryLink = {
+  to: string
+  label: string
+  end: boolean
+  badge?: string
+}
+
+export const PRIMARY_LINKS: PrimaryLink[] = [
   { to: '/', label: 'Inicio', end: true },
+  { to: '/roadmap', label: 'Roadmap', end: false, badge: 'NUEVO' },
   { to: '/catalogo', label: 'Catálogo', end: false },
   { to: '/clasificaciones', label: 'Clasificaciones', end: false },
   { to: '/buscar', label: 'Buscar', end: false },
