@@ -10,6 +10,8 @@ import TemaPage from '../pages/TemaPage'
 import SoftwareDetallePage from '../pages/SoftwareDetallePage'
 import ClasificacionesPage from '../pages/ClasificacionesPage'
 import ClasificacionDetallePage from '../pages/ClasificacionDetallePage'
+import BlogPage from '../pages/BlogPage'
+import PublicacionDetallePage from '../pages/PublicacionDetallePage'
 import BuscarPage from '../pages/BuscarPage'
 import ForoPage from '../pages/ForoPage'
 import ForoTemaPage from '../pages/ForoTemaPage'
@@ -33,6 +35,8 @@ const router = createBrowserRouter([
       { path: 'software/:slug', element: <SoftwareDetallePage /> },
       { path: 'clasificaciones', element: <ClasificacionesPage /> },
       { path: 'clasificaciones/:slug', element: <ClasificacionDetallePage /> },
+      { path: 'blog', element: <BlogPage /> },
+      { path: 'blog/:slug', element: <PublicacionDetallePage /> },
       { path: 'buscar', element: <BuscarPage /> },
       { path: 'foro', element: <ForoPage /> },
       { path: 'foro/:id', element: <ForoTemaPage /> },

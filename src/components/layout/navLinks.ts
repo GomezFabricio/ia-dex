@@ -16,6 +16,7 @@ export const PRIMARY_LINKS: PrimaryLink[] = [
   { to: '/roadmap', label: 'Roadmap', end: false, badge: 'NUEVO' },
   { to: '/catalogo', label: 'Catálogo', end: false },
   { to: '/clasificaciones', label: 'Clasificaciones', end: false },
+  { to: '/blog', label: 'Blog', end: false },
   { to: '/buscar', label: 'Buscar', end: false },
   { to: '/foro', label: 'Foro', end: false },
   { to: '/estadisticas', label: 'Estadísticas', end: false },

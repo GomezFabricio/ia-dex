@@ -36,6 +36,16 @@ export type CriterioSI = Tables<'criterios_si'>
 
 export type ClasificacionConCriterio = ClasificacionSI & { criterio: CriterioSI }
 
+// Publicacion narrows `enlaces` from raw Json to Enlace[] (identical narrowing to
+// ClasificacionSI). The service layer parses the jsonb at the read boundary.
+export type Publicacion = Omit<Tables<'publicaciones'>, 'enlaces'> & {
+  enlaces: Enlace[]
+}
+
+// Composed read type: a Publicacion plus its resolved author display name
+// (sourced from v_autores_publicos, never from a direct profiles join).
+export type PublicacionConAutor = Publicacion & { autorNombre: string }
+
 // Valoracion narrows `contenido_tipo` from string to the known union.
 export type Valoracion = Omit<Tables<'valoraciones'>, 'contenido_tipo'> & {
   contenido_tipo: ContenidoTipo

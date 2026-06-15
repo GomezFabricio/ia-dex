@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useClasificacion } from '../hooks/useClasificacion'
 import { useSoftwarePorClasificacion } from '../hooks/useSoftwarePorClasificacion'
+import { usePublicacionesPorClasificacion } from '../hooks/usePublicacionesPorClasificacion'
 import { useTemas } from '../hooks/useTemas'
 import StarRating from '../components/ui/StarRating'
 import ContentRow from '../components/software/ContentRow'
@@ -23,6 +24,7 @@ export default function ClasificacionDetallePage() {
 
   const { data, loading, error, refetch } = useClasificacion(slug)
   const tools = useSoftwarePorClasificacion(data?.id)
+  const publicaciones = usePublicacionesPorClasificacion(data?.id)
   const temas = useTemas()
 
   // tema_id → tema.nombre resolver for the tool rail poster kickers.
@@ -168,6 +170,42 @@ export default function ClasificacionDetallePage() {
           </section>
         )}
       </div>
+
+      {/* Contenido didáctico — per-SI publicaciones (rendered only when ≥1) */}
+      {!publicaciones.loading &&
+        publicaciones.error === null &&
+        publicaciones.data.length > 0 && (
+          <section className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-6 pb-8 sm:px-8 lg:px-12">
+            <header className="flex items-center gap-3">
+              <span
+                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                aria-hidden="true"
+              />
+              <h2 className="font-display m-0 text-xl font-semibold tracking-[-0.015em] text-text">
+                Contenido didáctico
+              </h2>
+            </header>
+            <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+              {publicaciones.data.map((pub) => (
+                <li key={pub.id}>
+                  <Link
+                    to={`/blog/${pub.slug}`}
+                    className="qtile group flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
+                  >
+                    <span className="dex-label text-[9px] text-accent-2">Publicación</span>
+                    <h3 className="font-display text-base font-semibold leading-tight tracking-[-0.01em] text-text">
+                      {pub.titulo}
+                    </h3>
+                    <span className="dex-label text-[9px] text-muted">{pub.autorNombre}</span>
+                    <span className="dex-label mt-1.5 text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+                      Leer →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
       {/* Herramientas de esta categoría — semantic tool rail (software ↔ clasificacion_si) */}
       {!tools.loading && tools.error === null && tools.data.length > 0 && (
