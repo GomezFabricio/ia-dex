@@ -63,6 +63,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "clasificaciones_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "clasificaciones_si_criterio_id_fkey"
             columns: ["criterio_id"]
             isOneToOne: false
@@ -105,6 +112,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criterios_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
             referencedColumns: ["id"]
           },
         ]
@@ -240,6 +254,83 @@ export type Database = {
           },
         ]
       }
+      publicaciones: {
+        Row: {
+          autor_id: string | null
+          clasificacion_si_id: string | null
+          created_at: string
+          cuerpo: string | null
+          enlaces: Json
+          estado: string
+          id: string
+          imagen_url: string | null
+          slug: string
+          tema_id: string | null
+          titulo: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          autor_id?: string | null
+          clasificacion_si_id?: string | null
+          created_at?: string
+          cuerpo?: string | null
+          enlaces?: Json
+          estado?: string
+          id?: string
+          imagen_url?: string | null
+          slug: string
+          tema_id?: string | null
+          titulo: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          autor_id?: string | null
+          clasificacion_si_id?: string | null
+          created_at?: string
+          cuerpo?: string | null
+          enlaces?: Json
+          estado?: string
+          id?: string
+          imagen_url?: string | null
+          slug?: string
+          tema_id?: string | null
+          titulo?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publicaciones_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publicaciones_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publicaciones_clasificacion_si_id_fkey"
+            columns: ["clasificacion_si_id"]
+            isOneToOne: false
+            referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publicaciones_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       software: {
         Row: {
           anio_lanzamiento: number | null
@@ -301,6 +392,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
             referencedColumns: ["id"]
           },
           {
@@ -436,6 +534,24 @@ export type Database = {
       }
     }
     Views: {
+      v_autores_publicos: {
+        Row: {
+          apellido: string | null
+          id: string | null
+          nombre: string | null
+        }
+        Insert: {
+          apellido?: string | null
+          id?: string | null
+          nombre?: string | null
+        }
+        Update: {
+          apellido?: string | null
+          id?: string | null
+          nombre?: string | null
+        }
+        Relationships: []
+      }
       v_software_populares: {
         Row: {
           nombre: string | null
