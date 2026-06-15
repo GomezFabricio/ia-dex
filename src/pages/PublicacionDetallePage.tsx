@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { usePublicacion } from '../hooks/usePublicacion'
+import { usePublicaciones } from '../hooks/usePublicaciones'
 import VideoEmbed from '../components/software/VideoEmbed'
 import Modal from '../components/ui/Modal'
 import { formatFecha } from '../lib/date'
+import { hueFor, washFor } from '../lib/hue'
+import type { PublicacionConAutor } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
 // PublicacionDetallePage — single publicacion by :slug (publicaciones S2).
@@ -14,7 +17,54 @@ import { formatFecha } from '../lib/date'
 // imagen_url renders directly in <img src> with object-cover, BYPASSING the
 // useImageOk 200px gate (author-curated images, per ST3). video_url renders via
 // VideoEmbed + toEmbedUrl. Author name comes from autorNombre (Capability 4).
+//
+// "Seguí leyendo" surfaces related (same tema/clasificación, fallback latest)
+// publications at the foot of the article.
 // ---------------------------------------------------------------------------
+
+// Compact card for the "Seguí leyendo" related strip.
+function RelacionadaCard({ pub }: { pub: PublicacionConAutor }) {
+  const fecha = formatFecha(pub.created_at)
+  const wash = washFor(hueFor(pub.id))
+
+  return (
+    <Link
+      to={`/blog/${pub.slug}`}
+      className="qtile group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
+    >
+      <div className="relative aspect-[16/9] overflow-hidden">
+        {pub.imagen_url !== null && pub.imagen_url !== '' ? (
+          <img
+            src={pub.imagen_url}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <>
+            <div aria-hidden="true" className="absolute inset-0" style={{ background: wash }} />
+            <div aria-hidden="true" className="dex-grid absolute inset-0 opacity-25" />
+            <span
+              aria-hidden="true"
+              className="font-display absolute inset-0 grid place-items-center text-[3rem] font-bold leading-none text-[color-mix(in_oklab,var(--color-text)_12%,transparent)]"
+            >
+              {pub.titulo.charAt(0)}
+            </span>
+          </>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-1.5 p-4">
+        <h3 className="font-display line-clamp-2 text-base font-semibold leading-tight text-text">
+          {pub.titulo}
+        </h3>
+        <span className="dex-label mt-auto text-[9px] text-muted">
+          {pub.autorNombre}
+          {fecha !== '' && <> · {fecha}</>}
+        </span>
+      </div>
+    </Link>
+  )
+}
 
 export default function PublicacionDetallePage() {
   const { slug: slugParam } = useParams<{ slug: string }>()
@@ -26,6 +76,24 @@ export default function PublicacionDetallePage() {
   // accessible alt text. null when closed (no carousel — Modal's Esc/backdrop
   // handles dismissal).
   const [lightbox, setLightbox] = useState<{ url: string; index: number } | null>(null)
+
+  // Related feed for "Seguí leyendo": all published pubs, preferring ones that
+  // share this pub's tema/clasificación, falling back to latest, excluding the
+  // current pub. Computed client-side from the feed (small scale).
+  const { data: todas } = usePublicaciones()
+  const relacionadas = useMemo<PublicacionConAutor[]>(() => {
+    if (data === null) return []
+    const otras = todas.filter((p) => p.id !== data.id)
+    const mismoTema = otras.filter(
+      (p) =>
+        (data.tema_id !== null && p.tema_id === data.tema_id) ||
+        (data.clasificacion_si_id !== null &&
+          p.clasificacion_si_id === data.clasificacion_si_id),
+    )
+    const ids = new Set(mismoTema.map((p) => p.id))
+    const resto = otras.filter((p) => !ids.has(p.id))
+    return [...mismoTema, ...resto].slice(0, 3)
+  }, [todas, data])
 
   // Loading state
   if (loading) {
@@ -68,6 +136,10 @@ export default function PublicacionDetallePage() {
   const pub = data
   const fecha = formatFecha(pub.created_at)
   const enlacesFiltrados = pub.enlaces.filter((e) => e.url)
+  const minutosLectura =
+    pub.cuerpo !== null && pub.cuerpo.trim() !== ''
+      ? Math.max(1, Math.round(pub.cuerpo.trim().split(/\s+/).length / 200))
+      : 0
 
   return (
     <div className="flex flex-col">
@@ -95,6 +167,7 @@ export default function PublicacionDetallePage() {
           <p className="dex-label text-[10px] text-muted">
             {pub.autorNombre}
             {fecha !== '' && <> · {fecha}</>}
+            {minutosLectura > 0 && <> · {minutosLectura} min de lectura</>}
           </p>
         </div>
       </section>
@@ -225,6 +298,28 @@ export default function PublicacionDetallePage() {
           </section>
         )}
       </article>
+
+      {/* Seguí leyendo — related / latest publications */}
+      {relacionadas.length > 0 && (
+        <section className="border-t border-border">
+          <div className="mx-auto w-full max-w-[1400px] px-6 py-12 sm:px-8 lg:px-12">
+            <h2 className="font-display mb-6 flex items-center gap-3 text-xl font-semibold text-text">
+              <span
+                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                aria-hidden="true"
+              />
+              Seguí leyendo
+            </h2>
+            <ul className="grid list-none grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {relacionadas.map((p) => (
+                <li key={p.id}>
+                  <RelacionadaCard pub={p} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
