@@ -30,6 +30,8 @@ type Props = {
   dexStart?: number
   /** Hide the built-in header (caller renders its own); titulo still labels the region. */
   hideHeader?: boolean
+  /** Align the rail to the centered max-w-[1400px] content column (detail pages) instead of full-bleed. */
+  contained?: boolean
 }
 
 export default function ContentRow({
@@ -41,9 +43,19 @@ export default function ContentRow({
   layout = 'rail',
   dexStart = 1,
   hideHeader = false,
+  contained = false,
 }: Props) {
   const trackRef = useRef<HTMLUListElement>(null)
   const isGrid = layout === 'grid'
+
+  // Full-bleed by default. `contained` aligns the rail to the centered
+  // max-w-[1400px] px-6/8/12 content column the detail pages use, so the rail's
+  // left edge lines up with the rest of the page instead of bleeding wider.
+  const containerCls = contained ? 'mx-auto w-full max-w-[1400px] ' : ''
+  const padX = contained ? 'px-6 sm:px-8 lg:px-12' : 'px-4 sm:px-8'
+  const scrollPadX = contained
+    ? 'scroll-pl-6 sm:scroll-pl-8 lg:scroll-pl-12'
+    : 'scroll-pl-4 sm:scroll-pl-8'
 
   // Arrows appear ONLY when the track actually overflows (so a rail whose cards
   // all fit shows none). A ResizeObserver keeps this in sync with viewport /
@@ -90,7 +102,7 @@ export default function ContentRow({
     <section role="region" aria-label={titulo} className="relative">
       {/* Header */}
       {!hideHeader && (
-      <header className="flex items-center gap-3 px-4 pb-3.5 sm:px-8">
+      <header className={`${containerCls}flex items-center gap-3 pb-3.5 ${padX}`}>
         <span
           className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
           aria-hidden="true"
@@ -113,7 +125,7 @@ export default function ContentRow({
       )}
 
       {isGrid ? (
-        <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-4 px-4 pb-4 sm:px-8">
+        <ul className={`${containerCls}grid list-none grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-4 pb-4 ${padX}`}>
           {items.map((sw, i) => (
             <li key={sw.id}>
               <PosterCard software={sw} dex={dexStart + i} temaNombre={temaNombrePorId?.(sw.tema_id)} />
@@ -121,11 +133,11 @@ export default function ContentRow({
           ))}
         </ul>
       ) : (
-        <div className="relative">
+        <div className={`${containerCls}relative`}>
           <ul
             ref={trackRef}
             data-rail
-            className="flex snap-x snap-mandatory list-none gap-4 overflow-x-auto scroll-smooth scroll-pl-4 px-4 pb-6 pr-[12%] sm:scroll-pl-8 sm:px-8"
+            className={`flex snap-x snap-mandatory list-none gap-4 overflow-x-auto scroll-smooth pb-6 pr-[12%] ${scrollPadX} ${padX}`}
           >
             {items.map((sw, i) => (
               <li key={sw.id} className="w-[clamp(200px,60vw,260px)] shrink-0 snap-start">
