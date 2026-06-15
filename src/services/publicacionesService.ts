@@ -24,12 +24,27 @@ function parseEnlaces(raw: unknown): Enlace[] {
 }
 
 /**
- * Maps a raw publicaciones row to Publicacion, parsing enlaces along the way.
+ * Parses the raw Json imagenes column into string[] (an ordered gallery of public
+ * Storage URLs). FILTER semantics: returns [] on null/non-array, then keeps only
+ * the non-empty string elements (dropping non-strings and empty strings). Mirrors
+ * parseEnlaces' read-boundary contract.
+ */
+function parseImagenes(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  return raw.filter(
+    (item): item is string => typeof item === 'string' && item.length > 0,
+  )
+}
+
+/**
+ * Maps a raw publicaciones row to Publicacion, parsing enlaces and imagenes along
+ * the way (the single read boundary — no component re-parses jsonb).
  */
 function toPublicacion(row: PublicacionRow): Publicacion {
   return {
     ...row,
     enlaces: parseEnlaces(row.enlaces),
+    imagenes: parseImagenes(row.imagenes),
   }
 }
 
@@ -317,4 +332,60 @@ export async function subirImagen(
 
   const { data } = supabase.storage.from('publicaciones').getPublicUrl(path)
   return data.publicUrl
+}
+
+// Bucket-scoped marker inside a Supabase public URL. Everything after it is the
+// Storage object key. indexOf (not startsWith) so the full absolute URL form
+// (https://<ref>.supabase.co/storage/v1/object/public/publicaciones/<key>) works.
+const PUBLIC_PREFIX = '/storage/v1/object/public/publicaciones/'
+
+/**
+ * Uploads ONE gallery image to the 'publicaciones' Storage bucket under a
+ * COLLISION-PROOF key `{publicacionId}/{uuid}-{file.name}` and returns its public
+ * URL — a value to append to the imagenes array.
+ *
+ * Unlike subirImagen (the cover), this NEVER upserts: a gallery is a SET, so two
+ * files with the same name MUST coexist. The uuid prefix guarantees a unique key
+ * even for identical filenames, which makes upsert unnecessary and unsafe. The
+ * cover helper subirImagen is unchanged. Throws on upload error.
+ */
+export async function subirImagenGaleria(
+  publicacionId: string,
+  file: File,
+): Promise<string> {
+  const path = `${publicacionId}/${crypto.randomUUID()}-${file.name}`
+
+  const { error } = await supabase.storage
+    .from('publicaciones')
+    .upload(path, file)
+
+  if (error) throw error
+
+  const { data } = supabase.storage.from('publicaciones').getPublicUrl(path)
+  return data.publicUrl
+}
+
+/**
+ * Best-effort delete of a gallery object given its public URL. Reconstructs the
+ * Storage object key from the stable Supabase public-URL shape and removes it.
+ *
+ * Graceful: if the URL doesn't contain the expected bucket prefix (legacy/foreign
+ * URL) it returns WITHOUT throwing. Storage API errors (permission/RLS/not-found)
+ * are warned but not re-thrown — a failed cleanup must NEVER break a form save
+ * (the array edit is what the user actually asked for). Accepts the orphan-blob
+ * tradeoff of the embed model.
+ */
+export async function eliminarImagenGaleria(url: string): Promise<void> {
+  const marker = url.indexOf(PUBLIC_PREFIX)
+  if (marker === -1) return // not our bucket / malformed — skip, do not throw
+  const key = decodeURIComponent(url.slice(marker + PUBLIC_PREFIX.length))
+  if (key === '') return
+  try {
+    const { error } = await supabase.storage.from('publicaciones').remove([key])
+    if (error) console.warn('[publicaciones] gallery image storage delete failed', error)
+  } catch (err) {
+    // Best-effort cleanup: a network-level throw leaves an orphan blob but must
+    // never break the save.
+    console.warn('[publicaciones] gallery image storage delete threw', err)
+  }
 }

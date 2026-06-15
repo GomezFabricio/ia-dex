@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { usePublicaciones } from '../hooks/usePublicaciones'
 import { useIsAdmin } from '../hooks/useIsAdmin'
 import { formatFecha } from '../lib/date'
@@ -7,54 +8,148 @@ import type { PublicacionConAutor } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
 // BlogPage — "cine-neural" publicaciones feed (publicaciones S2).
-// Full-bleed hero + a card grid of published publicaciones, newest-first, each
-// linking to its /blog/:slug detail page. D4 states: loading / error+retry /
-// not-found-or-empty / data. Author-curated thumbnails render directly (no
-// useImageOk gate); a lettered placeholder over a per-item wash otherwise.
+// Full-bleed hero + a feed of published publicaciones, newest-first, each
+// linking to its /blog/:slug detail page. Two views, toggled and persisted in
+// localStorage: LIST (a real-blog feed — newest post featured full-width, the
+// rest as horizontal rows) and GRID (uniform cards). D4 states: loading /
+// error+retry / not-found-or-empty / data. Author-curated thumbnails render
+// directly (no useImageOk gate); a lettered placeholder over a per-item wash
+// otherwise.
 // ---------------------------------------------------------------------------
 
-function PublicacionCard({ pub }: { pub: PublicacionConAutor }) {
+type BlogView = 'list' | 'grid'
+const VIEW_KEY = 'blog:view'
+
+function readStoredView(): BlogView {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'grid' ? 'grid' : 'list'
+  } catch {
+    return 'list'
+  }
+}
+
+// Plain-text excerpt from the body: collapse whitespace; CSS line-clamp truncates.
+function excerptOf(cuerpo: string | null): string {
+  if (cuerpo === null) return ''
+  return cuerpo.replace(/\s+/g, ' ').trim()
+}
+
+// Thumbnail or lettered placeholder. Sizing/rounding comes from `className` so
+// each variant (featured / list / grid) can shape its own frame.
+function Thumb({ pub, className }: { pub: PublicacionConAutor; className?: string }) {
   const wash = washFor(hueFor(pub.id))
+  return (
+    <div className={`relative overflow-hidden ${className ?? ''}`}>
+      {pub.imagen_url !== null && pub.imagen_url !== '' ? (
+        <img
+          src={pub.imagen_url}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      ) : (
+        <>
+          <div aria-hidden="true" className="absolute inset-0" style={{ background: wash }} />
+          <div aria-hidden="true" className="dex-grid absolute inset-0 opacity-25" />
+          <span
+            aria-hidden="true"
+            className="font-display absolute inset-0 grid place-items-center text-[4rem] font-bold leading-none text-[color-mix(in_oklab,var(--color-text)_12%,transparent)]"
+          >
+            {pub.titulo.charAt(0)}
+          </span>
+        </>
+      )}
+    </div>
+  )
+}
+
+// Featured (newest) — full-width hero card, only in LIST view.
+function PublicacionFeatured({ pub }: { pub: PublicacionConAutor }) {
   const fecha = formatFecha(pub.created_at)
+  const ex = excerptOf(pub.cuerpo)
 
   return (
     <Link
       to={`/blog/${pub.slug}`}
-      className="qtile group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
+      className="qtile group relative flex flex-col gap-5 overflow-hidden rounded-3xl border border-border bg-surface p-5 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow lg:flex-row lg:gap-7 lg:p-6"
     >
-      {/* Thumbnail or lettered placeholder */}
-      <div className="relative aspect-[16/9] overflow-hidden">
-        {pub.imagen_url !== null && pub.imagen_url !== '' ? (
-          <img
-            src={pub.imagen_url}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <>
-            <div aria-hidden="true" className="absolute inset-0" style={{ background: wash }} />
-            <div aria-hidden="true" className="dex-grid absolute inset-0 opacity-25" />
-            <span
-              aria-hidden="true"
-              className="font-display absolute inset-0 grid place-items-center text-[4rem] font-bold leading-none text-[color-mix(in_oklab,var(--color-text)_12%,transparent)]"
-            >
-              {pub.titulo.charAt(0)}
-            </span>
-          </>
+      <Thumb pub={pub} className="aspect-[16/9] w-full shrink-0 rounded-2xl lg:w-[58%]" />
+      <div className="flex flex-1 flex-col gap-3 lg:py-2">
+        <span className="dex-label text-[10px] text-accent-2">Última publicación</span>
+        <h2 className="font-display line-clamp-3 text-[clamp(1.5rem,3vw,2.25rem)] font-bold leading-tight tracking-[-0.02em] text-text">
+          {pub.titulo}
+        </h2>
+        {ex !== '' && (
+          <p className="line-clamp-3 text-base leading-relaxed text-muted lg:line-clamp-4">{ex}</p>
         )}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+          <span className="dex-label text-[10px] text-muted">
+            {pub.autorNombre}
+            {fecha !== '' && <> · {fecha}</>}
+          </span>
+          <span aria-hidden="true" className="dex-label text-[11px] text-accent transition-transform group-hover:translate-x-0.5">
+            Leer →
+          </span>
+        </div>
       </div>
+    </Link>
+  )
+}
 
-      <div className="flex flex-col gap-2 p-5">
+// Card for the GRID (uniform) and LIST (horizontal row) views.
+function PublicacionCard({ pub, variant }: { pub: PublicacionConAutor; variant: BlogView }) {
+  const fecha = formatFecha(pub.created_at)
+  const ex = excerptOf(pub.cuerpo)
+
+  if (variant === 'list') {
+    return (
+      <Link
+        to={`/blog/${pub.slug}`}
+        className="qtile group relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-surface p-4 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow sm:flex-row sm:gap-5"
+      >
+        <Thumb pub={pub} className="aspect-[16/9] w-full shrink-0 rounded-xl sm:w-64" />
+        <div className="flex flex-1 flex-col gap-2">
+          <span className="dex-label text-[9px] text-accent-2">Publicación</span>
+          <h3 className="font-display line-clamp-2 text-xl font-semibold leading-tight tracking-[-0.01em] text-text">
+            {pub.titulo}
+          </h3>
+          {ex !== '' && (
+            <p className="line-clamp-2 text-sm leading-relaxed text-muted sm:line-clamp-3">{ex}</p>
+          )}
+          <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+            <span className="dex-label text-[9px] text-muted">
+              {pub.autorNombre}
+              {fecha !== '' && <> · {fecha}</>}
+            </span>
+            <span aria-hidden="true" className="dex-label text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+              Leer →
+            </span>
+          </div>
+        </div>
+      </Link>
+    )
+  }
+
+  // grid
+  return (
+    <Link
+      to={`/blog/${pub.slug}`}
+      className="qtile group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
+    >
+      <Thumb pub={pub} className="aspect-[16/9]" />
+      <div className="flex flex-1 flex-col gap-2 p-5">
         <span className="dex-label text-[9px] text-accent-2">Publicación</span>
-        <h3 className="font-display text-lg font-semibold leading-tight tracking-[-0.01em] text-text">
+        <h3 className="font-display line-clamp-2 text-lg font-semibold leading-tight tracking-[-0.01em] text-text">
           {pub.titulo}
         </h3>
-        <span className="dex-label text-[9px] text-muted">
+        {ex !== '' && (
+          <p className="line-clamp-2 text-sm leading-relaxed text-muted">{ex}</p>
+        )}
+        <span className="dex-label mt-auto text-[9px] text-muted">
           {pub.autorNombre}
           {fecha !== '' && <> · {fecha}</>}
         </span>
-        <span className="dex-label mt-1.5 text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+        <span aria-hidden="true" className="dex-label text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
           Leer →
         </span>
       </div>
@@ -62,9 +157,61 @@ function PublicacionCard({ pub }: { pub: PublicacionConAutor }) {
   )
 }
 
+// Segmented list/grid toggle.
+function ViewToggle({ view, onChange }: { view: BlogView; onChange: (v: BlogView) => void }) {
+  const btn = (active: boolean) =>
+    `grid h-8 w-8 place-items-center rounded-md transition-colors ${
+      active ? 'bg-accent text-bg' : 'text-muted hover:text-text'
+    }`
+  return (
+    <div role="group" aria-label="Vista del blog" className="inline-flex items-center gap-1 rounded-[10px] border border-border bg-surface/70 p-1 backdrop-blur-md">
+      <button
+        type="button"
+        onClick={() => onChange('list')}
+        aria-pressed={view === 'list'}
+        aria-label="Vista lista"
+        className={btn(view === 'list')}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange('grid')}
+        aria-pressed={view === 'grid'}
+        aria-label="Vista cuadrícula"
+        className={btn(view === 'grid')}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
 export default function BlogPage() {
   const { data, loading, error, refetch } = usePublicaciones()
   const isAdmin = useIsAdmin()
+  const [view, setViewState] = useState<BlogView>(readStoredView)
+
+  function setView(v: BlogView) {
+    setViewState(v)
+    try {
+      localStorage.setItem(VIEW_KEY, v)
+    } catch {
+      /* localStorage unavailable — keep the in-memory choice */
+    }
+  }
 
   return (
     <div className="flex flex-col">
@@ -129,13 +276,34 @@ export default function BlogPage() {
 
         {/* Data */}
         {!loading && error === null && data.length > 0 && (
-          <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
-            {data.map((pub) => (
-              <li key={pub.id}>
-                <PublicacionCard pub={pub} />
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className="mb-6 flex items-center justify-end">
+              <ViewToggle view={view} onChange={setView} />
+            </div>
+
+            {view === 'list' ? (
+              <div className="flex flex-col gap-4">
+                <PublicacionFeatured pub={data[0]} />
+                {data.length > 1 && (
+                  <ul className="flex list-none flex-col gap-4">
+                    {data.slice(1).map((pub) => (
+                      <li key={pub.id}>
+                        <PublicacionCard pub={pub} variant="list" />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+                {data.map((pub) => (
+                  <li key={pub.id}>
+                    <PublicacionCard pub={pub} variant="grid" />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </div>
     </div>
