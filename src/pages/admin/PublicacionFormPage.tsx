@@ -376,17 +376,22 @@ export default function PublicacionFormPage() {
 
         {/* Imagen */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="imagen" className="text-muted text-sm">
-            Imagen
+          <span className="text-muted text-sm">Imagen</span>
+          <label
+            className={`inline-flex w-fit cursor-pointer items-center rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:opacity-90 focus-within:ring-2 focus-within:ring-accent ${
+              uploading ? 'pointer-events-none opacity-50' : ''
+            }`}
+          >
+            Elegir imagen
+            <input
+              id="imagen"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="sr-only"
+            />
           </label>
-          <input
-            id="imagen"
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/svg+xml"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="text-sm text-muted file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-bg disabled:opacity-50"
-          />
           {uploading && <span className="text-xs text-muted">Subiendo imagen…</span>}
           {uploadError !== null && (
             <span role="alert" className="text-sm text-error">
@@ -409,18 +414,25 @@ export default function PublicacionFormPage() {
 
         {/* Galería */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="galeria" className="text-muted text-sm">
-            Galería
+          <span className="text-muted text-sm">Galería</span>
+          <label
+            className={`inline-flex w-fit cursor-pointer items-center rounded-md bg-accent px-3 py-2 text-sm font-semibold text-bg transition hover:opacity-90 focus-within:ring-2 focus-within:ring-accent ${
+              uploadingGalleria || uploading || removingGaleria
+                ? 'pointer-events-none opacity-50'
+                : ''
+            }`}
+          >
+            Elegir imágenes
+            <input
+              id="galeria"
+              type="file"
+              multiple
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              onChange={handleGalleriaChange}
+              disabled={uploadingGalleria || uploading || removingGaleria}
+              className="sr-only"
+            />
           </label>
-          <input
-            id="galeria"
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleGalleriaChange}
-            disabled={uploadingGalleria || uploading || removingGaleria}
-            className="text-sm text-muted file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-bg disabled:opacity-50"
-          />
           {uploadingGalleria && (
             <span className="text-xs text-muted">Subiendo imágenes…</span>
           )}
