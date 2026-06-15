@@ -10,10 +10,15 @@ import TemaPage from '../pages/TemaPage'
 import SoftwareDetallePage from '../pages/SoftwareDetallePage'
 import ClasificacionesPage from '../pages/ClasificacionesPage'
 import ClasificacionDetallePage from '../pages/ClasificacionDetallePage'
+import BlogPage from '../pages/BlogPage'
+import PublicacionDetallePage from '../pages/PublicacionDetallePage'
 import BuscarPage from '../pages/BuscarPage'
 import ForoPage from '../pages/ForoPage'
 import ForoTemaPage from '../pages/ForoTemaPage'
 import EstadisticasPage from '../pages/EstadisticasPage'
+import RequireAdmin from '../components/auth/RequireAdmin'
+import PublicacionesAdminPage from '../pages/admin/PublicacionesAdminPage'
+import PublicacionFormPage from '../pages/admin/PublicacionFormPage'
 
 // ---------------------------------------------------------------------------
 // AppRouter — full route table per spec §AppRouter Route Table
@@ -33,10 +38,24 @@ const router = createBrowserRouter([
       { path: 'software/:slug', element: <SoftwareDetallePage /> },
       { path: 'clasificaciones', element: <ClasificacionesPage /> },
       { path: 'clasificaciones/:slug', element: <ClasificacionDetallePage /> },
+      { path: 'blog', element: <BlogPage /> },
+      { path: 'blog/:slug', element: <PublicacionDetallePage /> },
       { path: 'buscar', element: <BuscarPage /> },
       { path: 'foro', element: <ForoPage /> },
       { path: 'foro/:id', element: <ForoTemaPage /> },
       { path: 'estadisticas', element: <EstadisticasPage /> },
+      // Admin write path — gated by RequireAdmin (UI convenience only; RLS is
+      // the authoritative enforcement). Layout route: RequireAdmin renders an
+      // <Outlet/> for the children when the caller is a resolved admin.
+      {
+        path: 'admin/publicaciones',
+        element: <RequireAdmin />,
+        children: [
+          { index: true, element: <PublicacionesAdminPage /> },
+          { path: 'nuevo', element: <PublicacionFormPage /> },
+          { path: ':id/editar', element: <PublicacionFormPage /> },
+        ],
+      },
       {
         path: '*',
         element: <PageStub title="404" message="La página solicitada no existe." />,

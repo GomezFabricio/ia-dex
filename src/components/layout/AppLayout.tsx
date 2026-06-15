@@ -32,11 +32,13 @@ function isFullBleedPath(pathname: string): boolean {
   if (pathname === '/roadmap') return true
   if (pathname === '/catalogo') return true
   if (pathname === '/clasificaciones') return true
+  if (pathname === '/blog') return true
   if (pathname === '/buscar') return true
   if (pathname === '/estadisticas') return true
   if (pathname.startsWith('/software/')) return true
   if (pathname.startsWith('/clasificaciones/')) return true
   if (pathname.startsWith('/catalogo/')) return true
+  if (pathname.startsWith('/blog/')) return true
   return false
 }
 

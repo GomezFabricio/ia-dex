@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTema } from '../hooks/useTema'
 import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
+import { usePublicacionesPorTema } from '../hooks/usePublicacionesPorTema'
 import { useClasificacionesPorSoftwareIds } from '../hooks/useClasificacionesPorSoftwareIds'
 import PosterCard from '../components/software/PosterCard'
 import StarRating from '../components/ui/StarRating'
@@ -30,6 +31,7 @@ export default function TemaPage() {
 
   const tema = useTema(slug)
   const software = useSoftwarePorTema(tema.data?.id)
+  const publicaciones = usePublicacionesPorTema(tema.data?.id)
 
   // Batch junction fetch — skip until software list is ready.
   const softwareIds = useMemo(
@@ -103,6 +105,42 @@ export default function TemaPage() {
           </div>
         </div>
       </section>
+
+      {/* Contenido didáctico — per-tema publicaciones (rendered only when ≥1) */}
+      {!publicaciones.loading &&
+        publicaciones.error === null &&
+        publicaciones.data.length > 0 && (
+          <section className="mx-auto w-full max-w-[1400px] px-4 pt-2 sm:px-8">
+            <header className="mb-4 flex items-center gap-3">
+              <span
+                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                aria-hidden="true"
+              />
+              <h2 className="font-display m-0 text-xl font-semibold tracking-[-0.015em] text-text">
+                Contenido didáctico
+              </h2>
+            </header>
+            <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+              {publicaciones.data.map((pub) => (
+                <li key={pub.id}>
+                  <Link
+                    to={`/blog/${pub.slug}`}
+                    className="qtile group flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
+                  >
+                    <span className="dex-label text-[9px] text-accent-2">Publicación</span>
+                    <h3 className="font-display text-base font-semibold leading-tight tracking-[-0.01em] text-text">
+                      {pub.titulo}
+                    </h3>
+                    <span className="dex-label text-[9px] text-muted">{pub.autorNombre}</span>
+                    <span className="dex-label mt-1.5 text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+                      Leer →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
       {/* Software grid — each tool shown exactly once with per-axis SI chips */}
       <div className="pb-16 pt-4">
