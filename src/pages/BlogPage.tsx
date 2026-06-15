@@ -87,7 +87,7 @@ function PublicacionFeatured({ pub }: { pub: PublicacionConAutor }) {
             {pub.autorNombre}
             {fecha !== '' && <> · {fecha}</>}
           </span>
-          <span className="dex-label text-[11px] text-accent transition-transform group-hover:translate-x-0.5">
+          <span aria-hidden="true" className="dex-label text-[11px] text-accent transition-transform group-hover:translate-x-0.5">
             Leer →
           </span>
         </div>
@@ -121,7 +121,7 @@ function PublicacionCard({ pub, variant }: { pub: PublicacionConAutor; variant: 
               {pub.autorNombre}
               {fecha !== '' && <> · {fecha}</>}
             </span>
-            <span className="dex-label text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+            <span aria-hidden="true" className="dex-label text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
               Leer →
             </span>
           </div>
@@ -149,7 +149,7 @@ function PublicacionCard({ pub, variant }: { pub: PublicacionConAutor; variant: 
           {pub.autorNombre}
           {fecha !== '' && <> · {fecha}</>}
         </span>
-        <span className="dex-label text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+        <span aria-hidden="true" className="dex-label text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
           Leer →
         </span>
       </div>
@@ -164,7 +164,7 @@ function ViewToggle({ view, onChange }: { view: BlogView; onChange: (v: BlogView
       active ? 'bg-accent text-bg' : 'text-muted hover:text-text'
     }`
   return (
-    <div className="inline-flex items-center gap-1 rounded-[10px] border border-border bg-surface/70 p-1 backdrop-blur-md">
+    <div role="group" aria-label="Vista del blog" className="inline-flex items-center gap-1 rounded-[10px] border border-border bg-surface/70 p-1 backdrop-blur-md">
       <button
         type="button"
         onClick={() => onChange('list')}

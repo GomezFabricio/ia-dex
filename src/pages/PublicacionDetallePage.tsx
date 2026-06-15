@@ -80,7 +80,7 @@ export default function PublicacionDetallePage() {
   // Related feed for "Seguí leyendo": all published pubs, preferring ones that
   // share this pub's tema/clasificación, falling back to latest, excluding the
   // current pub. Computed client-side from the feed (small scale).
-  const { data: todas } = usePublicaciones()
+  const { data: todas, loading: todasLoading } = usePublicaciones()
   const relacionadas = useMemo<PublicacionConAutor[]>(() => {
     if (data === null) return []
     const otras = todas.filter((p) => p.id !== data.id)
@@ -136,10 +136,10 @@ export default function PublicacionDetallePage() {
   const pub = data
   const fecha = formatFecha(pub.created_at)
   const enlacesFiltrados = pub.enlaces.filter((e) => e.url)
-  const minutosLectura =
-    pub.cuerpo !== null && pub.cuerpo.trim() !== ''
-      ? Math.max(1, Math.round(pub.cuerpo.trim().split(/\s+/).length / 200))
-      : 0
+  const palabrasCuerpo =
+    pub.cuerpo !== null ? pub.cuerpo.trim().split(/\s+/).filter(Boolean).length : 0
+  // Only show a reading-time badge for posts long enough to be meaningful.
+  const minutosLectura = palabrasCuerpo >= 50 ? Math.max(1, Math.round(palabrasCuerpo / 200)) : 0
 
   return (
     <div className="flex flex-col">
@@ -299,8 +299,9 @@ export default function PublicacionDetallePage() {
         )}
       </article>
 
-      {/* Seguí leyendo — related / latest publications */}
-      {relacionadas.length > 0 && (
+      {/* Seguí leyendo — related / latest publications. Skeleton while the feed
+          loads so the section reserves space instead of popping in. */}
+      {(todasLoading || relacionadas.length > 0) && (
         <section className="border-t border-border">
           <div className="mx-auto w-full max-w-[1400px] px-6 py-12 sm:px-8 lg:px-12">
             <h2 className="font-display mb-6 flex items-center gap-3 text-xl font-semibold text-text">
@@ -310,13 +311,21 @@ export default function PublicacionDetallePage() {
               />
               Seguí leyendo
             </h2>
-            <ul className="grid list-none grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {relacionadas.map((p) => (
-                <li key={p.id}>
-                  <RelacionadaCard pub={p} />
-                </li>
-              ))}
-            </ul>
+            {todasLoading ? (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="skeleton h-64 rounded-2xl" />
+                ))}
+              </div>
+            ) : (
+              <ul className="grid list-none grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {relacionadas.map((p) => (
+                  <li key={p.id}>
+                    <RelacionadaCard pub={p} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
       )}
