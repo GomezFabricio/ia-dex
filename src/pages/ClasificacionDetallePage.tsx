@@ -215,6 +215,7 @@ export default function ClasificacionDetallePage() {
             items={tools.data}
             count={`${tools.data.length} herramientas`}
             temaNombrePorId={temaNombrePorId}
+            contained
           />
         </div>
       )}

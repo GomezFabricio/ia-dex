@@ -234,7 +234,7 @@ export default function SoftwareDetallePage() {
 
       {/* Relacionados — semantic rail (PR-6), same-theme fallback */}
       <div className="pb-16">
-        <ContentRow titulo="Relacionados" items={railItems} temaNombrePorId={temaNombrePorId} />
+        <ContentRow titulo="Relacionados" items={railItems} temaNombrePorId={temaNombrePorId} contained />
       </div>
     </div>
   )
