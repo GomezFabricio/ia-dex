@@ -133,7 +133,7 @@ export default function RoadmapPage() {
         </nav>
 
         {/* Stage cards on a gradient spine */}
-        <div className="relative">
+        <div className="relative min-w-0">
           {/* Spine track + completion fill */}
           <div aria-hidden="true" className="absolute bottom-10 left-[17px] top-2 w-0.5 bg-border-strong/80" />
           <div
@@ -148,7 +148,7 @@ export default function RoadmapPage() {
               <div
                 key={etapa.tema.id}
                 ref={(el) => { stageRefs.current[i] = el }}
-                className="reveal relative scroll-mt-20 pb-10 pl-[52px]"
+                className="reveal relative min-w-0 scroll-mt-20 pb-10 pl-9 sm:pl-[52px]"
               >
                 {/* Spine node */}
                 <span
@@ -161,7 +161,7 @@ export default function RoadmapPage() {
                 />
 
                 <div className="overflow-hidden rounded-[18px] border border-border bg-surface/50">
-                  <div className="px-6 pt-5">
+                  <div className="px-4 pt-5 sm:px-6">
                     <div className="mb-2.5 flex flex-wrap items-center gap-2.5">
                       <span className={`dex-label text-[10px] ${done ? 'text-accent-2' : 'text-muted'}`}>
                         Etapa {String(i + 1).padStart(2, '0')}
@@ -177,7 +177,7 @@ export default function RoadmapPage() {
                       </span>
                     </div>
 
-                    <h2 className="font-display mb-2.5 text-[clamp(1.4rem,3vw,1.85rem)] font-semibold tracking-[-0.015em] text-text">
+                    <h2 className="font-display mb-2.5 text-[clamp(1.4rem,3vw,1.85rem)] font-semibold tracking-[-0.015em] text-text break-words">
                       {etapa.tema.nombre}
                     </h2>
                     {etapa.tema.descripcion !== null && (

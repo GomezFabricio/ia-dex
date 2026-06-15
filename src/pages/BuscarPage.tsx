@@ -239,7 +239,7 @@ export default function BuscarPage() {
               aria-label="Filtrar por tema"
               value={form.temaId}
               onChange={(e) => handleSelectFilterChange({ temaId: e.target.value })}
-              className={fieldClass}
+              className={`${fieldClass} w-full min-w-0 max-w-full truncate sm:w-auto`}
             >
               <option value="">Todos los temas</option>
               {temas.data.map((t) => (
@@ -255,7 +255,7 @@ export default function BuscarPage() {
               value={form.licencia}
               onChange={(e) => handleTextFilterChange({ licencia: e.target.value })}
               onBlur={(e) => handleTextFilterBlur({ licencia: e.target.value })}
-              className={`${fieldClass} w-32`}
+              className={`${fieldClass} w-full min-w-0 sm:w-32`}
             />
             <input
               type="number"
@@ -264,7 +264,7 @@ export default function BuscarPage() {
               value={form.anioDesde}
               onChange={(e) => handleTextFilterChange({ anioDesde: e.target.value })}
               onBlur={(e) => handleTextFilterBlur({ anioDesde: e.target.value })}
-              className={`${fieldClass} w-24`}
+              className={`${fieldClass} w-full min-w-0 sm:w-24`}
             />
             <input
               type="number"
@@ -273,7 +273,7 @@ export default function BuscarPage() {
               value={form.anioHasta}
               onChange={(e) => handleTextFilterChange({ anioHasta: e.target.value })}
               onBlur={(e) => handleTextFilterBlur({ anioHasta: e.target.value })}
-              className={`${fieldClass} w-24`}
+              className={`${fieldClass} w-full min-w-0 sm:w-24`}
             />
           </div>
         </div>

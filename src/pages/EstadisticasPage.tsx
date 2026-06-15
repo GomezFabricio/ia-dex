@@ -48,7 +48,7 @@ function PodioRow({
   return (
     <Link
       to={`/software/${softwareSlug}`}
-      className="ranking-row relative flex items-center gap-4 overflow-hidden rounded-xl px-4 py-3 no-underline transition-colors hover:bg-surface-2"
+      className="ranking-row relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl px-3 py-3 no-underline transition-colors hover:bg-surface-2 sm:gap-4 sm:px-4"
     >
       <span className="rank-bar absolute bottom-2 left-0 top-2 w-[3px] rounded bg-accent-2" aria-hidden="true" />
       <span className="font-display w-[46px] shrink-0 text-center text-[40px] font-bold leading-none text-[color-mix(in_oklab,var(--color-accent-2)_32%,transparent)]">
@@ -79,7 +79,7 @@ type SectionProps = {
 
 function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, children }: SectionProps) {
   return (
-    <section className="rounded-[18px] border border-border bg-surface/50 p-2">
+    <section className="min-w-0 rounded-[18px] border border-border bg-surface/50 p-2">
       <h2 className="dex-label px-4 pb-2.5 pt-3.5 text-[10px] text-muted">{titulo}</h2>
 
       {loading && <p className="px-4 pb-3 text-muted">Cargando…</p>}
@@ -134,7 +134,7 @@ export default function EstadisticasPage() {
 
       {/* Stat cards */}
       <div className="mx-auto w-full max-w-[1400px] px-6 pb-2 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(190px,1fr))]">
           <StatCard value={todos.data.length} label="Herramientas indexadas" />
           <StatCard value={temas.data.length} label="Temas pedagógicos" />
           <StatCard value={clasifs.data.length} label="Clasificaciones de SI" />
@@ -144,7 +144,7 @@ export default function EstadisticasPage() {
 
       {/* Podio */}
       <div className="mx-auto w-full max-w-[1400px] px-6 py-8 pb-16 sm:px-8 lg:px-12">
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-6 [&>*]:min-w-0 lg:grid-cols-2">
           <Section
             titulo="Más vistos"
             loading={populares.loading}

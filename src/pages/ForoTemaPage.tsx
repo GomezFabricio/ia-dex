@@ -125,7 +125,7 @@ export default function ForoTemaPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_19rem]">
         {/* Main — conversation */}
-        <div className="order-1 flex flex-col gap-6">
+        <div className="order-1 flex min-w-0 flex-col gap-6">
           {/* Title */}
           <div>
             <span className="dex-label inline-block rounded-full border border-accent/25 bg-accent/[0.12] px-2 py-[3px] text-[9px] text-accent-strong">
@@ -146,9 +146,9 @@ export default function ForoTemaPage() {
               {temaInitial}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="mb-1.5 flex items-baseline gap-2">
+              <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
                 <span className="font-display text-sm font-semibold text-text">{temaAuthorLabel}</span>
-                <span className="dex-label text-[9px] text-faint">autor · OP · {formatFecha(tema.created_at)}</span>
+                <span className="dex-label min-w-0 break-words text-[9px] text-faint">autor · OP · {formatFecha(tema.created_at)}</span>
                 {temaIsOwn && (
                   <button
                     type="button"
@@ -161,7 +161,7 @@ export default function ForoTemaPage() {
                 )}
               </div>
               {tema.cuerpo !== null && tema.cuerpo !== '' && (
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-text">{tema.cuerpo}</p>
+                <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-text">{tema.cuerpo}</p>
               )}
             </div>
           </div>

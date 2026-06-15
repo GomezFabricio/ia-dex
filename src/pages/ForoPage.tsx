@@ -80,7 +80,7 @@ export default function ForoPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_19rem]">
         {/* Main — thread list */}
-        <div className="order-2 flex flex-col gap-4 lg:order-1">
+        <div className="order-2 flex min-w-0 flex-col gap-4 lg:order-1">
           {loading ? (
             <p className="text-muted">Cargando temas…</p>
           ) : error !== null ? (
@@ -99,7 +99,7 @@ export default function ForoPage() {
         </div>
 
         {/* Aside — CTA + stats */}
-        <aside className="order-1 flex flex-col gap-4 lg:order-2">
+        <aside className="order-1 flex min-w-0 flex-col gap-4 lg:order-2">
           <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5">
             <h2 className="font-display text-base font-semibold text-text">Iniciá un debate</h2>
             <p className="text-sm text-muted">
