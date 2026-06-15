@@ -8,8 +8,8 @@ import type { Tema } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
 // CatalogoPage — "cine-neural" catalogue browse (redesign).
-// Full-bleed hero + a sticky toolbar (tema jump-chips + Rieles/Cuadrícula view
-// toggle). "Rieles": one Netflix rail per tema (ghost-number header + "Ver tema").
+// Full-bleed hero + a sticky toolbar (Rieles/Cuadrícula view toggle).
+// "Rieles": one Netflix rail per tema (ghost-number header + "Ver tema").
 // "Cuadrícula": every tool in one poster grid. Recreates the catalogo screen
 // from the design handoff. Each rail owns its own fetch so one failure is local.
 // ---------------------------------------------------------------------------
@@ -49,15 +49,6 @@ export default function CatalogoPage() {
     return (temaId: string) => byId.get(temaId)
   }, [temas.data])
 
-  function goTema(id: string) {
-    setView('rieles')
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        document.getElementById(`cat-tema-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }),
-    )
-  }
-
   const seg = (active: boolean) =>
     [
       'dex-label rounded-lg px-3.5 py-2 text-[10px] transition-colors',
@@ -90,30 +81,16 @@ export default function CatalogoPage() {
         </div>
       </section>
 
-      {/* Sticky toolbar — view toggle on its own row, then tema chips full-width */}
+      {/* Sticky toolbar — Rieles/Cuadrícula view toggle */}
       <div className="sticky top-14 z-20 border-b border-border bg-bg/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1400px] flex-col gap-2.5 px-4 py-3 sm:px-8">
-          <div className="flex justify-end">
-            <div className="flex shrink-0 gap-1 rounded-[11px] border border-border bg-surface-2 p-1">
-              <button type="button" onClick={() => setView('rieles')} className={seg(view === 'rieles')}>
-                Rieles
-              </button>
-              <button type="button" onClick={() => setView('grid')} className={seg(view === 'grid')}>
-                Cuadrícula
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {temas.data.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => goTema(t.id)}
-                className="dex-label shrink-0 whitespace-nowrap rounded-full border border-border bg-surface px-3.5 py-2 text-[10px] text-muted transition-colors hover:border-accent/60 hover:text-text"
-              >
-                {t.nombre}
-              </button>
-            ))}
+        <div className="mx-auto flex max-w-[1400px] justify-end px-4 py-3 sm:px-8">
+          <div className="flex shrink-0 gap-1 rounded-[11px] border border-border bg-surface-2 p-1">
+            <button type="button" onClick={() => setView('rieles')} className={seg(view === 'rieles')}>
+              Rieles
+            </button>
+            <button type="button" onClick={() => setView('grid')} className={seg(view === 'grid')}>
+              Cuadrícula
+            </button>
           </div>
         </div>
       </div>

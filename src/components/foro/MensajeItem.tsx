@@ -31,9 +31,9 @@ export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Prop
         {initial}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="mb-1.5 flex items-baseline gap-2">
+        <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
           <span className="font-display text-sm font-semibold text-text">{authorLabel}</span>
-          <span className="dex-label text-[9px] text-faint">{formatFecha(mensaje.created_at)}</span>
+          <span className="dex-label min-w-0 break-words text-[9px] text-faint">{formatFecha(mensaje.created_at)}</span>
           {isOwn && (
             <button
               type="button"
@@ -44,7 +44,7 @@ export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Prop
             </button>
           )}
         </div>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-text">{mensaje.contenido}</p>
+        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-text">{mensaje.contenido}</p>
       </div>
     </li>
   )
