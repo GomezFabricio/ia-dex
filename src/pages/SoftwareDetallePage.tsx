@@ -9,8 +9,11 @@ import { useClasificacionesDeSoftware } from '../hooks/useClasificacionesDeSoftw
 import VideoEmbed from '../components/software/VideoEmbed'
 import ContentRow from '../components/software/ContentRow'
 import StarRating from '../components/ui/StarRating'
+import InlineEdit from '../components/admin/InlineEdit'
+import { useIsAdmin } from '../hooks/useIsAdmin'
 import { hueFor, washFor } from '../lib/hue'
 import * as eventosService from '../services/eventosService'
+import * as softwareService from '../services/softwareService'
 import type { ClasificacionConCriterio, CriterioSI } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
@@ -34,6 +37,11 @@ export default function SoftwareDetallePage() {
   const softwareSlug = slug ?? ''
 
   const software = useSoftware(softwareSlug)
+  // Admin gate for the edit-only spec rows (Imagen / Video) that exist solely as
+  // edit anchors — they must not leak into the public view. InlineEdit still
+  // gates its own pencil; this only decides which rows to MOUNT. Called
+  // unconditionally (Rules of Hooks) before the state early-returns below.
+  const isAdmin = useIsAdmin()
   // Once resolved, use the UUID for hooks that require an id (relacionados, clasificaciones, evento).
   const softwareId = software.data?.id ?? ''
   const relacionados = useRelacionados(softwareId === '' ? undefined : softwareId)
@@ -205,12 +213,165 @@ export default function SoftwareDetallePage() {
         <div className="reveal overflow-hidden rounded-[20px] border border-border bg-surface/55">
           <div className="dex-label px-6 pt-5 pb-1 text-[11px] text-accent-2">Especificaciones</div>
           <dl className="grid gap-x-6 px-6 pb-6 sm:grid-cols-2">
-            <SpecRow label="Objetivo" value={sw.objetivo} />
-            <SpecRow label="Descripción" value={sw.descripcion_corta} />
-            <SpecRow label="Licencia" value={sw.licencia} mono />
-            <SpecRow label="Año de lanzamiento" value={sw.anio_lanzamiento} mono />
-            <SpecRow label="Autor de referencia" value={sw.autor_referencia} />
-            <SpecRow label="Acceso" value={sw.url_acceso} href={sw.url_acceso ?? undefined} />
+            {/* Each cell is a block <div> (grid child). InlineEdit wraps only the <dd> content so
+                the pencil sits inline next to the value — no inline <span> as a grid child. */}
+            <div className="border-t border-border py-3.5">
+              <dt className="dex-label mb-1.5 text-[9px] text-muted">Objetivo</dt>
+              <dd className="text-sm leading-relaxed text-text">
+                <InlineEdit
+                  value={sw.objetivo}
+                  variant="textarea"
+                  label="el objetivo"
+                  onSave={(next) =>
+                    softwareService.editar(sw.id, { objetivo: next as string | null }).then(() => {})
+                  }
+                  onSaved={software.refetch}
+                >
+                  <span>{sw.objetivo ?? '—'}</span>
+                </InlineEdit>
+              </dd>
+            </div>
+            <div className="border-t border-border py-3.5">
+              <dt className="dex-label mb-1.5 text-[9px] text-muted">Descripción</dt>
+              <dd className="text-sm leading-relaxed text-text">
+                <InlineEdit
+                  value={sw.descripcion_corta}
+                  variant="textarea"
+                  label="la descripción"
+                  onSave={(next) =>
+                    softwareService
+                      .editar(sw.id, { descripcion_corta: next as string | null })
+                      .then(() => {})
+                  }
+                  onSaved={software.refetch}
+                >
+                  <span>{sw.descripcion_corta ?? '—'}</span>
+                </InlineEdit>
+              </dd>
+            </div>
+            {/* Imagen — edit-only anchor; admins only. The public cover lives in the
+                hero, so this row would only duplicate it for non-admins. */}
+            {isAdmin && (
+              <div className="border-t border-border py-3.5">
+                <dt className="dex-label mb-1.5 text-[9px] text-muted">Imagen</dt>
+                <dd className="text-sm leading-relaxed text-text">
+                  <InlineEdit
+                    value={sw.imagen_url}
+                    variant="image"
+                    label="la imagen"
+                    uploadPrefix="software"
+                    uploadEntityId={sw.id}
+                    onSave={(next) =>
+                      softwareService.editar(sw.id, { imagen_url: next as string | null }).then(() => {})
+                    }
+                    onSaved={software.refetch}
+                  >
+                    <ImageSpecValue value={sw.imagen_url} />
+                  </InlineEdit>
+                </dd>
+              </div>
+            )}
+            <div className="border-t border-border py-3.5">
+              <dt className="dex-label mb-1.5 text-[9px] text-muted">Licencia</dt>
+              <dd className="dex-label text-[13px] text-text">
+                <InlineEdit
+                  value={sw.licencia}
+                  variant="text"
+                  label="la licencia"
+                  onSave={(next) =>
+                    softwareService.editar(sw.id, { licencia: next as string | null }).then(() => {})
+                  }
+                  onSaved={software.refetch}
+                >
+                  <span>{sw.licencia ?? '—'}</span>
+                </InlineEdit>
+              </dd>
+            </div>
+            <div className="border-t border-border py-3.5">
+              <dt className="dex-label mb-1.5 text-[9px] text-muted">Año de lanzamiento</dt>
+              <dd className="dex-label text-[13px] text-text">
+                <InlineEdit
+                  value={sw.anio_lanzamiento}
+                  variant="number"
+                  label="el año de lanzamiento"
+                  onSave={(next) =>
+                    softwareService
+                      .editar(sw.id, { anio_lanzamiento: next as number | null })
+                      .then(() => {})
+                  }
+                  onSaved={software.refetch}
+                >
+                  <span>{sw.anio_lanzamiento ?? '—'}</span>
+                </InlineEdit>
+              </dd>
+            </div>
+            <div className="border-t border-border py-3.5">
+              <dt className="dex-label mb-1.5 text-[9px] text-muted">Autor de referencia</dt>
+              <dd className="text-sm leading-relaxed text-text">
+                <InlineEdit
+                  value={sw.autor_referencia}
+                  variant="text"
+                  label="el autor"
+                  onSave={(next) =>
+                    softwareService
+                      .editar(sw.id, { autor_referencia: next as string | null })
+                      .then(() => {})
+                  }
+                  onSaved={software.refetch}
+                >
+                  <span>{sw.autor_referencia ?? '—'}</span>
+                </InlineEdit>
+              </dd>
+            </div>
+            <div className="border-t border-border py-3.5">
+              <dt className="dex-label mb-1.5 text-[9px] text-muted">Acceso</dt>
+              <dd className="text-sm leading-relaxed text-text">
+                <InlineEdit
+                  value={sw.url_acceso}
+                  variant="url"
+                  label="la URL de acceso"
+                  onSave={(next) =>
+                    softwareService.editar(sw.id, { url_acceso: next as string | null }).then(() => {})
+                  }
+                  onSaved={software.refetch}
+                >
+                  {sw.url_acceso != null ? (
+                    <a
+                      href={sw.url_acceso}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="break-all text-accent-2 transition-colors hover:text-text"
+                    >
+                      {sw.url_acceso}
+                    </a>
+                  ) : (
+                    <span>—</span>
+                  )}
+                </InlineEdit>
+              </dd>
+            </div>
+            {/* Video — edit-only anchor; admins only (avoids leaking the raw YouTube
+                URL to the public). The public VideoEmbed is in a separate gated
+                <section> below (Decision 6, design.md line 407). Always rendered for
+                admins so they can ADD a video even when video_url is null. */}
+            {isAdmin && (
+              <div className="border-t border-border py-3.5">
+                <dt className="dex-label mb-1.5 text-[9px] text-muted">Video</dt>
+                <dd className="text-sm leading-relaxed text-text">
+                  <InlineEdit
+                    value={sw.video_url}
+                    variant="youtube"
+                    label="el video"
+                    onSave={(next) =>
+                      softwareService.editar(sw.id, { video_url: next as string | null }).then(() => {})
+                    }
+                    onSaved={software.refetch}
+                  >
+                    <span>{sw.video_url ?? '—'}</span>
+                  </InlineEdit>
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
 
@@ -219,7 +380,8 @@ export default function SoftwareDetallePage() {
           <SIChipGroups clasificaciones={clasificacionesSI.data} />
         )}
 
-        {sw.video_url !== null && sw.video_url !== undefined && (
+        {/* Public video embed — gated on a set value; visible to everyone when present. */}
+        {sw.video_url != null && (
           <section ref={videoRef} id="sw-video" className="reveal mt-8 scroll-mt-20">
             <h2 className="font-display mb-3.5 flex items-center gap-3 text-xl font-semibold text-text">
               <span className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
@@ -293,39 +455,25 @@ function SIChipGroups({ clasificaciones }: { clasificaciones: ClasificacionConCr
 }
 
 // ---------------------------------------------------------------------------
-// SpecRow — one labelled spec cell. Null/empty renders an em dash; a href turns
-// the value into an external link; `mono` renders the value as a dex-label.
+// ImageSpecValue — the <dd>-content portion for the imagen_url InlineEdit cell.
+// Shows a small thumbnail when set, an em dash when empty. Rendered inside the
+// <dd> of the Imagen grid cell; the SpecRow <div> container lives at the call
+// site so it (not the InlineEdit <span>) is the direct <dl> grid child.
+// The hero background is aria-hidden/decorative, so this is the stable, visible
+// edit anchor; on save + refetch the hero re-validates via useImageOk.
 // ---------------------------------------------------------------------------
 
-type SpecRowProps = {
-  label: string
-  value: string | number | null | undefined
-  href?: string
-  mono?: boolean
-}
-
-function SpecRow({ label, value, href, mono }: SpecRowProps) {
+function ImageSpecValue({ value }: { value: string | null | undefined }) {
   const isEmpty = value === null || value === undefined || value === ''
 
+  if (isEmpty) return <span>—</span>
+
   return (
-    <div className="border-t border-border py-3.5">
-      <dt className="dex-label mb-1.5 text-[9px] text-muted">{label}</dt>
-      <dd className={mono ? 'dex-label text-[13px] text-text' : 'text-sm leading-relaxed text-text'}>
-        {isEmpty ? (
-          '—'
-        ) : href ? (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="break-all text-accent-2 transition-colors hover:text-text"
-          >
-            {value}
-          </a>
-        ) : (
-          value
-        )}
-      </dd>
-    </div>
+    <img
+      src={value}
+      alt=""
+      className="h-12 w-auto rounded-md border border-border object-cover"
+    />
   )
 }
+
