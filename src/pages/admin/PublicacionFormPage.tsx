@@ -41,6 +41,7 @@ export default function PublicacionFormPage() {
   const [slugTouched, setSlugTouched] = useState(false)
   const [cuerpo, setCuerpo] = useState('')
   const [imagenUrl, setImagenUrl] = useState('')
+  const [imagenes, setImagenes] = useState<string[]>([])
   const [videoUrl, setVideoUrl] = useState('')
   const [enlaces, setEnlaces] = useState<Enlace[]>([])
   const [temaId, setTemaId] = useState('')
@@ -57,6 +58,10 @@ export default function PublicacionFormPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [uploadingGalleria, setUploadingGalleria] = useState(false)
+  const [galleriaError, setGalleriaError] = useState<string | null>(null)
+  const [removingGaleria, setRemovingGaleria] = useState(false)
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [videoError, setVideoError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -98,6 +103,7 @@ export default function PublicacionFormPage() {
         setSlugTouched(true)
         setCuerpo(pub.cuerpo ?? '')
         setImagenUrl(pub.imagen_url ?? '')
+        setImagenes(pub.imagenes)
         setVideoUrl(pub.video_url ?? '')
         setEnlaces(pub.enlaces)
         setTemaId(pub.tema_id ?? '')
@@ -148,6 +154,67 @@ export default function PublicacionFormPage() {
     }
   }
 
+  // --- Galería editing -----------------------------------------------------
+  // Multi-file upload: sequential loop, append each returned URL on success so
+  // partial progress survives a mid-batch failure (vs an all-or-nothing
+  // Promise.all). uploadingGalleria gates the submit button while it runs.
+  async function handleGalleriaChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setUploadingGalleria(true)
+    setGalleriaError(null)
+    try {
+      for (const file of Array.from(files)) {
+        const url = await publicacionesService.subirImagenGaleria(workingId, file)
+        setImagenes((prev) => [...prev, url])
+      }
+    } catch (err: unknown) {
+      setGalleriaError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo subir una imagen de la galería.',
+      )
+    } finally {
+      setUploadingGalleria(false)
+      e.target.value = '' // allow re-selecting the same files
+    }
+  }
+
+  // Pure index move — the ONE reorder primitive, shared by drag-and-drop AND the
+  // up/down buttons so the two can never diverge. Clamps and no-ops out of range.
+  function moveImagen(from: number, to: number) {
+    setImagenes((prev) => {
+      if (
+        from === to ||
+        from < 0 ||
+        to < 0 ||
+        from >= prev.length ||
+        to >= prev.length
+      ) {
+        return prev
+      }
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      next.splice(to, 0, moved)
+      return next
+    })
+  }
+
+  // Remove: optimistic array edit, THEN await best-effort Storage cleanup. The
+  // removingGaleria flag gates the submit button so the user cannot save while a
+  // delete is still in flight (GAL4-REMOVE).
+  async function removeImagen(index: number) {
+    const url = imagenes[index]
+    setImagenes((prev) => prev.filter((_, i) => i !== index))
+    setRemovingGaleria(true)
+    try {
+      await publicacionesService.eliminarImagenGaleria(url)
+    } finally {
+      setRemovingGaleria(false)
+    }
+  }
+
   // --- Enlaces editing -----------------------------------------------------
   function addEnlace() {
     setEnlaces((prev) => [...prev, { titulo: '', url: '' }])
@@ -188,6 +255,7 @@ export default function PublicacionFormPage() {
           slug: slug.trim(),
           cuerpo: cuerpo === '' ? null : cuerpo,
           imagen_url: imagenUrl === '' ? null : imagenUrl,
+          imagenes,
           video_url: trimmedVideo === '' ? null : trimmedVideo,
           enlaces: enlacesLimpios,
           tema_id: temaId === '' ? null : temaId,
@@ -203,6 +271,7 @@ export default function PublicacionFormPage() {
           slug: slug.trim(),
           cuerpo: cuerpo === '' ? null : cuerpo,
           imagen_url: imagenUrl === '' ? null : imagenUrl,
+          imagenes,
           video_url: trimmedVideo === '' ? null : trimmedVideo,
           enlaces: enlacesLimpios,
           tema_id: temaId === '' ? null : temaId,
@@ -334,6 +403,86 @@ export default function PublicacionFormPage() {
                 />
               </div>
               <span className="break-all text-xs text-muted">{imagenUrl}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Galería */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="galeria" className="text-muted text-sm">
+            Galería
+          </label>
+          <input
+            id="galeria"
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleGalleriaChange}
+            disabled={uploadingGalleria || uploading || removingGaleria}
+            className="text-sm text-muted file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-bg disabled:opacity-50"
+          />
+          {uploadingGalleria && (
+            <span className="text-xs text-muted">Subiendo imágenes…</span>
+          )}
+          {galleriaError !== null && (
+            <span role="alert" className="text-sm text-error">
+              {galleriaError}
+            </span>
+          )}
+          {imagenes.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {imagenes.map((url, index) => (
+                <div
+                  key={url}
+                  draggable
+                  onDragStart={() => setDragIndex(index)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => {
+                    if (dragIndex !== null) moveImagen(dragIndex, index)
+                    setDragIndex(null)
+                  }}
+                  onDragEnd={() => setDragIndex(null)}
+                  className="flex flex-col gap-1.5 rounded-lg border border-border p-1.5"
+                >
+                  <div className="overflow-hidden rounded-md border border-border">
+                    <img
+                      src={url}
+                      alt={`Imagen ${index + 1} de la galería`}
+                      className="aspect-video w-full object-cover"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-1">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveImagen(index, index - 1)}
+                        disabled={index === 0}
+                        aria-label={`Mover imagen ${index + 1} antes`}
+                        className="rounded-md border border-border px-2 py-1 text-xs text-muted transition-colors hover:border-accent/60 hover:text-text disabled:opacity-40"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveImagen(index, index + 1)}
+                        disabled={index === imagenes.length - 1}
+                        aria-label={`Mover imagen ${index + 1} después`}
+                        className="rounded-md border border-border px-2 py-1 text-xs text-muted transition-colors hover:border-accent/60 hover:text-text disabled:opacity-40"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeImagen(index)}
+                      aria-label={`Quitar imagen ${index + 1}`}
+                      className="rounded-md border border-border px-2 py-1 text-xs text-error transition-colors hover:border-error/60"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -483,7 +632,7 @@ export default function PublicacionFormPage() {
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            disabled={submitting || uploading}
+            disabled={submitting || uploading || uploadingGalleria || removingGaleria}
             className="rounded-lg bg-accent px-5 py-2 text-sm font-semibold text-bg shadow-glow transition-transform hover:-translate-y-px disabled:translate-y-0 disabled:opacity-50"
           >
             {submitting ? 'Guardando…' : 'Guardar'}

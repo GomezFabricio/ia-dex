@@ -41,3 +41,4 @@ supabase/.temp/
 
 # Local visual-verification tooling (Playwright)
 pw-verify.mjs
+.pw-tmp/

@@ -37,9 +37,12 @@ export type CriterioSI = Tables<'criterios_si'>
 export type ClasificacionConCriterio = ClasificacionSI & { criterio: CriterioSI }
 
 // Publicacion narrows `enlaces` from raw Json to Enlace[] (identical narrowing to
-// ClasificacionSI). The service layer parses the jsonb at the read boundary.
-export type Publicacion = Omit<Tables<'publicaciones'>, 'enlaces'> & {
+// ClasificacionSI) and `imagenes` from raw Json to string[] (an ordered gallery of
+// public Storage URLs). The service layer parses both jsonb columns at the read
+// boundary (toPublicacion). A single combined Omit narrows both columns at once.
+export type Publicacion = Omit<Tables<'publicaciones'>, 'enlaces' | 'imagenes'> & {
   enlaces: Enlace[]
+  imagenes: string[]
 }
 
 // Composed read type: a Publicacion plus its resolved author display name

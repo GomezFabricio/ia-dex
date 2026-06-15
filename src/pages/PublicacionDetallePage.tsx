@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { usePublicacion } from '../hooks/usePublicacion'
 import VideoEmbed from '../components/software/VideoEmbed'
+import Modal from '../components/ui/Modal'
 import { formatFecha } from '../lib/date'
 
 // ---------------------------------------------------------------------------
@@ -19,6 +21,11 @@ export default function PublicacionDetallePage() {
   const slug = slugParam ?? ''
 
   const { data, loading, error, refetch } = usePublicacion(slug)
+
+  // Single-image lightbox: tracks the active image URL and its gallery index for
+  // accessible alt text. null when closed (no carousel — Modal's Esc/backdrop
+  // handles dismissal).
+  const [lightbox, setLightbox] = useState<{ url: string; index: number } | null>(null)
 
   // Loading state
   if (loading) {
@@ -103,6 +110,62 @@ export default function PublicacionDetallePage() {
               className="aspect-video w-full object-cover"
             />
           </div>
+        )}
+
+        {/* Galería — author-curated images, direct render (no useImageOk gate),
+            rendered only when there is at least one image */}
+        {pub.imagenes.length > 0 && (
+          <section className="reveal flex flex-col gap-3">
+            <h2 className="font-display mb-3.5 flex items-center gap-3 text-xl font-semibold text-text">
+              <span
+                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                aria-hidden="true"
+              />
+              Galería
+            </h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {pub.imagenes.map((url, index) => (
+                <button
+                  key={url}
+                  type="button"
+                  onClick={() => setLightbox({ url, index })}
+                  aria-label={`Ampliar imagen ${index + 1} de la galería`}
+                  className="overflow-hidden rounded-[14px] border border-border transition-colors hover:border-accent/60"
+                >
+                  <img
+                    src={url}
+                    alt={`Imagen ${index + 1} de la galería`}
+                    className="aspect-video w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+            <Modal
+              open={lightbox !== null}
+              onClose={() => setLightbox(null)}
+              maxWidthClassName="max-w-5xl"
+            >
+              {lightbox !== null && (
+                <>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setLightbox(null)}
+                      aria-label="Cerrar imagen"
+                      className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-muted transition-colors hover:border-accent/60 hover:text-text"
+                    >
+                      ×
+                    </button>
+                    <img
+                      src={lightbox.url}
+                      alt={`Imagen ${lightbox.index + 1} de la galería`}
+                      className="h-auto w-full object-contain"
+                    />
+                  </div>
+                </>
+              )}
+            </Modal>
+          </section>
         )}
 
         {/* cuerpo — plain text, line breaks preserved (no markdown) */}

@@ -265,6 +265,7 @@ export type Database = {
           firma: string | null
           id: string
           imagen_url: string | null
+          imagenes: Json
           slug: string
           tema_id: string | null
           titulo: string
@@ -281,6 +282,7 @@ export type Database = {
           firma?: string | null
           id?: string
           imagen_url?: string | null
+          imagenes?: Json
           slug: string
           tema_id?: string | null
           titulo: string
@@ -297,6 +299,7 @@ export type Database = {
           firma?: string | null
           id?: string
           imagen_url?: string | null
+          imagenes?: Json
           slug?: string
           tema_id?: string | null
           titulo?: string
