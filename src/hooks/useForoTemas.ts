@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react'
-import type { TemaForo, NuevoTemaForo } from '../types/dtos'
+import type { TemaForoConAutor, NuevoTemaForo } from '../types/dtos'
 import * as foroService from '../services/foroService'
 
 // ---------------------------------------------------------------------------
@@ -11,7 +11,7 @@ import * as foroService from '../services/foroService'
 // ---------------------------------------------------------------------------
 
 type State = {
-  data: TemaForo[]
+  data: TemaForoConAutor[]
   loading: boolean
   error: Error | null
   version: number
@@ -19,7 +19,7 @@ type State = {
 
 type Action =
   | { type: 'refetch' }
-  | { type: 'success'; payload: TemaForo[] }
+  | { type: 'success'; payload: TemaForoConAutor[] }
   | { type: 'error'; payload: Error }
 
 const initialState: State = {
@@ -41,7 +41,7 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useForoTemas(): {
-  temas: TemaForo[]
+  temas: TemaForoConAutor[]
   loading: boolean
   error: string | null
   crear: (input: NuevoTemaForo) => Promise<void>
