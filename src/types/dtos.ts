@@ -58,6 +58,12 @@ export type TemaForo = Tables<'temas_foro'>
 
 export type MensajeForo = Tables<'mensajes_foro'>
 
+// Composed read types: a foro row plus its resolved author display name
+// (sourced from v_autores_publicos, mirroring PublicacionConAutor).
+export type TemaForoConAutor = TemaForo & { autorNombre: string }
+
+export type MensajeForoConAutor = MensajeForo & { autorNombre: string }
+
 // Evento narrows `tipo` to EventoTipo and `metadata` from Json to a typed record.
 export type Evento = Omit<Tables<'eventos'>, 'tipo' | 'metadata'> & {
   tipo: EventoTipo

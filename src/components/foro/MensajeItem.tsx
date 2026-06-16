@@ -1,4 +1,4 @@
-import type { MensajeForo } from '../../types/dtos'
+import type { MensajeForoConAutor } from '../../types/dtos'
 import { formatFecha } from '../../lib/date'
 import { hueFor, washFor } from '../../lib/hue'
 
@@ -10,16 +10,16 @@ import { hueFor, washFor } from '../../lib/hue'
 // ---------------------------------------------------------------------------
 
 type Props = {
-  mensaje: MensajeForo
+  mensaje: MensajeForoConAutor
   currentUserId: string | null
   onEliminar: (id: string) => void
 }
 
 export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Props) {
   const isOwn = currentUserId !== null && mensaje.user_id === currentUserId
-  const authorLabel = isOwn ? 'vos' : `Usuario ${mensaje.user_id.slice(0, 8)}`
+  const authorLabel = isOwn ? 'vos' : mensaje.autorNombre
   const wash = washFor(hueFor(mensaje.user_id))
-  const initial = (isOwn ? 'V' : mensaje.user_id.charAt(0)).toUpperCase()
+  const initial = (isOwn ? 'V' : mensaje.autorNombre.charAt(0)).toUpperCase()
 
   return (
     <li className="flex gap-3.5 rounded-2xl border border-border bg-surface/50 p-4">

@@ -1,25 +1,25 @@
 import { Link } from 'react-router-dom'
-import type { TemaForo } from '../../types/dtos'
+import type { TemaForoConAutor } from '../../types/dtos'
 import { formatFecha } from '../../lib/date'
 import { hueFor, washFor } from '../../lib/hue'
 
 // ---------------------------------------------------------------------------
 // TemaForoItem — single thread card in the foro listing (cine-neural).
-// A wash avatar (derived from user_id — the only identity we store) + title +
-// author + date + chevron. Author label: own content → 'vos', else 'Usuario ' +
-// user_id.slice(0, 8). Links to /foro/:id.
+// A wash avatar (derived from user_id) + title + author + date + chevron.
+// Author label: own content → 'vos', else the resolved autorNombre. Links to
+// /foro/:id.
 // ---------------------------------------------------------------------------
 
 type Props = {
-  tema: TemaForo
+  tema: TemaForoConAutor
   currentUserId: string | null
 }
 
 export default function TemaForoItem({ tema, currentUserId }: Props) {
   const isOwn = currentUserId !== null && tema.user_id === currentUserId
-  const authorLabel = isOwn ? 'vos' : `Usuario ${tema.user_id.slice(0, 8)}`
+  const authorLabel = isOwn ? 'vos' : tema.autorNombre
   const wash = washFor(hueFor(tema.user_id))
-  const initial = (isOwn ? 'V' : tema.user_id.charAt(0)).toUpperCase()
+  const initial = (isOwn ? 'V' : tema.autorNombre.charAt(0)).toUpperCase()
 
   return (
     <li>

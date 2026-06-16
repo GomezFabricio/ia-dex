@@ -112,9 +112,9 @@ export default function ForoTemaPage() {
   }
 
   const temaIsOwn = currentUserId !== null && tema.user_id === currentUserId
-  const temaAuthorLabel = temaIsOwn ? 'vos' : `Usuario ${tema.user_id.slice(0, 8)}`
+  const temaAuthorLabel = temaIsOwn ? 'vos' : tema.autorNombre
   const temaWash = washFor(hueFor(tema.user_id))
-  const temaInitial = (temaIsOwn ? 'V' : tema.user_id.charAt(0)).toUpperCase()
+  const temaInitial = (temaIsOwn ? 'V' : tema.autorNombre.charAt(0)).toUpperCase()
 
   return (
     <div className="flex flex-col gap-6">
