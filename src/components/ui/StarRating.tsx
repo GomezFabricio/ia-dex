@@ -26,7 +26,7 @@ type Props = {
 }
 
 export default function StarRating({ tipo, contenidoId }: Props) {
-  const { promedio, cantidad, miVoto, loading, saving, error, guardar, refetch } =
+  const { promedio, cantidad, miVoto, loading, saving, error, saveError, guardar, refetch } =
     useValoracion(tipo, contenidoId)
   const requireAuth = useRequireAuth()
 
@@ -105,8 +105,9 @@ export default function StarRating({ tipo, contenidoId }: Props) {
         <span className="text-muted text-sm ml-1">{voteCountLabel}</span>
       </div>
 
-      {/* Save error — inline, stars remain visible */}
-      {error !== null && (
+      {/* Save error — inline, stars remain visible. Uses saveError (not the load
+          error) so a failed vote never trips the load-error/Reintentar block. */}
+      {saveError !== null && (
         <p className="text-error text-sm">No se pudo guardar la valoración. Intentá de nuevo.</p>
       )}
     </div>

@@ -10,6 +10,10 @@ import { useAuth } from './useAuth'
 //   D2: key={contenidoId} on StarRating mounts handles param reset; no `pending` action needed
 //   No pending action: avoids blanking stars on every post-vote refetch
 // Reducer has 5 actions: refetch / success / error / saving / save-error
+//   error    = LOAD error (initial fetch failed; no data)
+//   saveError = SAVE error (a vote failed to persist; data may still be present)
+// They are SEPARATE so a failed vote on a 0-vote item surfaces a save message
+// instead of the full load-error/Reintentar block (which keys on promedio===0).
 // ---------------------------------------------------------------------------
 
 type ValoracionData = {
@@ -23,6 +27,7 @@ type State = {
   loading: boolean
   saving: boolean
   error: string | null
+  saveError: string | null
   version: number
 }
 
@@ -38,21 +43,22 @@ const initialState: State = {
   loading: true,
   saving: false,
   error: null,
+  saveError: null,
   version: 0,
 }
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'refetch':
-      return { ...state, loading: true, error: null, version: state.version + 1 }
+      return { ...state, loading: true, error: null, saveError: null, version: state.version + 1 }
     case 'success':
-      return { ...state, loading: false, saving: false, data: action.payload, error: null }
+      return { ...state, loading: false, saving: false, data: action.payload, error: null, saveError: null }
     case 'error':
       return { ...state, loading: false, data: null, error: action.payload }
     case 'saving':
-      return { ...state, saving: true, error: null }
+      return { ...state, saving: true, saveError: null }
     case 'save-error':
-      return { ...state, saving: false, error: action.payload }
+      return { ...state, saving: false, saveError: action.payload }
   }
 }
 
@@ -66,6 +72,7 @@ export function useValoracion(
   loading: boolean
   saving: boolean
   error: string | null
+  saveError: string | null
   guardar: (puntaje: number) => void
   refetch: () => void
 } {
@@ -135,6 +142,7 @@ export function useValoracion(
     loading: state.loading,
     saving: state.saving,
     error: state.error,
+    saveError: state.saveError,
     guardar,
     refetch,
   }
