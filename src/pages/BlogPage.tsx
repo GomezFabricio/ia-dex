@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { usePublicaciones } from '../hooks/usePublicaciones'
+import { usePublicacionesMasValoradas } from '../hooks/usePublicacionesMasValoradas'
 import { useIsAdmin } from '../hooks/useIsAdmin'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
 import { htmlToText } from '../lib/sanitizeHtml'
-import type { PublicacionConAutor } from '../types/dtos'
+import type { PublicacionConAutor, PublicacionRating } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
 // BlogPage — "cine-neural" publicaciones feed (publicaciones S2).
@@ -160,6 +161,38 @@ function PublicacionCard({ pub, variant }: { pub: PublicacionConAutor; variant: 
   )
 }
 
+// es-AR average formatter (one decimal) for the "Más valoradas" strip, matching
+// StarRating's display contract.
+const ratingFormat = new Intl.NumberFormat('es-AR', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+})
+
+// Compact card for the "Más valoradas" strip — title + rating, links to the post.
+function ValoradaCard({ item }: { item: PublicacionRating }) {
+  const votosLabel =
+    item.cantidad_votos === 1
+      ? '1 voto'
+      : `${item.cantidad_votos} votos`
+
+  return (
+    <Link
+      to={`/blog/${item.slug}`}
+      className="qtile group flex h-full flex-col gap-2 rounded-2xl border border-border bg-surface p-4 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
+    >
+      <span className="dex-label text-[9px] text-accent">
+        ★ {ratingFormat.format(item.promedio)} · {votosLabel}
+      </span>
+      <h3 className="font-display line-clamp-2 text-base font-semibold leading-tight text-text">
+        {item.titulo}
+      </h3>
+      <span aria-hidden="true" className="dex-label mt-auto text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
+        Leer →
+      </span>
+    </Link>
+  )
+}
+
 // Segmented list/grid toggle.
 function ViewToggle({ view, onChange }: { view: BlogView; onChange: (v: BlogView) => void }) {
   const btn = (active: boolean) =>
@@ -204,6 +237,7 @@ function ViewToggle({ view, onChange }: { view: BlogView; onChange: (v: BlogView
 
 export default function BlogPage() {
   const { data, loading, error, refetch } = usePublicaciones()
+  const masValoradas = usePublicacionesMasValoradas(5)
   const isAdmin = useIsAdmin()
   const [view, setViewState] = useState<BlogView>(readStoredView)
 
@@ -252,6 +286,30 @@ export default function BlogPage() {
           </p>
         </div>
       </section>
+
+      {/* Más valoradas — rating strip from v_publicaciones_rating. Hidden on
+          cold-start / load error / no votes so it never shows an empty shell;
+          surfaces only when there is at least one rated post. */}
+      {!masValoradas.loading &&
+        masValoradas.error === null &&
+        masValoradas.data.length > 0 && (
+          <section className="mx-auto w-full max-w-[1400px] px-6 pb-4 sm:px-8 lg:px-12">
+            <h2 className="font-display mb-5 flex items-center gap-3 text-xl font-semibold tracking-[-0.015em] text-text">
+              <span
+                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                aria-hidden="true"
+              />
+              Artículos más valorados
+            </h2>
+            <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
+              {masValoradas.data.map((item) => (
+                <li key={item.publicacion_id}>
+                  <ValoradaCard item={item} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
       {/* Feed */}
       <div className="mx-auto w-full max-w-[1400px] px-6 pb-16 sm:px-8 lg:px-12">

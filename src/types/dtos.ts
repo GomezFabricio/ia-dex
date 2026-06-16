@@ -4,7 +4,7 @@ import type { Tables } from './database.types'
 // Primitive union types
 // ---------------------------------------------------------------------------
 
-export type ContenidoTipo = 'software' | 'tema' | 'clasificacion_si'
+export type ContenidoTipo = 'software' | 'tema' | 'clasificacion_si' | 'publicacion'
 
 export type EventoTipo = 'vista' | 'busqueda' | 'click_enlace'
 
@@ -124,10 +124,22 @@ export type SoftwarePopular = {
   vistas: number
 }
 
+// PublicacionRating mirrors SoftwareRating (non-null coalesced view shape) for the
+// publicaciones rating leaderboard (v_publicaciones_rating). cantidad_votos keeps
+// the view column name, identical to SoftwareRating's rationale above.
+export type PublicacionRating = {
+  publicacion_id: string
+  titulo: string
+  slug: string
+  promedio: number
+  cantidad_votos: number
+}
+
 // Views raw rows for internal service use (the generated Tables helper
 // resolves view names as well as table names)
 export type SoftwareRatingRow = Tables<'v_software_rating'>
 export type SoftwarePopularRow = Tables<'v_software_populares'>
+export type PublicacionRatingRow = Tables<'v_publicaciones_rating'>
 
 // ---------------------------------------------------------------------------
 // Filter / input types

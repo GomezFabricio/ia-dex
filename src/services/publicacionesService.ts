@@ -1,5 +1,11 @@
 import { supabase } from '../lib/supabase'
-import type { Enlace, Publicacion, PublicacionConAutor } from '../types/dtos'
+import type {
+  Enlace,
+  Publicacion,
+  PublicacionConAutor,
+  PublicacionRating,
+  PublicacionRatingRow,
+} from '../types/dtos'
 import type { Tables, TablesInsert, TablesUpdate } from '../types/database.types'
 
 type PublicacionRow = Tables<'publicaciones'>
@@ -143,7 +149,10 @@ export async function obtenerPublicacion(
 }
 
 /**
- * Returns published publicaciones linked to a tema, newest first.
+ * Returns published publicaciones linked to a tema in the admin-curated order:
+ * `orden` ascending (NULLS LAST), then created_at descending as a tiebreaker.
+ * Curated items lead in the admin's chosen sequence; never-ordered rows fall to
+ * the end by recency. Served by idx_publicaciones_tema_orden.
  */
 export async function listarPorTema(
   temaId: string,
@@ -153,6 +162,7 @@ export async function listarPorTema(
     .select('*')
     .eq('estado', 'publicado')
     .eq('tema_id', temaId)
+    .order('orden', { ascending: true, nullsFirst: false })
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -174,6 +184,46 @@ export async function listarPorClasificacion(
 
   if (error) throw error
   return resolverAutores((data ?? []).map(toPublicacion))
+}
+
+/**
+ * Coalesces a nullable view row into the non-null PublicacionRating DTO.
+ * Rows with null publicacion_id are filtered out before calling this.
+ * (Mirrors estadisticasService.toSoftwareRating — same read-boundary contract.)
+ */
+function toPublicacionRating(row: PublicacionRatingRow): PublicacionRating {
+  return {
+    publicacion_id: row.publicacion_id ?? '',
+    titulo: row.titulo ?? '',
+    slug: row.slug ?? '',
+    promedio: row.promedio ?? 0,
+    cantidad_votos: row.cantidad_votos ?? 0,
+  }
+}
+
+/**
+ * Returns the highest-rated published publicaciones from v_publicaciones_rating,
+ * ranked by promedio desc then cantidad_votos desc. The view only exposes
+ * published posts with >= 1 rating, so it is empty on cold-start (returns []).
+ * (Mirrors estadisticasService.mejorValorados.)
+ */
+export async function listarMasValoradas(
+  limite = 5,
+): Promise<PublicacionRating[]> {
+  const { data, error } = await supabase
+    .from('v_publicaciones_rating')
+    .select('*')
+    .order('promedio', { ascending: false })
+    .order('cantidad_votos', { ascending: false })
+    .limit(limite)
+
+  if (error) throw error
+
+  return (data ?? [])
+    .filter((row): row is PublicacionRatingRow & { publicacion_id: string } =>
+      row.publicacion_id !== null,
+    )
+    .map(toPublicacionRating)
 }
 
 // ---------------------------------------------------------------------------
@@ -306,6 +356,25 @@ export async function eliminar(id: string): Promise<void> {
 
   const { error } = await supabase.from('publicaciones').delete().eq('id', id)
 
+  if (error) throw error
+}
+
+/**
+ * Persists the admin-curated order of a tema's contenido didáctico. Delegates
+ * to the reordenar_material_tema RPC (atomic, admin-enforced by RLS). `ids`
+ * is the full ordered list of publicacion ids for the tema; each row's `orden`
+ * is set to its 0-based position. Throws 'Requiere sesión' before any network
+ * call when unauthenticated.
+ */
+export async function reordenarMaterialTema(
+  temaId: string,
+  ids: string[],
+): Promise<void> {
+  await requireUser()
+  const { error } = await supabase.rpc('reordenar_material_tema', {
+    p_tema_id: temaId,
+    p_ids: ids,
+  })
   if (error) throw error
 }
 

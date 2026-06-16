@@ -269,6 +269,7 @@ export type Database = {
           id: string
           imagen_url: string | null
           imagenes: Json
+          orden: number | null
           slug: string
           tema_id: string | null
           titulo: string
@@ -286,6 +287,7 @@ export type Database = {
           id?: string
           imagen_url?: string | null
           imagenes?: Json
+          orden?: number | null
           slug: string
           tema_id?: string | null
           titulo: string
@@ -303,6 +305,7 @@ export type Database = {
           id?: string
           imagen_url?: string | null
           imagenes?: Json
+          orden?: number | null
           slug?: string
           tema_id?: string | null
           titulo?: string
@@ -581,6 +584,16 @@ export type Database = {
         }
         Relationships: []
       }
+      v_publicaciones_rating: {
+        Row: {
+          cantidad_votos: number | null
+          promedio: number | null
+          publicacion_id: string | null
+          slug: string | null
+          titulo: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       buscar_hibrido: {
@@ -613,6 +626,10 @@ export type Database = {
       }
       get_embed_secret: { Args: never; Returns: string }
       puede_gestionar_contenido: { Args: never; Returns: boolean }
+      reordenar_material_tema: {
+        Args: { p_tema_id: string; p_ids: string[] }
+        Returns: undefined
+      }
       software_relacionados: {
         Args: { p_limit?: number; p_software_id: string }
         Returns: {

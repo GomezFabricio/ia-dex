@@ -8,6 +8,7 @@ import PosterCard from '../components/software/PosterCard'
 import StarRating from '../components/ui/StarRating'
 import VideoEmbed from '../components/software/VideoEmbed'
 import InlineEdit from '../components/admin/InlineEdit'
+import ContenidoDidactico from '../components/tema/ContenidoDidactico'
 import { useIsAdmin } from '../hooks/useIsAdmin'
 import * as temasService from '../services/temasService'
 import type { ClasificacionConCriterio, CriterioSI } from '../types/dtos'
@@ -182,36 +183,12 @@ export default function TemaPage() {
       {!publicaciones.loading &&
         publicaciones.error === null &&
         publicaciones.data.length > 0 && (
-          <section className="mx-auto w-full max-w-[1400px] px-4 pt-2 sm:px-8">
-            <header className="mb-4 flex items-center gap-3">
-              <span
-                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
-                aria-hidden="true"
-              />
-              <h2 className="font-display m-0 text-xl font-semibold tracking-[-0.015em] text-text">
-                Contenido didáctico
-              </h2>
-            </header>
-            <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
-              {publicaciones.data.map((pub) => (
-                <li key={pub.id}>
-                  <Link
-                    to={`/blog/${pub.slug}`}
-                    className="qtile group flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-glow"
-                  >
-                    <span className="dex-label text-[9px] text-accent-2">Publicación</span>
-                    <h3 className="font-display text-base font-semibold leading-tight tracking-[-0.01em] text-text">
-                      {pub.titulo}
-                    </h3>
-                    <span className="dex-label text-[9px] text-muted">{pub.autorNombre}</span>
-                    <span className="dex-label mt-1.5 text-[10px] text-accent transition-transform group-hover:translate-x-0.5">
-                      Leer →
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <ContenidoDidactico
+            key={temaData.id}
+            publicaciones={publicaciones.data}
+            isAdmin={isAdmin}
+            temaId={temaData.id}
+          />
         )}
 
       {/* Software grid — each tool shown exactly once with per-axis SI chips */}

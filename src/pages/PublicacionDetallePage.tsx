@@ -4,6 +4,7 @@ import { usePublicacion } from '../hooks/usePublicacion'
 import { usePublicaciones } from '../hooks/usePublicaciones'
 import VideoEmbed from '../components/software/VideoEmbed'
 import Modal from '../components/ui/Modal'
+import StarRating from '../components/ui/StarRating'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
 import { sanitizeHtml, htmlToText, looksLikeHtml } from '../lib/sanitizeHtml'
@@ -185,6 +186,11 @@ export default function PublicacionDetallePage() {
             {fecha !== '' && <> · {fecha}</>}
             {minutosLectura > 0 && <> · {minutosLectura} min de lectura</>}
           </p>
+
+          {/* Per-article rating widget — self-styling, key resets state per slug */}
+          <div className="mt-4">
+            <StarRating key={pub.id} tipo="publicacion" contenidoId={pub.id} />
+          </div>
         </div>
       </section>
 
