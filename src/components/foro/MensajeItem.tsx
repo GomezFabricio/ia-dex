@@ -5,17 +5,20 @@ import { hueFor, washFor } from '../../lib/hue'
 // ---------------------------------------------------------------------------
 // MensajeItem — single reply in a foro thread (cine-neural).
 // Wash avatar (from user_id) + author + date header, then the message body.
-// Delete button: rendered ONLY when currentUserId === mensaje.user_id; fires raw
-// mensaje.id (page owns confirm + service call, design D6).
+// Delete button: rendered when the viewer OWNS the message (currentUserId ===
+// mensaje.user_id) OR is an admin (moderation of inappropriate replies). Fires
+// raw mensaje.id; the page owns the confirm + service call (design D6). RLS
+// enforces the same author-OR-admin rule server-side.
 // ---------------------------------------------------------------------------
 
 type Props = {
   mensaje: MensajeForoConAutor
   currentUserId: string | null
+  isAdmin: boolean
   onEliminar: (id: string) => void
 }
 
-export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Props) {
+export default function MensajeItem({ mensaje, currentUserId, isAdmin, onEliminar }: Props) {
   const isOwn = currentUserId !== null && mensaje.user_id === currentUserId
   const authorLabel = isOwn ? 'vos' : mensaje.autorNombre
   const wash = washFor(hueFor(mensaje.user_id))
@@ -34,7 +37,7 @@ export default function MensajeItem({ mensaje, currentUserId, onEliminar }: Prop
         <div className="mb-1.5 flex flex-wrap items-baseline gap-2">
           <span className="font-display text-sm font-semibold text-text">{authorLabel}</span>
           <span className="dex-label min-w-0 break-words text-[9px] text-faint">{formatFecha(mensaje.created_at)}</span>
-          {isOwn && (
+          {(isOwn || isAdmin) && (
             <button
               type="button"
               onClick={() => onEliminar(mensaje.id)}

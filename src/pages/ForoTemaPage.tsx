@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useForoTema } from '../hooks/useForoTema'
 import { useAuth } from '../hooks/useAuth'
+import { useIsAdmin } from '../hooks/useIsAdmin'
 import MensajeItem from '../components/foro/MensajeItem'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
@@ -23,6 +24,8 @@ export default function ForoTemaPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const currentUserId = user?.id ?? null
+  // Admins can moderate (delete) any reply; passed down to each MensajeItem.
+  const isAdmin = useIsAdmin()
 
   const { tema, mensajes, loading, error, refetch } = useForoTema(id ?? '')
 
@@ -179,6 +182,7 @@ export default function ForoTemaPage() {
                     key={msg.id}
                     mensaje={msg}
                     currentUserId={currentUserId}
+                    isAdmin={isAdmin}
                     onEliminar={(msgId) => { void handleEliminarMensaje(msgId) }}
                   />
                 ))}
