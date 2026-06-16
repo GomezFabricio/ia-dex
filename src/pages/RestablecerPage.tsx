@@ -7,10 +7,11 @@ import Logo from '../components/layout/Logo'
 // ---------------------------------------------------------------------------
 // RestablecerPage — password reset landing page.
 //
-// The recovery email links here: Supabase redirects with a recovery session in
-// the URL, supabase-js picks it up (detectSessionInUrl) and AuthContext exposes
-// it. With that temporary session, updateUser({ password }) sets the new one.
-// Visiting without a session (expired/used link, direct navigation) shows a
+// The recovery email links here: supabase-js detects the recovery token in the
+// URL (detectSessionInUrl) and fires a PASSWORD_RECOVERY event, which AuthContext
+// latches as `passwordRecovery`. The password form renders ONLY during that
+// recovery flow — never for a normal logged-in session that navigates here (X3).
+// Anything else (expired/used link, direct visit, ordinary session) shows a
 // friendly dead-end with a way back to /login.
 // ---------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ const RESET_ERROR_MESSAGES: Record<string, string> = {
 const FALLBACK_ERROR = 'Ocurrió un error. Intenta de nuevo.'
 
 export default function RestablecerPage() {
-  const { session, loading } = useAuth()
+  const { loading, passwordRecovery } = useAuth()
 
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -74,8 +75,8 @@ export default function RestablecerPage() {
 
         {loading && <p className="text-center text-muted">Cargando...</p>}
 
-        {/* No recovery session: expired/used link or direct visit */}
-        {!loading && session === null && (
+        {/* Not a recovery flow: expired/used link, direct visit, or ordinary session */}
+        {!loading && !passwordRecovery && (
           <div className="flex flex-col gap-4 text-center">
             <p className="text-muted">
               El enlace de recuperación no es válido o ya venció. Pedí uno nuevo
@@ -90,7 +91,7 @@ export default function RestablecerPage() {
           </div>
         )}
 
-        {!loading && session !== null && done && (
+        {!loading && passwordRecovery && done && (
           <div className="flex flex-col gap-4 text-center">
             <p className="text-text">Tu contraseña fue actualizada.</p>
             <Link
@@ -102,7 +103,7 @@ export default function RestablecerPage() {
           </div>
         )}
 
-        {!loading && session !== null && !done && (
+        {!loading && passwordRecovery && !done && (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
               <label htmlFor="new-password" className="text-muted text-sm">

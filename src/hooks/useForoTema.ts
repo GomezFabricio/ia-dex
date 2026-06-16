@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react'
-import type { TemaForo, MensajeForo } from '../types/dtos'
+import type { TemaForoConAutor, MensajeForoConAutor } from '../types/dtos'
 import * as foroService from '../services/foroService'
 
 // ---------------------------------------------------------------------------
@@ -12,13 +12,13 @@ import * as foroService from '../services/foroService'
 // ---------------------------------------------------------------------------
 
 type Payload = {
-  tema: TemaForo | null
-  mensajes: MensajeForo[]
+  tema: TemaForoConAutor | null
+  mensajes: MensajeForoConAutor[]
 }
 
 type State = {
-  tema: TemaForo | null
-  mensajes: MensajeForo[]
+  tema: TemaForoConAutor | null
+  mensajes: MensajeForoConAutor[]
   loading: boolean
   error: Error | null
   version: number
@@ -58,8 +58,8 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useForoTema(id: string): {
-  tema: TemaForo | null
-  mensajes: MensajeForo[]
+  tema: TemaForoConAutor | null
+  mensajes: MensajeForoConAutor[]
   loading: boolean
   error: string | null
   refetch: () => void

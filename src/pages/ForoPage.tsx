@@ -56,16 +56,31 @@ export default function ForoPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pt-4">
       {/* Header */}
-      <div className="flex flex-col gap-1">
-        <h1 className="font-display text-3xl font-bold text-text">Foro</h1>
-        <p className="text-sm text-muted">Debatí sobre las herramientas del catálogo.</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <p className="dex-label text-[11px] text-accent-2">Comunidad</p>
+          <h1 className="font-display text-[clamp(2rem,4.5vw,2.8rem)] font-bold tracking-[-0.02em] text-text">
+            Foro
+          </h1>
+          <p className="text-sm text-muted">Debatí sobre las herramientas del catálogo.</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleNuevoTemaClick}
+          className="font-display inline-flex items-center gap-2 rounded-[11px] bg-accent px-[18px] py-3 font-semibold text-on-accent shadow-glow transition-transform hover:-translate-y-0.5"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Nuevo tema
+        </button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_19rem]">
         {/* Main — thread list */}
-        <div className="order-2 flex flex-col gap-4 lg:order-1">
+        <div className="order-2 flex min-w-0 flex-col gap-4 lg:order-1">
           {loading ? (
             <p className="text-muted">Cargando temas…</p>
           ) : error !== null ? (
@@ -84,7 +99,7 @@ export default function ForoPage() {
         </div>
 
         {/* Aside — CTA + stats */}
-        <aside className="order-1 flex flex-col gap-4 lg:order-2">
+        <aside className="order-1 flex min-w-0 flex-col gap-4 lg:order-2">
           <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5">
             <h2 className="font-display text-base font-semibold text-text">Iniciá un debate</h2>
             <p className="text-sm text-muted">

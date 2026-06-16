@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react'
-import type { ClasificacionSI } from '../types/dtos'
+import type { ClasificacionConCriterio } from '../types/dtos'
 import * as clasificacionesService from '../services/clasificacionesService'
 
 // ---------------------------------------------------------------------------
@@ -9,7 +9,7 @@ import * as clasificacionesService from '../services/clasificacionesService'
 // ---------------------------------------------------------------------------
 
 type State = {
-  data: ClasificacionSI[]
+  data: ClasificacionConCriterio[]
   loading: boolean
   error: Error | null
   version: number
@@ -17,7 +17,7 @@ type State = {
 
 type Action =
   | { type: 'refetch' }
-  | { type: 'success'; payload: ClasificacionSI[] }
+  | { type: 'success'; payload: ClasificacionConCriterio[] }
   | { type: 'error'; payload: Error }
 
 const initialState: State = {
@@ -39,7 +39,7 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useClasificaciones(): {
-  data: ClasificacionSI[]
+  data: ClasificacionConCriterio[]
   loading: boolean
   error: Error | null
   refetch: () => void

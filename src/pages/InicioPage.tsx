@@ -1,16 +1,24 @@
-import { Link } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSoftwarePopulares } from '../hooks/useSoftwarePopulares'
 import { useMejorValorados } from '../hooks/useMejorValorados'
 import { useRecomendacionesGlobales } from '../hooks/useRecomendacionesGlobales'
+import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
+import { useSoftwareTodos } from '../hooks/useSoftwareTodos'
+import { useTemas } from '../hooks/useTemas'
+import type { Tema } from '../types/dtos'
 import RankingListPopular from '../components/software/RankingListPopular'
 import RankingListRating from '../components/software/RankingListRating'
-import SoftwareList from '../components/software/SoftwareList'
+import ContentRow from '../components/software/ContentRow'
 
 // ---------------------------------------------------------------------------
-// InicioPage — home dashboard.
-// Three independent sections, each with its own D4 state quartet (loading /
-// error+retry / empty / data). A failure in one section MUST NOT affect others.
-// Section is a local non-exported helper — deliberately not shared.
+// InicioPage — "cine-neural" home.
+// Software lists are now Netflix-style horizontal rails (ContentRow + PosterCard);
+// the popularity/rating leaderboards stay as the "Podio" rankings (they use
+// ranking DTOs that lack the full Software fields a poster needs).
+// Each section keeps its own D4 state quartet (loading / error+retry / empty /
+// data) so a failure in one rail NEVER takes down the others.
+// Section + TemaRail are local non-exported helpers — deliberately not shared.
 // ---------------------------------------------------------------------------
 
 type SectionProps = {
@@ -34,7 +42,7 @@ function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, child
         {titulo}
       </h2>
 
-      {loading && <p className="text-muted">Cargando…</p>}
+      {loading && <div className="skeleton h-24 w-full rounded-xl" aria-hidden="true" />}
 
       {!loading && error !== null && (
         <div className="flex flex-col gap-2">
@@ -55,6 +63,29 @@ function Section({ titulo, loading, error, refetch, isEmpty, emptyMessage, child
 
       {!loading && error === null && !isEmpty && children}
     </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// TemaRail — one rail per tema. Lives in its own component so each tema gets an
+// isolated useSoftwarePorTema fetch (hooks can't run in a loop). Renders nothing
+// while loading / on error / when empty — the home stays clean and a single
+// tema's failure can't break the page. ContentRow already returns null on [].
+// ---------------------------------------------------------------------------
+
+function TemaRail({ tema, temaNombrePorId }: { tema: Tema; temaNombrePorId: (id: string) => string | undefined }) {
+  const { data, loading, error } = useSoftwarePorTema(tema.id)
+
+  if (loading || error !== null || data.length === 0) return null
+
+  return (
+    <ContentRow
+      titulo={tema.nombre}
+      items={data}
+      count={`${data.length} herramientas`}
+      verTodoHref={`/catalogo/${tema.slug}`}
+      temaNombrePorId={temaNombrePorId}
+    />
   )
 }
 
@@ -110,108 +141,182 @@ const QUICK_LINKS = [
 export default function InicioPage() {
   const populares = useSoftwarePopulares(5)
   const mejorValorados = useMejorValorados(5)
-  const recomendaciones = useRecomendacionesGlobales(5)
+  const recomendaciones = useRecomendacionesGlobales(12)
+  const temas = useTemas()
+  const todos = useSoftwareTodos()
+
+  // tema_id → tema.nombre resolver for poster kickers (built once per data change).
+  const temaNombrePorId = useMemo(() => {
+    const byId = new Map(temas.data.map((t) => [t.id, t.nombre]))
+    return (id: string) => byId.get(id)
+  }, [temas.data])
+
+  // id → slug lookup for ranking rows (views only carry software_id/UUID).
+  const slugMap = useMemo(
+    () => new Map(todos.data.map((s) => [s.id, s.slug])),
+    [todos.data],
+  )
+
+  // Hero command bar → hand the query to the search page via ?q=.
+  const navigate = useNavigate()
+  const [query, setQuery] = useState('')
+
+  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const q = query.trim()
+    navigate(q === '' ? '/buscar' : `/buscar?q=${encodeURIComponent(q)}`)
+  }
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Welcome hero */}
-      <section className="relative overflow-hidden rounded-3xl border border-border bg-surface p-8 sm:p-10">
+    <div className="flex flex-col">
+      {/* Full-bleed hero */}
+      <section className="relative flex min-h-[60vh] items-center overflow-hidden px-6 pt-28 pb-16 sm:px-8 lg:min-h-[82vh] lg:px-12">
         <div
           aria-hidden="true"
-          className="dex-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(90%_120%_at_15%_0%,black,transparent)]"
+          className="dex-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(120%_90%_at_30%_40%,black,transparent_75%)]"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/20 blur-3xl"
+          className="orb-float pointer-events-none absolute -left-32 -top-40 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent)_70%,transparent),transparent_65%)] opacity-50 blur-[90px]"
         />
-        <div className="relative flex flex-col gap-6">
-          <div className="flex flex-col gap-4">
-            <span className="dex-label inline-flex w-fit items-center gap-2 rounded-full border border-border bg-bg/60 px-3 py-1 text-[11px] uppercase tracking-widest text-accent-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-2" aria-hidden="true" />
-              Índice de IA
-            </span>
-            <h1 className="max-w-2xl font-display text-4xl font-bold leading-tight sm:text-5xl">
-              Bienvenido a{' '}
-              <span className="bg-gradient-to-r from-accent to-accent-2 bg-clip-text text-transparent">
-                IA-dex
-              </span>
-            </h1>
-            <p className="max-w-2xl text-base text-muted sm:text-lg">
-              El índice del software de inteligencia artificial, catalogado por los temas y las
-              clasificaciones del curso. Explorá, compará y valorá herramientas — sin vueltas.
-            </p>
-          </div>
+        <div
+          aria-hidden="true"
+          className="orb-float-2 pointer-events-none absolute -bottom-48 -right-20 h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent-2)_65%,transparent),transparent_65%)] opacity-40 blur-[100px]"
+        />
+        <div
+          aria-hidden="true"
+          className="orb-float pointer-events-none absolute right-[24%] top-[20%] h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-accent-3)_70%,transparent),transparent_65%)] opacity-30 blur-[110px]"
+        />
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              to="/catalogo"
-              className="rounded-lg bg-accent px-5 py-2.5 font-semibold text-bg no-underline shadow-glow transition-transform hover:-translate-y-0.5"
-            >
-              Explorar catálogo
-            </Link>
-            <Link
-              to="/buscar"
-              className="rounded-lg border border-border bg-bg/40 px-5 py-2.5 font-medium text-text no-underline transition-colors hover:border-accent/60 hover:text-accent-strong"
-            >
-              Buscar herramienta
-            </Link>
-          </div>
+        <div className="relative max-w-[760px]">
+          <p className="dex-label mb-5 text-[11px] text-accent-2">
+            Índice de IA · Catálogo cinematográfico
+          </p>
+          <h1 className="font-display mb-5 text-[clamp(2.75rem,6.5vw,4.6rem)] font-bold leading-[1.04] tracking-[-0.02em]">
+            <span className="text-text">Aprendé </span>
+            <span className="neural-text">Inteligencia Artificial</span>
+          </h1>
+          <p className="mb-7 max-w-[560px] text-body-lg leading-relaxed text-muted">
+            El índice cinematográfico del software de IA, catalogado por temas y clasificaciones.
+            Explorá, mirá y dominá las herramientas que están redefiniendo el mundo.
+          </p>
 
-          {/* Quick-access tiles */}
-          <div className="grid gap-3 pt-2 sm:grid-cols-2 lg:grid-cols-4">
-            {QUICK_LINKS.map((q) => (
-              <Link
-                key={q.to}
-                to={q.to}
-                className="group flex flex-col gap-1.5 rounded-xl border border-border bg-bg/40 p-4 no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:bg-surface"
-              >
-                <span className="text-accent" aria-hidden="true">{q.icon}</span>
-                <span className="font-display font-semibold text-text transition-colors group-hover:text-accent-strong">
-                  {q.label}
-                </span>
-                <span className="text-xs text-muted">{q.desc}</span>
-              </Link>
-            ))}
+          {/* Command search bar */}
+          <form
+            role="search"
+            onSubmit={handleSearch}
+            className="flex max-w-[560px] items-center gap-2.5 rounded-2xl border border-border-strong bg-surface/80 p-[7px] pl-4 shadow-pop backdrop-blur-md"
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0 text-muted" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscá una herramienta, tema o concepto…"
+              aria-label="Buscar"
+              className="min-w-0 flex-1 border-none bg-transparent text-[15px] text-text outline-none placeholder:text-muted"
+            />
+            <button
+              type="submit"
+              className="dex-label shrink-0 rounded-[9px] bg-accent px-[18px] py-[11px] text-[11px] text-on-accent shadow-glow transition-transform hover:-translate-y-0.5"
+            >
+              Buscar
+            </button>
+          </form>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              to="/roadmap"
+              className="dex-label inline-flex items-center gap-2 rounded-[10px] border border-border bg-surface/70 px-[18px] py-3 text-[11px] text-text no-underline backdrop-blur-md transition-colors hover:border-accent/60"
+            >
+              ▸ Ver roadmap · Empezá tu camino
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Ranking sections — 2-column grid on large screens */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Section
-          titulo="Más vistos"
-          loading={populares.loading}
-          error={populares.error}
-          refetch={populares.refetch}
-          isEmpty={populares.data.length === 0}
-          emptyMessage="Aún no hay visitas registradas."
-        >
-          <RankingListPopular items={populares.data} />
-        </Section>
-
-        <Section
-          titulo="Mejor valorados"
-          loading={mejorValorados.loading}
-          error={mejorValorados.error}
-          refetch={mejorValorados.refetch}
-          isEmpty={mejorValorados.data.length === 0}
-          emptyMessage="Aún no hay valoraciones registradas."
-        >
-          <RankingListRating items={mejorValorados.data} />
-        </Section>
+      {/* Quick-access tiles — overlap the hero's lower edge */}
+      <div className="relative z-[5] -mt-7 grid gap-3 px-4 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
+        {QUICK_LINKS.map((q) => (
+          <Link
+            key={q.to}
+            to={q.to}
+            className="qtile group flex flex-col gap-1.5 rounded-xl border border-border bg-surface/85 p-[18px] no-underline backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60"
+          >
+            <span className="text-accent-2" aria-hidden="true">{q.icon}</span>
+            <span className="font-display font-semibold text-text transition-colors group-hover:text-accent-strong">
+              {q.label}
+            </span>
+            <span className="dex-label text-[9px] text-muted">{q.desc}</span>
+          </Link>
+        ))}
       </div>
 
-      {/* Recos — full width; SoftwareList owns its internal grid */}
-      <Section
-        titulo="Populares del catálogo"
-        loading={recomendaciones.loading}
-        error={recomendaciones.error}
-        refetch={recomendaciones.refetch}
-        isEmpty={recomendaciones.data.length === 0}
-        emptyMessage="No hay software cargado todavía."
-      >
-        <SoftwareList items={recomendaciones.data} />
-      </Section>
+      {/* Rails */}
+      <div className="mt-12 flex flex-col gap-8">
+        {/* Featured rail */}
+        {!recomendaciones.loading && recomendaciones.error === null && recomendaciones.data.length > 0 && (
+          <ContentRow
+            titulo="Populares del catálogo"
+            items={recomendaciones.data}
+            verTodoHref="/catalogo"
+            temaNombrePorId={temaNombrePorId}
+          />
+        )}
+        {recomendaciones.loading && (
+          <div className="skeleton mx-4 h-72 rounded-xl sm:mx-8" aria-hidden="true" />
+        )}
+        {!recomendaciones.loading && recomendaciones.error !== null && (
+          <div className="flex flex-col gap-2 px-4 sm:px-8">
+            <p className="text-muted">No se pudieron cargar los datos</p>
+            <button
+              type="button"
+              onClick={recomendaciones.refetch}
+              className="text-accent hover:text-text self-start transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+
+        {/* Per-tema rails — one isolated fetch each, render only when they have data */}
+        {temas.data.map((tema) => (
+          <TemaRail key={tema.id} tema={tema} temaNombrePorId={temaNombrePorId} />
+        ))}
+      </div>
+
+      {/* Podio — popularity & rating leaderboards (ranking DTOs, not posters) */}
+      <div className="mt-12 px-4 sm:px-8">
+        <h2 className="font-display mb-5 flex items-center gap-3 text-xl font-semibold tracking-[-0.015em] text-text">
+          <span className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
+          Podio del catálogo
+        </h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Section
+            titulo="Más vistos"
+            loading={populares.loading}
+            error={populares.error}
+            refetch={populares.refetch}
+            isEmpty={populares.data.length === 0}
+            emptyMessage="Aún no hay visitas registradas."
+          >
+            <RankingListPopular items={populares.data} slugMap={slugMap} />
+          </Section>
+
+          <Section
+            titulo="Mejor valorados"
+            loading={mejorValorados.loading}
+            error={mejorValorados.error}
+            refetch={mejorValorados.refetch}
+            isEmpty={mejorValorados.data.length === 0}
+            emptyMessage="Aún no hay valoraciones registradas."
+          >
+            <RankingListRating items={mejorValorados.data} slugMap={slugMap} />
+          </Section>
+        </div>
+      </div>
     </div>
   )
 }

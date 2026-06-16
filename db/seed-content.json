@@ -1,51 +1,265 @@
 {
   "temas": [
     {
-      "slug": "busqueda-resolucion-problemas",
-      "nombre": "Búsqueda y resolución de problemas / juegos",
-      "descripcion": "Técnicas que permiten a un agente explorar un espacio de estados para encontrar una secuencia de acciones que lleve desde un estado inicial hasta un estado objetivo. Incluye búsqueda ciega (BFS, DFS), búsqueda heurística (A*) y algoritmos adversariales como minimax y poda alfa-beta, especialmente relevantes en juegos de dos jugadores.",
+      "slug": "introduccion-ia",
+      "nombre": "Introducción a los sistemas inteligentes y la IA",
+      "descripcion": "Recorrido por los fundamentos, la historia y la evolución de la inteligencia artificial: qué es un sistema inteligente, la diferencia entre IA débil y fuerte, y los enfoques que buscan que las máquinas piensen o actúen de forma racional o como humanos. Introduce el Test de Turing, los niveles evolutivos de la IA y la noción de agente inteligente.",
       "orden": 1
+    },
+    {
+      "slug": "resolucion-problemas-busqueda",
+      "nombre": "Resolución de problemas y búsqueda",
+      "descripcion": "Técnicas que permiten a un agente formular un problema en términos de estados y acciones y explorar sistemáticamente el espacio de estados para hallar una secuencia que lleve al objetivo. Incluye árboles de búsqueda, búsqueda ciega y heurística (A*) y algoritmos adversariales como minimax y poda alfa-beta en juegos de dos jugadores.",
+      "orden": 2
     },
     {
       "slug": "representacion-conocimiento",
       "nombre": "Representación del conocimiento y razonamiento",
-      "descripcion": "Área de la IA que estudia cómo codificar información sobre el mundo en estructuras que una computadora pueda usar para razonar. Incluye lógica de predicados, sistemas de reglas de producción, ontologías y bases de conocimiento, siendo la base de los sistemas expertos y la web semántica.",
-      "orden": 2
+      "descripcion": "Estudia cómo codificar información sobre el mundo en estructuras que una computadora pueda usar para razonar. Abarca la jerarquía dato-información-conocimiento, la lógica y los sistemas de reglas, las ontologías y la distinción entre conocimiento declarativo y procedimental, base de los sistemas expertos y la web semántica.",
+      "orden": 3
     },
     {
       "slug": "aprendizaje-automatico",
       "nombre": "Aprendizaje automático",
-      "descripcion": "Conjunto de técnicas mediante las cuales un sistema mejora su desempeño a partir de la experiencia, sin ser programado explícitamente para cada tarea. Comprende el aprendizaje supervisado, no supervisado y por refuerzo, siendo la base del reconocimiento de imágenes, la recomendación y el procesamiento del lenguaje.",
-      "orden": 3
-    },
-    {
-      "slug": "reconocimiento-patrones-vision",
-      "nombre": "Reconocimiento de patrones / visión",
-      "descripcion": "Disciplina orientada a que las computadoras interpreten imágenes y video para identificar objetos, rostros, gestos y escenas. Combina técnicas de procesamiento de imágenes con redes neuronales convolucionales para tareas como detección de objetos, segmentación semántica y reconocimiento facial.",
+      "descripcion": "Conjunto de técnicas mediante las cuales un sistema mejora su desempeño a partir de los datos, sin ser programado explícitamente para cada tarea. Comprende el aprendizaje supervisado, no supervisado y por refuerzo, con algoritmos como la regresión, los árboles de decisión, k-medias o Q-learning.",
       "orden": 4
     },
     {
-      "slug": "algoritmos-geneticos-busqueda-local",
-      "nombre": "Algoritmos genéticos y búsqueda local",
-      "descripcion": "Métodos de optimización inspirados en la evolución biológica (selección, cruce, mutación) y en procesos físicos como el recocido simulado. Se aplican a problemas de optimización combinatoria donde el espacio de búsqueda es demasiado grande para una exploración exhaustiva.",
+      "slug": "redes-neuronales-deep-learning",
+      "nombre": "Redes neuronales y aprendizaje profundo",
+      "descripcion": "Subcampo del aprendizaje automático inspirado en el sistema nervioso, basado en neuronas artificiales interconectadas mediante pesos y funciones de activación. Las redes profundas, con múltiples capas, permiten abstraer representaciones de alto nivel para resolver problemas complejos de visión, lenguaje y voz.",
       "orden": 5
     },
     {
-      "slug": "bots-procesamiento-lenguaje-natural",
-      "nombre": "Bots y procesamiento del lenguaje natural",
-      "descripcion": "Campo que estudia cómo las computadoras comprenden, generan y responden al lenguaje humano. Abarca desde el análisis sintáctico y semántico de texto hasta los modelos de lenguaje de gran escala y los chatbots conversacionales que se integran en servicios digitales.",
+      "slug": "reconocimiento-patrones-pln",
+      "nombre": "Reconocimiento de patrones y procesamiento del lenguaje natural",
+      "descripcion": "Aplica el aprendizaje automático y profundo para percibir y clasificar señales del mundo real: imágenes, voz y texto. Cubre el ciclo de reconocimiento (sensado, segmentación, extracción de características y clasificación), las redes convolucionales, el reconocimiento del habla y el procesamiento del lenguaje natural.",
+      "orden": 6
+    }
+  ],
+  "criterios": [
+    {
+      "slug": "alcance-capacidad",
+      "nombre": "Alcance y capacidad",
+      "descripcion": "Clasifica la IA según la amplitud de tareas que puede resolver, desde sistemas especializados hasta una hipotética inteligencia general.",
+      "orden": 1
+    },
+    {
+      "slug": "russell-norvig",
+      "nombre": "Modelos de Russell y Norvig",
+      "descripcion": "Las cuatro visiones clásicas de la IA según el cruce pensar/actuar y humano/racional.",
+      "orden": 2
+    },
+    {
+      "slug": "evolucion-hintze",
+      "nombre": "Evolución (Arend Hintze)",
+      "descripcion": "Niveles evolutivos de la IA según su capacidad de memoria, comprensión y conciencia.",
+      "orden": 3
+    },
+    {
+      "slug": "tipo-aprendizaje",
+      "nombre": "Tipo de aprendizaje (Machine Learning)",
+      "descripcion": "Cómo el sistema aprende a partir de los datos: con o sin etiquetas, por refuerzo o en profundidad.",
+      "orden": 4
+    },
+    {
+      "slug": "paradigma-representacion",
+      "nombre": "Paradigma de representación del conocimiento",
+      "descripcion": "Cómo se representa el conocimiento: con símbolos y reglas explícitas o de forma implícita en estructuras matemáticas.",
+      "orden": 5
+    },
+    {
+      "slug": "naturaleza-conocimiento",
+      "nombre": "Naturaleza y forma del conocimiento",
+      "descripcion": "Clasifica el conocimiento según su grado de abstracción, su expresabilidad y su contenido u objetivo.",
       "orden": 6
     },
     {
-      "slug": "interaccion-hombre-maquina",
-      "nombre": "Interacción Hombre-Máquina",
-      "descripcion": "Área interdisciplinaria que estudia el diseño, evaluación e implementación de sistemas interactivos para uso humano. Incorpora el reconocimiento de voz, gestos y lengua de señas como modalidades de entrada, permitiendo interfaces más naturales y accesibles entre personas y sistemas inteligentes.",
+      "slug": "metodo-adquisicion",
+      "nombre": "Método de adquisición del conocimiento",
+      "descripcion": "Cómo se obtiene el conocimiento: transferido por expertos humanos (deductivo) o extraído de datos y ejemplos (inductivo).",
       "orden": 7
     }
   ],
   "clasificaciones_si": [
     {
+      "slug": "ia-debil-estrecha",
+      "criterio_slug": "alcance-capacidad",
+      "nombre": "IA Débil (o Estrecha)",
+      "en_que_consiste": "Diseñada para realizar tareas específicas y limitadas. No posee comprensión general del mundo. Es el tipo de IA utilizado actualmente.",
+      "imagen_url": null,
+      "ejemplos": "Siri, Alexa, sistemas de reconocimiento de voz, recomendadores de contenido.",
+      "orden": 1
+    },
+    {
+      "slug": "ia-fuerte-general",
+      "criterio_slug": "alcance-capacidad",
+      "nombre": "IA Fuerte (IAG)",
+      "en_que_consiste": "Capaz de realizar cualquier tarea intelectual que pueda realizar un ser humano. Razonamiento general, adaptación y aprendizaje amplio. Actualmente es un concepto teórico.",
+      "imagen_url": null,
+      "ejemplos": "(concepto teórico — sin ejemplos implementados)",
+      "orden": 2
+    },
+    {
+      "slug": "sistemas-que-piensan-como-humanos",
+      "criterio_slug": "russell-norvig",
+      "nombre": "Sistemas que piensan como humanos",
+      "en_que_consiste": "Según Russell y Norvig, este enfoque busca que las máquinas reproduzcan los procesos cognitivos humanos: cómo razonamos, tomamos decisiones y resolvemos problemas. Se apoya en la psicología cognitiva y la neurociencia para modelar la mente humana computacionalmente, siendo la base de la IA cognitiva y de los modelos de memoria y atención.",
+      "imagen_url": null,
+      "ejemplos": "Sistemas de razonamiento analógico, modelos computacionales de la memoria humana, arquitecturas cognitivas como ACT-R.",
+      "enlaces": [
+        {
+          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
+          "url": "https://aima.cs.berkeley.edu/"
+        },
+        {
+          "titulo": "What is AI? The four schools of thought — Medium / Otto Lang",
+          "url": "https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"
+        }
+      ],
+      "orden": 1
+    },
+    {
+      "slug": "sistemas-que-actuan-como-humanos",
+      "criterio_slug": "russell-norvig",
+      "nombre": "Sistemas que actúan como humanos",
+      "en_que_consiste": "Este enfoque, también de Russell y Norvig, se centra en producir comportamientos indistinguibles de los humanos, independientemente de si el proceso interno es igual al humano. La prueba de Turing es el referente clásico de este paradigma. Incluye la robótica social, los avatares conversacionales y los sistemas de imitación de comportamiento humano.",
+      "imagen_url": null,
+      "ejemplos": "Chatbots como ELIZA, robots humanoides sociales, asistentes de voz que imitan entonación humana.",
+      "enlaces": [
+        {
+          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
+          "url": "https://aima.cs.berkeley.edu/"
+        },
+        {
+          "titulo": "What is AI? The four schools of thought — Medium / Otto Lang",
+          "url": "https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"
+        }
+      ],
+      "orden": 2
+    },
+    {
+      "slug": "sistemas-que-piensan-racionalmente",
+      "criterio_slug": "russell-norvig",
+      "nombre": "Sistemas que piensan racionalmente",
+      "en_que_consiste": "Este enfoque busca formalizar el razonamiento correcto mediante la lógica y las matemáticas, siguiendo leyes de inferencia válidas para llegar a conclusiones garantizadas. Se basa en la tradición logicista de la filosofía y la matemática. Está en la base de los planificadores automáticos, los sistemas de demostración de teoremas y la programación lógica.",
+      "imagen_url": null,
+      "ejemplos": "Prolog y sus motores de inferencia, demostradores automáticos de teoremas (Coq, Lean), planificadores PDDL.",
+      "enlaces": [
+        {
+          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
+          "url": "https://aima.cs.berkeley.edu/"
+        },
+        {
+          "titulo": "Logic and Artificial Intelligence — Stanford Encyclopedia of Philosophy",
+          "url": "https://plato.stanford.edu/entries/logic-ai/"
+        }
+      ],
+      "orden": 3
+    },
+    {
+      "slug": "sistemas-que-actuan-racionalmente",
+      "criterio_slug": "russell-norvig",
+      "nombre": "Sistemas que actúan racionalmente",
+      "en_que_consiste": "Es el enfoque preferido por Russell y Norvig: el agente racional actúa para maximizar su rendimiento esperado dado su conocimiento y sus capacidades, sin importar si lo hace exactamente como un humano o siguiendo un razonamiento lógico puro. Este paradigma unifica la teoría de decisiones, el aprendizaje por refuerzo y los agentes inteligentes.",
+      "imagen_url": null,
+      "ejemplos": "Agentes de aprendizaje por refuerzo (AlphaGo, motores de ajedrez), robots autónomos, sistemas de recomendación.",
+      "enlaces": [
+        {
+          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
+          "url": "https://aima.cs.berkeley.edu/"
+        },
+        {
+          "titulo": "What is AI? The four schools of thought — Medium / Otto Lang",
+          "url": "https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"
+        }
+      ],
+      "orden": 4
+    },
+    {
+      "slug": "maquinas-reactivas",
+      "criterio_slug": "evolucion-hintze",
+      "nombre": "Máquinas Reactivas",
+      "en_que_consiste": "No poseen memoria. Responden únicamente al estado actual del entorno. No aprenden de experiencias pasadas.",
+      "imagen_url": null,
+      "ejemplos": "Deep Blue.",
+      "orden": 1
+    },
+    {
+      "slug": "memoria-limitada",
+      "criterio_slug": "evolucion-hintze",
+      "nombre": "Memoria Limitada",
+      "en_que_consiste": "Utilizan información reciente para mejorar sus decisiones. Aprenden de experiencias previas.",
+      "imagen_url": null,
+      "ejemplos": "Vehículos autónomos.",
+      "orden": 2
+    },
+    {
+      "slug": "teoria-de-la-mente",
+      "criterio_slug": "evolucion-hintze",
+      "nombre": "Teoría de la Mente",
+      "en_que_consiste": "Comprenderían emociones, intenciones y necesidades humanas. Aún no existen plenamente.",
+      "imagen_url": null,
+      "ejemplos": "(concepto teórico)",
+      "orden": 3
+    },
+    {
+      "slug": "autoconciencia",
+      "criterio_slug": "evolucion-hintze",
+      "nombre": "Autoconciencia",
+      "en_que_consiste": "Poseerían conciencia de sí mismas y de su existencia. Concepto teórico.",
+      "imagen_url": null,
+      "ejemplos": "(concepto teórico)",
+      "orden": 4
+    },
+    {
+      "slug": "aprendizaje-supervisado",
+      "criterio_slug": "tipo-aprendizaje",
+      "nombre": "Aprendizaje Supervisado",
+      "en_que_consiste": "Aprende mediante datos etiquetados. Conoce previamente las respuestas correctas.",
+      "imagen_url": null,
+      "ejemplos": "Filtros de spam, predicción de precios, diagnóstico asistido.",
+      "orden": 1
+    },
+    {
+      "slug": "aprendizaje-no-supervisado",
+      "criterio_slug": "tipo-aprendizaje",
+      "nombre": "Aprendizaje No Supervisado",
+      "en_que_consiste": "Trabaja con datos sin etiquetar. Busca patrones y agrupaciones ocultas.",
+      "imagen_url": null,
+      "ejemplos": "Clustering.",
+      "orden": 2
+    },
+    {
+      "slug": "aprendizaje-semi-supervisado",
+      "criterio_slug": "tipo-aprendizaje",
+      "nombre": "Aprendizaje Semi-supervisado",
+      "en_que_consiste": "Combina datos etiquetados y no etiquetados. Reduce la necesidad de etiquetar grandes volúmenes.",
+      "imagen_url": null,
+      "ejemplos": "Clasificación de páginas web con pocas etiquetas, reconocimiento de voz con audio parcialmente transcrito, detección de fraude con pocos casos confirmados.",
+      "orden": 3
+    },
+    {
+      "slug": "aprendizaje-por-refuerzo",
+      "criterio_slug": "tipo-aprendizaje",
+      "nombre": "Aprendizaje por Refuerzo",
+      "en_que_consiste": "Aprende mediante recompensas y castigos. Busca maximizar una recompensa acumulada.",
+      "imagen_url": null,
+      "ejemplos": "AlphaGo.",
+      "orden": 4
+    },
+    {
+      "slug": "deep-learning",
+      "criterio_slug": "tipo-aprendizaje",
+      "nombre": "Aprendizaje Profundo (Deep Learning)",
+      "en_que_consiste": "Subcampo del ML. Redes neuronales profundas con múltiples capas.",
+      "imagen_url": null,
+      "ejemplos": "Visión por computadora, PLN, reconocimiento de voz.",
+      "orden": 5
+    },
+    {
       "slug": "ia-simbolica",
+      "criterio_slug": "paradigma-representacion",
       "nombre": "IA Simbólica",
       "en_que_consiste": "La IA Simbólica representa el conocimiento mediante unidades discretas y explícitas: reglas lógicas, fórmulas, relaciones y símbolos manipulables. El razonamiento se lleva a cabo aplicando operaciones formales sobre estas estructuras, de manera que las decisiones pueden explicarse paso a paso. Es el paradigma dominante desde los orígenes de la IA hasta fines del siglo XX.",
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Chess_Programming.svg",
@@ -64,6 +278,7 @@
     },
     {
       "slug": "ia-subsimbolica",
+      "criterio_slug": "paradigma-representacion",
       "nombre": "IA Sub-simbólica",
       "en_que_consiste": "La IA Sub-simbólica (o no simbólica) codifica el conocimiento de forma implícita, distribuida en los pesos y parámetros de estructuras como las redes neuronales. En lugar de reglas explícitas, el sistema aprende representaciones internas a partir de grandes cantidades de datos. Esta aproximación es la base del deep learning y es más robusta ante datos ruidosos o incompletos.",
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg",
@@ -81,431 +296,361 @@
       "orden": 2
     },
     {
-      "slug": "sistemas-que-piensan-como-humanos",
-      "nombre": "Sistemas que piensan como humanos",
-      "en_que_consiste": "Según Russell y Norvig, este enfoque busca que las máquinas reproduzcan los procesos cognitivos humanos: cómo razonamos, tomamos decisiones y resolvemos problemas. Se apoya en la psicología cognitiva y la neurociencia para modelar la mente humana computacionalmente, siendo la base de la IA cognitiva y de los modelos de memoria y atención.",
+      "slug": "conocimiento-teorico",
+      "criterio_slug": "naturaleza-conocimiento",
+      "nombre": "Conocimiento Teórico",
+      "en_que_consiste": "Basado en teorías, modelos y generalizaciones. Busca explicar fenómenos. (dimensión: grado de abstracción)",
       "imagen_url": null,
-      "ejemplos": "Sistemas de razonamiento analógico, modelos computacionales de la memoria humana, arquitecturas cognitivas como ACT-R.",
-      "enlaces": [
-        {
-          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
-          "url": "https://aima.cs.berkeley.edu/"
-        },
-        {
-          "titulo": "What is AI? The four schools of thought — Medium / Otto Lang",
-          "url": "https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"
-        }
-      ],
+      "ejemplos": "Las leyes de Newton aplicadas a simulación física, un modelo matemático del clima, la teoría de grafos para optimización de rutas.",
+      "orden": 1
+    },
+    {
+      "slug": "conocimiento-empirico",
+      "criterio_slug": "naturaleza-conocimiento",
+      "nombre": "Conocimiento Empírico",
+      "en_que_consiste": "Basado en la experiencia directa y la observación. Surge de casos prácticos. (dimensión: grado de abstracción)",
+      "imagen_url": null,
+      "ejemplos": "Datos de sensores de una planta industrial, registros históricos de ventas, observaciones clínicas acumuladas.",
+      "orden": 2
+    },
+    {
+      "slug": "conocimiento-explicito",
+      "criterio_slug": "naturaleza-conocimiento",
+      "nombre": "Conocimiento Explícito",
+      "en_que_consiste": "Fácil de documentar, almacenar y transmitir. (dimensión: expresabilidad)",
+      "imagen_url": null,
+      "ejemplos": "Manuales, procedimientos, bases de conocimiento.",
       "orden": 3
     },
     {
-      "slug": "sistemas-que-actuan-como-humanos",
-      "nombre": "Sistemas que actúan como humanos",
-      "en_que_consiste": "Este enfoque, también de Russell y Norvig, se centra en producir comportamientos indistinguibles de los humanos, independientemente de si el proceso interno es igual al humano. La prueba de Turing es el referente clásico de este paradigma. Incluye la robótica social, los avatares conversacionales y los sistemas de imitación de comportamiento humano.",
+      "slug": "conocimiento-tacito",
+      "criterio_slug": "naturaleza-conocimiento",
+      "nombre": "Conocimiento Tácito",
+      "en_que_consiste": "Difícil de expresar formalmente. Basado en experiencia e intuición. (dimensión: expresabilidad)",
       "imagen_url": null,
-      "ejemplos": "Chatbots como ELIZA, robots humanoides sociales, asistentes de voz que imitan entonación humana.",
-      "enlaces": [
-        {
-          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
-          "url": "https://aima.cs.berkeley.edu/"
-        },
-        {
-          "titulo": "What is AI? The four schools of thought — Medium / Otto Lang",
-          "url": "https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"
-        }
-      ],
+      "ejemplos": "Reconocer una cara familiar.",
       "orden": 4
     },
     {
-      "slug": "sistemas-que-piensan-racionalmente",
-      "nombre": "Sistemas que piensan racionalmente",
-      "en_que_consiste": "Este enfoque busca formalizar el razonamiento correcto mediante la lógica y las matemáticas, siguiendo leyes de inferencia válidas para llegar a conclusiones garantizadas. Se basa en la tradición logicista de la filosofía y la matemática. Está en la base de los planificadores automáticos, los sistemas de demostración de teoremas y la programación lógica.",
+      "slug": "conocimiento-declarativo",
+      "criterio_slug": "naturaleza-conocimiento",
+      "nombre": "Conocimiento Declarativo",
+      "en_que_consiste": "Describe hechos, conceptos o relaciones. Responde qué es verdadero o falso (¿Qué?). (dimensión: contenido y objetivo)",
       "imagen_url": null,
-      "ejemplos": "Prolog y sus motores de inferencia, demostradores automáticos de teoremas (Coq, Lean), planificadores PDDL.",
-      "enlaces": [
-        {
-          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
-          "url": "https://aima.cs.berkeley.edu/"
-        },
-        {
-          "titulo": "Logic and Artificial Intelligence — Stanford Encyclopedia of Philosophy",
-          "url": "https://plato.stanford.edu/entries/logic-ai/"
-        }
-      ],
+      "ejemplos": "Una base de hechos ('París es la capital de Francia'), una ontología de productos, una red semántica de relaciones.",
       "orden": 5
     },
     {
-      "slug": "sistemas-que-actuan-racionalmente",
-      "nombre": "Sistemas que actúan racionalmente",
-      "en_que_consiste": "Es el enfoque preferido por Russell y Norvig: el agente racional actúa para maximizar su rendimiento esperado dado su conocimiento y sus capacidades, sin importar si lo hace exactamente como un humano o siguiendo un razonamiento lógico puro. Este paradigma unifica la teoría de decisiones, el aprendizaje por refuerzo y los agentes inteligentes.",
+      "slug": "conocimiento-procedimental",
+      "criterio_slug": "naturaleza-conocimiento",
+      "nombre": "Conocimiento Procedimental",
+      "en_que_consiste": "Describe procesos y métodos. Explica cómo realizar una tarea (¿Cómo?). (dimensión: contenido y objetivo)",
       "imagen_url": null,
-      "ejemplos": "Agentes de aprendizaje por refuerzo (AlphaGo, motores de ajedrez), robots autónomos, sistemas de recomendación.",
-      "enlaces": [
-        {
-          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
-          "url": "https://aima.cs.berkeley.edu/"
-        },
-        {
-          "titulo": "What is AI? The four schools of thought — Medium / Otto Lang",
-          "url": "https://otto-lang.medium.com/what-is-ai-an-explanation-by-the-4-different-schools-of-thought-74a85ebecda2"
-        }
-      ],
+      "ejemplos": "El algoritmo de ordenamiento de una lista, los pasos de un protocolo de diagnóstico, una receta paso a paso.",
       "orden": 6
     },
     {
-      "slug": "sistemas-expertos",
-      "nombre": "Sistemas Expertos",
-      "en_que_consiste": "Un sistema experto es un programa que emula el razonamiento de un especialista humano en un dominio específico, usando una base de conocimiento (reglas IF-THEN) y un motor de inferencia que aplica esas reglas a los hechos presentes. Fue la técnica de IA más exitosa comercialmente en los años 80 y 90, con aplicaciones en diagnóstico médico, configuración de equipos y análisis financiero.",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif",
-      "ejemplos": "MYCIN (diagnóstico de enfermedades infecciosas), XCON (configuración de computadoras DEC), CLIPS (herramienta de desarrollo de sistemas expertos de la NASA).",
-      "enlaces": [
-        {
-          "titulo": "Sistema experto — Wikipedia en español",
-          "url": "https://es.wikipedia.org/wiki/Sistema_experto"
-        },
-        {
-          "titulo": "CLIPS: A Tool for Building Expert Systems — Sitio oficial",
-          "url": "https://www.clipsrules.net/"
-        }
-      ],
-      "orden": 7
+      "slug": "aprendizaje-deductivo",
+      "criterio_slug": "metodo-adquisicion",
+      "nombre": "Aprendizaje Deductivo",
+      "en_que_consiste": "El conocimiento es transferido directamente por expertos humanos. Característico de los sistemas expertos. Basado en reglas definidas manualmente.",
+      "imagen_url": null,
+      "ejemplos": "Sistemas expertos como MYCIN, motores de reglas de negocio, bases de conocimiento con reglas if-then definidas por especialistas.",
+      "orden": 1
     },
     {
-      "slug": "redes-neuronales",
-      "nombre": "Redes Neuronales",
-      "en_que_consiste": "Las redes neuronales artificiales son modelos computacionales inspirados en el cerebro biológico, compuestos por capas de nodos (neuronas) conectados por pesos ajustables. Aprenden transformando datos de entrada a través de funciones de activación no lineales. Las redes profundas (deep learning) con muchas capas son hoy la técnica dominante en visión, lenguaje y audio.",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg",
-      "ejemplos": "Redes convolucionales para clasificación de imágenes, transformers para traducción automática, redes generativas adversariales (GANs) para síntesis de imágenes.",
+      "slug": "aprendizaje-inductivo",
+      "criterio_slug": "metodo-adquisicion",
+      "nombre": "Aprendizaje Inductivo",
+      "en_que_consiste": "El sistema extrae conocimiento a partir de datos y ejemplos. Característico de Machine Learning, redes neuronales, minería de datos.",
+      "imagen_url": null,
+      "ejemplos": "Un clasificador de spam entrenado con miles de correos, un modelo de visión que aprende de ejemplos etiquetados, árboles de decisión sobre datos históricos.",
+      "orden": 2
+    }
+  ],
+  "publicaciones": [
+    {
+      "slug": "que-es-un-sistema-inteligente",
+      "titulo": "¿Qué es un sistema inteligente?",
+      "cuerpo": "Un sistema inteligente es un programa o dispositivo capaz de percibir su entorno, procesar esa información y actuar de manera que maximiza la probabilidad de alcanzar sus objetivos. A diferencia de un programa tradicional, no sigue únicamente una secuencia fija de instrucciones: puede adaptarse, aprender y tomar decisiones en situaciones que no fueron explícitamente programadas.\n\nLa inteligencia artificial es el campo de la informática que estudia y construye estos sistemas. Desde sus orígenes en la década de 1950, la IA ha pasado por múltiples ciclos de entusiasmo y escepticismo, pero en las últimas dos décadas el avance en poder de cómputo y la disponibilidad de grandes volúmenes de datos han transformado ideas teóricas en aplicaciones concretas.\n\nHoy, los sistemas inteligentes están presentes en el reconocimiento de voz de tu teléfono, en los algoritmos que ordenan tu feed de noticias y en los modelos que asisten a médicos en el diagnóstico de imágenes. Entender qué son y cómo funcionan es el primer paso para usarlos con criterio.",
+      "imagen_url": null,
+      "video_url": null,
       "enlaces": [
         {
-          "titulo": "Red neuronal artificial — Wikipedia en español",
-          "url": "https://es.wikipedia.org/wiki/Red_neuronal_artificial"
+          "titulo": "Inteligencia artificial — Wikipedia en español",
+          "url": "https://es.wikipedia.org/wiki/Inteligencia_artificial"
         },
         {
-          "titulo": "But what is a neural network? — 3Blue1Brown (YouTube)",
-          "url": "https://www.youtube.com/watch?v=aircAruvnKk"
+          "titulo": "Artificial Intelligence: A Modern Approach — Sitio oficial AIMA",
+          "url": "https://aima.cs.berkeley.edu/"
         }
       ],
-      "orden": 8
+      "tema_slug": "introduccion-ia",
+      "estado": "publicado"
     },
     {
-      "slug": "algoritmos-geneticos",
-      "nombre": "Algoritmos Genéticos",
-      "en_que_consiste": "Los algoritmos genéticos son metaheurísticas de optimización que simulan la evolución natural: mantienen una población de soluciones candidatas, las seleccionan según su aptitud (fitness), las combinan (cruce) y las modifican aleatoriamente (mutación). Son especialmente útiles para encontrar soluciones aceptables a problemas NP-difíciles donde los métodos exactos son inviables.",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Evolutionary_Algorithm.svg",
-      "ejemplos": "Optimización de rutas logísticas, diseño evolutivo de redes neuronales (neuroevolución), scheduling de producción industrial.",
+      "slug": "como-aprende-una-maquina",
+      "titulo": "Cómo aprende una máquina: una introducción al aprendizaje automático",
+      "cuerpo": "Cuando hablamos de que una máquina \"aprende\", no nos referimos a que adquiere conciencia ni que comprende el mundo como lo hace una persona. Lo que ocurre es más preciso: el sistema ajusta sus parámetros internos a partir de ejemplos, de forma que mejora su desempeño en una tarea sin que nadie le haya dado la respuesta exacta para cada caso nuevo.\n\nEl aprendizaje automático (machine learning) engloba tres grandes paradigmas. En el aprendizaje supervisado, el sistema recibe pares de entrada y salida etiquetados —por ejemplo, miles de fotos de gatos y perros con su etiqueta correspondiente— y aprende a generalizar para clasificar imágenes que nunca ha visto. En el aprendizaje no supervisado, no hay etiquetas: el algoritmo busca patrones y agrupaciones por sí solo. Y en el aprendizaje por refuerzo, el agente aprende mediante prueba y error, recibiendo recompensas cuando toma buenas decisiones.\n\nEntender estos paradigmas es fundamental antes de entrar en redes neuronales o modelos de lenguaje. Son los cimientos conceptuales sobre los que se construye todo lo demás, y confundirlos lleva a elegir la herramienta equivocada para el problema.",
+      "imagen_url": null,
+      "video_url": null,
       "enlaces": [
         {
-          "titulo": "Algoritmo genético — Wikipedia en español",
-          "url": "https://es.wikipedia.org/wiki/Algoritmo_gen%C3%A9tico"
+          "titulo": "Aprendizaje automático — Wikipedia en español",
+          "url": "https://es.wikipedia.org/wiki/Aprendizaje_autom%C3%A1tico"
         },
         {
-          "titulo": "DEAP: Distributed Evolutionary Algorithms in Python — Documentación oficial",
-          "url": "https://deap.readthedocs.io/"
+          "titulo": "Machine Learning — Google Developers",
+          "url": "https://developers.google.com/machine-learning/crash-course/ml-intro"
         }
       ],
-      "orden": 9
+      "tema_slug": "aprendizaje-automatico",
+      "estado": "publicado"
+    },
+    {
+      "slug": "ia-debil-en-la-vida-cotidiana",
+      "titulo": "La IA Débil que usás todos los días",
+      "cuerpo": "La IA Débil —también llamada IA Estrecha o Narrow AI— es el tipo de inteligencia artificial que existe hoy. No es débil en el sentido de ser poco capaz: puede superar a cualquier humano en la tarea específica para la que fue diseñada. Es \"débil\" porque no puede trasladar ese conocimiento a otro dominio.\n\nCuando le pedís a tu teléfono que reconozca una canción, cuando Netflix te recomienda una serie, cuando el correo filtra el spam antes de que lo veas, o cuando el GPS recalcula la ruta en tiempo real: todos esos son ejemplos de IA Débil en acción. Cada uno de esos sistemas es extraordinariamente especializado y completamente incapaz de hacer lo que hace el de al lado.\n\nReconocer esto importa porque desmitifica la IA y te da una perspectiva más realista sobre lo que la tecnología puede y no puede hacer hoy. La IA Fuerte —un sistema con capacidades cognitivas generales como las humanas— sigue siendo un concepto teórico, no una realidad presente.",
+      "imagen_url": null,
+      "video_url": null,
+      "enlaces": [
+        {
+          "titulo": "IA débil — Wikipedia en español",
+          "url": "https://es.wikipedia.org/wiki/Inteligencia_artificial_d%C3%A9bil"
+        }
+      ],
+      "clasificacion_slug": "ia-debil-estrecha",
+      "estado": "publicado"
+    },
+    {
+      "slug": "bienvenidos-al-blog-ia-dex",
+      "titulo": "Bienvenidos al blog de ia-dex",
+      "cuerpo": "Este blog nace con un propósito concreto: acercar los conceptos de la inteligencia artificial a quienes están dando sus primeros pasos en el campo, sin sacrificar el rigor ni caer en la simplificación vacía. Cada artículo va a estar anclado en un tema o clasificación del catálogo de ia-dex, de modo que lo que leas acá tenga un correlato directo con el software, los conceptos y los recursos que encontrás en la plataforma.\n\nLo que vas a encontrar acá son explicaciones de conceptos fundamentales, análisis de herramientas, contexto histórico y reflexiones sobre el impacto de la IA en distintos ámbitos. No vamos a seguir el hype ni a publicar por publicar: cada entrada tiene que sumar algo real a tu comprensión del campo.\n\nSi acabás de llegar a ia-dex, te recomendamos empezar por el tema \"Introducción a los sistemas inteligentes y la IA\" en el catálogo. Y si tenés preguntas, sugerencias o querés que cubramos algún tema en particular, estamos atentos.",
+      "imagen_url": null,
+      "video_url": null,
+      "enlaces": [],
+      "estado": "publicado"
+    },
+    {
+      "slug": "roadmap-2026-borrador",
+      "titulo": "Roadmap 2026 (borrador)",
+      "cuerpo": "Este es un borrador interno de las mejoras planificadas para ia-dex durante 2026. El contenido aquí es provisional y no representa un compromiso público.\n\nEntre las iniciativas en evaluación se encuentran la incorporación de nuevos temas al catálogo —con foco en ética de la IA y sistemas multiagente—, la expansión de la sección de software con herramientas de visión por computadora y PLN, y la posibilidad de abrir un espacio de contribuciones de la comunidad para enriquecer las descripciones y ejemplos.\n\nEste artículo permanecerá en estado de borrador hasta que el roadmap esté confirmado. No es visible en el feed público.",
+      "imagen_url": null,
+      "video_url": null,
+      "enlaces": [],
+      "estado": "borrador"
     }
   ],
   "software": [
     {
-      "tema_slug": "busqueda-resolucion-problemas",
-      "clasificacion_slug": "sistemas-que-actuan-racionalmente",
-      "nombre": "Stockfish",
-      "objetivo": "Motor de ajedrez de código abierto capaz de analizar posiciones y encontrar el mejor movimiento.",
-      "descripcion_corta": "Stockfish es uno de los motores de ajedrez más fuertes del mundo, basado en búsqueda alfa-beta con evaluaciones neuronales (NNUE). Es utilizado por plataformas como Lichess y Chess.com para análisis de partidas.",
-      "url_acceso": "https://stockfishchess.org/",
-      "licencia": "GPL-3.0",
-      "anio_lanzamiento": 2008,
-      "autor_referencia": "Tord Romstad, Marco Costalba, Joona Kiiski (comunidad open source)",
-      "video_url": "https://www.youtube.com/watch?v=-MFanGV6ffQ",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/NewLogoSF.png"
-    },
-    {
-      "tema_slug": "busqueda-resolucion-problemas",
-      "clasificacion_slug": "sistemas-que-actuan-racionalmente",
-      "nombre": "Gymnasium (ex OpenAI Gym)",
-      "objetivo": "Plataforma estándar para desarrollar y comparar algoritmos de aprendizaje por refuerzo mediante entornos simulados.",
-      "descripcion_corta": "Gymnasium provee una API unificada para entornos de RL (CartPole, MuJoCo, Atari) que permite entrenar agentes capaces de resolver tareas de búsqueda y control mediante prueba y error. Es el estándar de facto en investigación de reinforcement learning.",
-      "url_acceso": "https://gymnasium.farama.org/",
-      "licencia": "MIT",
-      "anio_lanzamiento": 2016,
-      "autor_referencia": "OpenAI / Farama Foundation",
-      "video_url": "https://www.youtube.com/watch?v=FvuyrpzvwdI",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "busqueda-resolucion-problemas",
-      "clasificacion_slug": "ia-simbolica",
-      "nombre": "SWI-Prolog",
-      "objetivo": "Entorno de programación lógica para implementar agentes de razonamiento, búsqueda y resolución de problemas mediante cláusulas Horn.",
-      "descripcion_corta": "SWI-Prolog es un intérprete Prolog maduro y de uso libre, ideal para explorar técnicas de búsqueda en espacio de estados, planificación y razonamiento simbólico. Incluye herramientas para desarrollo web y aplicaciones semánticas.",
-      "url_acceso": "https://www.swi-prolog.org/",
-      "licencia": "BSD-2",
-      "anio_lanzamiento": 1987,
-      "autor_referencia": "Jan Wielemaker, Universidad de Ámsterdam",
-      "video_url": "https://www.youtube.com/watch?v=alX00Me2gWQ",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "busqueda-resolucion-problemas",
-      "clasificacion_slug": "sistemas-que-actuan-racionalmente",
-      "nombre": "PyGAD",
-      "objetivo": "Biblioteca Python para implementar algoritmos genéticos aplicados a optimización y búsqueda en espacios de soluciones complejos.",
-      "descripcion_corta": "PyGAD es una biblioteca de código abierto que permite construir algoritmos genéticos con pocas líneas de código. Soporta optimización de parámetros y puede combinarse con Keras y PyTorch para la evolución de modelos de aprendizaje automático.",
-      "url_acceso": "https://pygad.readthedocs.io/",
-      "licencia": "BSD-3-Clause",
-      "anio_lanzamiento": 2020,
-      "autor_referencia": "Ahmed Fawzy Gad",
-      "video_url": "https://www.youtube.com/watch?v=vPdJNfT676I",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "representacion-conocimiento",
-      "clasificacion_slug": "sistemas-expertos",
-      "nombre": "CLIPS",
-      "objetivo": "Herramienta de desarrollo de sistemas expertos basada en reglas de producción, creada originalmente por la NASA.",
-      "descripcion_corta": "CLIPS (C Language Integrated Production System) es un lenguaje de programación basado en reglas IF-THEN que permite construir sistemas expertos. Fue desarrollado en la NASA y es de dominio público desde 1996. Incluye un motor de inferencia RETE para evaluación eficiente de reglas.",
-      "url_acceso": "https://www.clipsrules.net/",
-      "licencia": "Dominio público",
-      "anio_lanzamiento": 1985,
-      "autor_referencia": "NASA Johnson Space Center",
-      "video_url": "https://www.youtube.com/watch?v=WhF33-cKUk8",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "representacion-conocimiento",
-      "clasificacion_slug": "sistemas-expertos",
-      "nombre": "Protégé",
-      "objetivo": "Editor de ontologías OWL de uso libre para construir bases de conocimiento reutilizables en la web semántica.",
-      "descripcion_corta": "Protégé es el editor de ontologías más utilizado en investigación y educación, desarrollado por Stanford University. Permite crear, visualizar y razonar sobre ontologías OWL, siendo la base de aplicaciones en bioinformática, biomedicina y web semántica.",
-      "url_acceso": "https://protege.stanford.edu/",
-      "licencia": "BSD-2",
-      "anio_lanzamiento": 1999,
-      "autor_referencia": "Stanford Center for Biomedical Informatics Research",
-      "video_url": "https://www.youtube.com/watch?v=vHmC-rRuMYM",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif"
-    },
-    {
-      "tema_slug": "representacion-conocimiento",
-      "clasificacion_slug": "ia-simbolica",
-      "nombre": "Apache Jena",
-      "objetivo": "Framework Java de código abierto para construir aplicaciones de web semántica y datos enlazados mediante RDF, OWL y SPARQL.",
-      "descripcion_corta": "Apache Jena es el framework de referencia para la web semántica en Java. Ofrece APIs para trabajar con grafos RDF, un motor de razonamiento OWL, una triple store persistente (TDB) y un servidor SPARQL (Fuseki), siendo ampliamente utilizado en bioinformática, bibliotecología y aplicaciones de conocimiento enlazado.",
-      "url_acceso": "https://jena.apache.org/",
-      "licencia": "Apache 2.0",
-      "anio_lanzamiento": 2000,
-      "autor_referencia": "Apache Software Foundation",
-      "video_url": "https://www.youtube.com/watch?v=nUdHneViLp4",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "aprendizaje-automatico",
-      "clasificacion_slug": "redes-neuronales",
-      "nombre": "TensorFlow",
-      "objetivo": "Plataforma de código abierto para construir y entrenar modelos de aprendizaje automático y redes neuronales a escala.",
-      "descripcion_corta": "TensorFlow es el framework de deep learning de Google, ampliamente utilizado en investigación y producción. Ofrece un ecosistema completo que incluye Keras como API de alto nivel, herramientas de despliegue en dispositivos móviles (TF Lite) y en navegadores (TF.js).",
-      "url_acceso": "https://www.tensorflow.org/",
-      "licencia": "Apache 2.0",
-      "anio_lanzamiento": 2015,
-      "autor_referencia": "Google Brain Team",
-      "video_url": "https://www.youtube.com/watch?v=tPYj3fFJGjk",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg"
-    },
-    {
-      "tema_slug": "aprendizaje-automatico",
-      "clasificacion_slug": "ia-subsimbolica",
-      "nombre": "scikit-learn",
-      "objetivo": "Biblioteca Python de machine learning que provee implementaciones listas para usar de los algoritmos clásicos de ML.",
-      "descripcion_corta": "scikit-learn es la biblioteca de referencia para aprendizaje automático en Python. Ofrece clasificadores, regresores, algoritmos de clustering y herramientas de preprocesamiento con una API consistente y bien documentada, ideal para prototipos y enseñanza.",
-      "url_acceso": "https://scikit-learn.org/",
-      "licencia": "BSD-3-Clause",
-      "anio_lanzamiento": 2007,
-      "autor_referencia": "David Cournapeau / comunidad open source",
-      "video_url": "https://www.youtube.com/watch?v=0B5eIE_1vpU",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg"
-    },
-    {
-      "tema_slug": "aprendizaje-automatico",
-      "clasificacion_slug": "ia-subsimbolica",
-      "nombre": "Weka",
-      "objetivo": "Banco de trabajo de machine learning con interfaz gráfica orientado a la exploración y enseñanza de algoritmos de aprendizaje.",
-      "descripcion_corta": "Weka (Waikato Environment for Knowledge Analysis) es una colección de algoritmos de ML con interfaz gráfica que facilita la experimentación sin necesidad de programar. Muy utilizado en entornos académicos para comparar clasificadores, hacer minería de datos y visualizar resultados.",
-      "url_acceso": "https://ml.cms.waikato.ac.nz/weka/",
-      "licencia": "GPL-3.0",
-      "anio_lanzamiento": 1993,
-      "autor_referencia": "Universidad de Waikato, Nueva Zelanda",
-      "video_url": "https://www.youtube.com/watch?v=TF1yh5PKaqI",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Weka_%28software%29_logo.png"
-    },
-    {
-      "tema_slug": "reconocimiento-patrones-vision",
-      "clasificacion_slug": "redes-neuronales",
-      "nombre": "OpenCV",
-      "objetivo": "Biblioteca de visión por computadora de código abierto para procesar imágenes, detectar objetos y analizar video en tiempo real.",
-      "descripcion_corta": "OpenCV (Open Computer Vision Library) es la biblioteca de visión artificial más usada en el mundo, con más de 2 500 algoritmos optimizados. Soporta C++, Python y Java, y se integra con frameworks de deep learning para tareas como reconocimiento facial, detección de movimiento y reconstrucción 3D.",
-      "url_acceso": "https://opencv.org/",
-      "licencia": "Apache 2.0",
-      "anio_lanzamiento": 1999,
-      "autor_referencia": "Intel Corporation / OpenCV Foundation",
-      "video_url": "https://www.youtube.com/watch?v=oXlwWbU8l2o",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/OpenCV_Logo_with_text.png"
-    },
-    {
-      "tema_slug": "reconocimiento-patrones-vision",
-      "clasificacion_slug": "redes-neuronales",
-      "nombre": "YOLO (Ultralytics)",
-      "objetivo": "Sistema de detección de objetos en tiempo real basado en redes neuronales convolucionales capaz de identificar múltiples clases en una sola pasada.",
-      "descripcion_corta": "YOLO (You Only Look Once) es el algoritmo de detección de objetos más popular en la actualidad. La implementación de Ultralytics (YOLOv5–YOLO11) facilita el entrenamiento con datasets propios y el despliegue en dispositivos edge, siendo ampliamente usada en vigilancia, robótica y vehículos autónomos.",
-      "url_acceso": "https://github.com/ultralytics/ultralytics",
-      "licencia": "AGPL-3.0",
-      "anio_lanzamiento": 2015,
-      "autor_referencia": "Joseph Redmon / Ultralytics",
-      "video_url": "https://www.youtube.com/watch?v=sWEm3dIGKU8",
-      "imagen_url": "https://raw.githubusercontent.com/ultralytics/assets/main/logo/Ultralytics_Logotype_Original.svg"
-    },
-    {
-      "tema_slug": "reconocimiento-patrones-vision",
-      "clasificacion_slug": "ia-subsimbolica",
-      "nombre": "Tesseract OCR",
-      "objetivo": "Motor de reconocimiento óptico de caracteres (OCR) de código abierto capaz de extraer texto de imágenes en más de 100 idiomas.",
-      "descripcion_corta": "Tesseract es el motor OCR open source más usado del mundo, mantenido por Google. Su versión 5 incorpora redes LSTM para mayor precisión. Se usa habitualmente junto a pytesseract en Python para extraer texto de documentos escaneados, facturas y capturas de pantalla.",
-      "url_acceso": "https://github.com/tesseract-ocr/tesseract",
-      "licencia": "Apache 2.0",
-      "anio_lanzamiento": 1985,
-      "autor_referencia": "HP Labs / Google",
-      "video_url": "https://www.youtube.com/watch?v=gFJc6KXxOqc",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "algoritmos-geneticos-busqueda-local",
-      "clasificacion_slug": "algoritmos-geneticos",
-      "nombre": "DEAP",
-      "objetivo": "Framework Python de computación evolutiva para prototipado rápido de algoritmos genéticos, estrategias evolutivas y programación genética.",
-      "descripcion_corta": "DEAP (Distributed Evolutionary Algorithms in Python) es el framework de referencia para algoritmos evolutivos en Python. Permite diseñar operadores de selección, cruce y mutación a medida, y se integra con multiprocessing para evaluación paralela de poblaciones.",
-      "url_acceso": "https://deap.readthedocs.io/",
-      "licencia": "LGPL-3.0",
-      "anio_lanzamiento": 2012,
-      "autor_referencia": "Félix-Antoine Fortin, Marc-André Gardner / Universidad Laval",
-      "video_url": "https://www.youtube.com/watch?v=6h5ImIy3kpA",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "algoritmos-geneticos-busqueda-local",
-      "clasificacion_slug": "algoritmos-geneticos",
-      "nombre": "OR-Tools",
-      "objetivo": "Suite de optimización combinatoria de Google para resolver problemas de ruteo de vehículos, planificación, programación entera y restricciones.",
-      "descripcion_corta": "OR-Tools es la suite de optimización de código abierto de Google, ganadora del campeonato internacional de programación por restricciones desde 2013. Disponible en Python, C++, Java y C#, cubre resolución de problemas de ruteo (VRP), scheduling, bin packing y programación lineal entera.",
-      "url_acceso": "https://developers.google.com/optimization",
-      "licencia": "Apache 2.0",
-      "anio_lanzamiento": 2010,
-      "autor_referencia": "Google",
-      "video_url": "https://www.youtube.com/watch?v=D5y4meQmKyE",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "algoritmos-geneticos-busqueda-local",
-      "clasificacion_slug": "algoritmos-geneticos",
-      "nombre": "HeuristicLab",
-      "objetivo": "Entorno gráfico para diseñar, ejecutar y analizar algoritmos heurísticos y evolutivos sin necesidad de programar desde cero.",
-      "descripcion_corta": "HeuristicLab es un framework de código abierto con interfaz gráfica para experimentar con algoritmos evolutivos, regresión simbólica y metaheurísticas. Desarrollado por la Universidad de Linz (Austria), permite configurar visualmente operadores genéticos y comparar corridas experimentales con herramientas estadísticas integradas.",
-      "url_acceso": "https://dev.heuristiclab.com/",
-      "licencia": "GPL-3.0",
-      "anio_lanzamiento": 2002,
-      "autor_referencia": "HEAL — Heuristic and Evolutionary Algorithms Laboratory, Universidad de Linz",
-      "video_url": "https://www.youtube.com/watch?v=dhRmLQvW_KQ",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "bots-procesamiento-lenguaje-natural",
-      "clasificacion_slug": "ia-subsimbolica",
+      "slug": "chatgpt",
+      "tema_slug": "introduccion-ia",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-como-humanos","memoria-limitada","aprendizaje-supervisado","aprendizaje-por-refuerzo","deep-learning","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-tacito"],
       "nombre": "ChatGPT",
-      "objetivo": "Asistente conversacional de propósito general basado en modelos de lenguaje de gran escala (LLMs), accesible vía web.",
-      "descripcion_corta": "ChatGPT es el chatbot de OpenAI construido sobre los modelos GPT-4 y GPT-4o. Permite mantener conversaciones en lenguaje natural, escribir código, resumir textos y responder preguntas complejas. Es el ejemplo más reconocido de IA generativa conversacional en la actualidad.",
+      "objetivo": "Generar respuestas conversacionales en lenguaje natural a partir de las indicaciones del usuario, asistiendo en tareas de redacción, consulta, programación y aprendizaje.",
+      "descripcion_corta": "ChatGPT es un asistente conversacional basado en inteligencia artificial desarrollado por OpenAI, construido sobre modelos de lenguaje de gran escala de la familia GPT. Permite mantener diálogos en lenguaje natural para responder preguntas, redactar y resumir textos, traducir, escribir y depurar código, entre otras tareas. Se accede a través de una interfaz web y dispone de versiones gratuitas y de pago.",
       "url_acceso": "https://chatgpt.com/",
-      "licencia": "Propietaria (acceso gratuito con límites)",
+      "licencia": "Propietaria (gratuita con límites)",
       "anio_lanzamiento": 2022,
       "autor_referencia": "OpenAI",
-      "video_url": "https://www.youtube.com/watch?v=_LMKslv5hPY",
+      "video_url": "https://www.youtube.com/watch?v=3u1k7Jyn434",
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg"
     },
     {
-      "tema_slug": "bots-procesamiento-lenguaje-natural",
-      "clasificacion_slug": "ia-subsimbolica",
-      "nombre": "Rasa",
-      "objetivo": "Framework de código abierto para construir chatbots y asistentes de voz con capacidades de comprensión del lenguaje natural (NLU).",
-      "descripcion_corta": "Rasa es una plataforma empresarial para el desarrollo de agentes conversacionales que combina NLU con gestión de diálogos estructurados. Permite despliegue on-premise, integración con múltiples canales (web, WhatsApp, Slack) y personalización total del flujo conversacional.",
-      "url_acceso": "https://rasa.com/",
-      "licencia": "Apache 2.0 (open source) / Propietaria (enterprise)",
-      "anio_lanzamiento": 2016,
-      "autor_referencia": "Rasa Technologies",
-      "video_url": "https://www.youtube.com/watch?v=hIWnpyTWsLQ",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Rasa_nlu_horizontal_purple.svg"
-    },
-    {
-      "tema_slug": "bots-procesamiento-lenguaje-natural",
-      "clasificacion_slug": "ia-subsimbolica",
-      "nombre": "spaCy",
-      "objetivo": "Biblioteca de procesamiento de lenguaje natural orientada a producción para tareas como reconocimiento de entidades, análisis sintáctico y clasificación de textos.",
-      "descripcion_corta": "spaCy es una biblioteca NLP de grado industrial que ofrece pipelines entrenados para más de 70 idiomas. Es conocida por su velocidad y facilidad de uso, y es el estándar en extracción de información, análisis de sentimientos y construcción de pipelines de NLP en Python.",
-      "url_acceso": "https://spacy.io/",
-      "licencia": "MIT",
-      "anio_lanzamiento": 2015,
-      "autor_referencia": "Explosion AI",
-      "video_url": "https://www.youtube.com/watch?v=WnGPv6HnBok",
-      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/8/88/SpaCy_logo.svg"
-    },
-    {
-      "tema_slug": "bots-procesamiento-lenguaje-natural",
-      "clasificacion_slug": "ia-subsimbolica",
-      "nombre": "NLTK",
-      "objetivo": "Plataforma educativa de procesamiento de lenguaje natural en Python con acceso a más de 50 corpus y recursos léxicos.",
-      "descripcion_corta": "NLTK (Natural Language Toolkit) es la herramienta de referencia en la enseñanza de NLP en Python. Ofrece módulos para tokenización, stemming, etiquetado gramatical, análisis sintáctico y acceso a corpus como WordNet y Brown Corpus, ideal para aprender los fundamentos del PLN.",
-      "url_acceso": "https://www.nltk.org/",
+      "slug": "teachable-machine",
+      "tema_slug": "introduccion-ia",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","aprendizaje-supervisado","deep-learning","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "Google Teachable Machine",
+      "objetivo": "Permite crear modelos de aprendizaje automático (para reconocer imágenes, sonidos y posturas) de forma rápida y sin necesidad de programar.",
+      "descripcion_corta": "Google Teachable Machine es una herramienta web gratuita desarrollada por Google Creative Lab que facilita la creación de modelos de aprendizaje automático sin requerir conocimientos de programación. Funciona en el navegador mediante TensorFlow.js y permite entrenar clasificadores de imágenes, sonidos y poses a partir de la cámara web, el micrófono o archivos cargados por el usuario. Los modelos resultantes se pueden exportar para integrarlos en sitios web y aplicaciones.",
+      "url_acceso": "https://teachablemachine.withgoogle.com/",
       "licencia": "Apache 2.0",
-      "anio_lanzamiento": 2001,
-      "autor_referencia": "Steven Bird, Edward Loper / Universidad de Pennsylvania",
-      "video_url": "https://www.youtube.com/watch?v=5e67tbgqgLA",
+      "anio_lanzamiento": 2017,
+      "autor_referencia": "Google Creative Lab",
+      "video_url": "https://www.youtube.com/watch?v=wU4ARWLp4sU",
       "imagen_url": null
     },
     {
-      "tema_slug": "interaccion-hombre-maquina",
-      "clasificacion_slug": "ia-subsimbolica",
+      "slug": "gymnasium",
+      "tema_slug": "resolucion-problemas-busqueda",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","aprendizaje-por-refuerzo","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "Gymnasium (ex OpenAI Gym)",
+      "objetivo": "Proporciona una API estandarizada y una colección de entornos de referencia para desarrollar, comparar y evaluar algoritmos de aprendizaje por refuerzo.",
+      "descripcion_corta": "Gymnasium es una biblioteca de código abierto que define una interfaz estándar para crear e interactuar con entornos de aprendizaje por refuerzo (reinforcement learning). Es el sucesor mantenido de OpenAI Gym, gestionado por la Farama Foundation, e incluye una amplia variedad de entornos de referencia como CartPole, Atari y simulaciones robóticas. Permite que los agentes aprendan mediante prueba y error a través de funciones bien definidas como reset() y step().",
+      "url_acceso": "https://gymnasium.farama.org/",
+      "licencia": "MIT",
+      "anio_lanzamiento": 2022,
+      "autor_referencia": "Farama Foundation (originalmente OpenAI)",
+      "video_url": "https://www.youtube.com/watch?v=Y_UqXz6aqfY",
+      "imagen_url": null
+    },
+    {
+      "slug": "stockfish",
+      "tema_slug": "resolucion-problemas-busqueda",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","maquinas-reactivas","ia-simbolica","ia-subsimbolica","aprendizaje-deductivo","conocimiento-procedimental","conocimiento-teorico"],
+      "nombre": "Stockfish",
+      "objetivo": "Analizar partidas de ajedrez y calcular las mejores jugadas mediante un motor de búsqueda y evaluación de posiciones de código abierto.",
+      "descripcion_corta": "Stockfish es uno de los motores de ajedrez de código abierto más potentes del mundo, capaz de evaluar posiciones y proponer las mejores jugadas con una fuerza muy superior a la de los grandes maestros humanos. Escrito en C++ y compatible con el protocolo UCI, se integra en numerosas plataformas y programas de ajedrez para analizar partidas y entrenar jugadores de todos los niveles. Desde 2020 incorpora redes neuronales (NNUE) que mejoran de forma notable la precisión de su evaluación.",
+      "url_acceso": "https://stockfishchess.org/",
+      "licencia": "GPL v3",
+      "anio_lanzamiento": 2008,
+      "autor_referencia": "Tord Romstad, Marco Costalba, Joona Kiiski, Gary Linscott y la comunidad de Stockfish",
+      "video_url": "https://www.youtube.com/watch?v=ZSf8Sp76qp8",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/NewLogoSF.png"
+    },
+    {
+      "slug": "or-tools",
+      "tema_slug": "resolucion-problemas-busqueda",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","maquinas-reactivas","ia-simbolica","aprendizaje-deductivo","conocimiento-procedimental","conocimiento-teorico"],
+      "nombre": "Google OR-Tools",
+      "objetivo": "Resolver problemas de optimización combinatoria, como enrutamiento, planificación, asignación y programación lineal y de restricciones, encontrando la mejor solución entre un gran conjunto de posibilidades.",
+      "descripcion_corta": "Google OR-Tools es una suite de software libre y de código abierto desarrollada por Google para la investigación de operaciones y la optimización combinatoria. Incluye solucionadores para programación lineal (LP), programación de enteros mixtos (MIP), programación de restricciones (CP) y enrutamiento de vehículos (VRP), entre otros. Escrita en C++, permite modelar problemas también desde Python, Java y C#, y se aplica en logística, planificación de horarios y asignación de recursos.",
+      "url_acceso": "https://developers.google.com/optimization?hl=es-419",
+      "licencia": "Apache 2.0",
+      "anio_lanzamiento": 2010,
+      "autor_referencia": "Google (autor original Laurent Perron)",
+      "video_url": "https://www.youtube.com/watch?v=XPiDrFl5S84",
+      "imagen_url": null
+    },
+    {
+      "slug": "protege",
+      "tema_slug": "representacion-conocimiento",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-piensan-racionalmente","maquinas-reactivas","ia-simbolica","aprendizaje-deductivo","conocimiento-declarativo","conocimiento-explicito"],
+      "nombre": "Protégé",
+      "objetivo": "Permite crear, editar y gestionar ontologías y bases de conocimiento mediante lenguajes estándar como OWL y RDF.",
+      "descripcion_corta": "Protégé es un editor de ontologías gratuito y de código abierto desarrollado en la Universidad de Stanford. Permite construir representaciones formales del conocimiento de un dominio utilizando estándares de la Web Semántica como OWL y RDF, y se integra con razonadores de lógica descriptiva. Está disponible como aplicación de escritorio (Protégé Desktop) y en una versión colaborativa basada en navegador (WebProtégé).",
+      "url_acceso": "https://protege.stanford.edu/",
+      "licencia": "BSD 2-Clause",
+      "anio_lanzamiento": 1999,
+      "autor_referencia": "Universidad de Stanford (Stanford Center for Biomedical Informatics Research)",
+      "video_url": "https://www.youtube.com/watch?v=N_uOC8xWWBE",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Prot%C3%A9g%C3%A9_Logo.gif"
+    },
+    {
+      "slug": "swi-prolog",
+      "tema_slug": "representacion-conocimiento",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-piensan-racionalmente","maquinas-reactivas","ia-simbolica","aprendizaje-deductivo","conocimiento-declarativo","conocimiento-procedimental","conocimiento-explicito"],
+      "nombre": "SWI-Prolog",
+      "objetivo": "Proporcionar un entorno completo y de código abierto para programar en el lenguaje lógico Prolog, basado en hechos, reglas y consultas.",
+      "descripcion_corta": "SWI-Prolog es una de las implementaciones de código abierto más utilizadas del lenguaje de programación lógico Prolog. Incluye un intérprete, un entorno de desarrollo con depurador, bibliotecas extensas y herramientas multiplataforma para Windows, Linux y macOS. Se emplea ampliamente en la enseñanza y en aplicaciones de inteligencia artificial, procesamiento de lenguaje natural, sistemas expertos y web semántica.",
+      "url_acceso": "https://www.swi-prolog.org/",
+      "licencia": "BSD 2-Clause",
+      "anio_lanzamiento": 1987,
+      "autor_referencia": "Jan Wielemaker (Universidad de Ámsterdam) y comunidad de SWI-Prolog",
+      "video_url": "https://www.youtube.com/watch?v=WagksXYJXPY",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Screenshot_of_SWI_prolog_icon.png"
+    },
+    {
+      "slug": "scikit-learn",
+      "tema_slug": "aprendizaje-automatico",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","aprendizaje-supervisado","aprendizaje-no-supervisado","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "scikit-learn",
+      "objetivo": "Proporcionar herramientas eficientes y de código abierto para el análisis de datos y el aprendizaje automático en Python, abarcando clasificación, regresión, agrupamiento y reducción de dimensionalidad.",
+      "descripcion_corta": "scikit-learn es una biblioteca de código abierto para aprendizaje automático en el lenguaje Python, construida sobre NumPy, SciPy y Matplotlib. Ofrece una interfaz consistente con algoritmos para tareas de clasificación, regresión, agrupamiento, reducción de dimensionalidad, selección de modelos y preprocesamiento de datos. Es ampliamente utilizada en investigación, educación y aplicaciones industriales por su simplicidad y documentación extensa.",
+      "url_acceso": "https://scikit-learn.org/",
+      "licencia": "BSD 3-Clause",
+      "anio_lanzamiento": 2010,
+      "autor_referencia": "Proyecto scikit-learn (iniciado por David Cournapeau; comunidad de contribuyentes)",
+      "video_url": "https://www.youtube.com/watch?v=qUjIybMkXBs",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg"
+    },
+    {
+      "slug": "weka",
+      "tema_slug": "aprendizaje-automatico",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","aprendizaje-supervisado","aprendizaje-no-supervisado","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "Weka",
+      "objetivo": "Reúne algoritmos de aprendizaje automático y herramientas de minería de datos para preparar datos, clasificar, regresionar, agrupar, encontrar reglas de asociación y visualizar resultados.",
+      "descripcion_corta": "Weka (Waikato Environment for Knowledge Analysis) es una colección de software de aprendizaje automático y minería de datos desarrollada en la Universidad de Waikato, Nueva Zelanda. Ofrece una interfaz gráfica (Explorer, Experimenter, KnowledgeFlow) y una línea de comandos para aplicar técnicas de clasificación, regresión, agrupamiento, selección de atributos y visualización sobre conjuntos de datos. Es uno de los entornos educativos de minería de datos más utilizados.",
+      "url_acceso": "https://ml.cms.waikato.ac.nz/weka",
+      "licencia": "GNU GPL",
+      "anio_lanzamiento": 1993,
+      "autor_referencia": "Machine Learning Group, Universidad de Waikato (Nueva Zelanda)",
+      "video_url": "https://www.youtube.com/watch?v=N6itjmU3qeA",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Weka_%28software%29_logo.png"
+    },
+    {
+      "slug": "orange",
+      "tema_slug": "aprendizaje-automatico",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","aprendizaje-supervisado","aprendizaje-no-supervisado","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "Orange Data Mining",
+      "objetivo": "Permite realizar análisis de datos, minería de datos y aprendizaje automático mediante programación visual, conectando bloques (widgets) en un lienzo sin necesidad de escribir código.",
+      "descripcion_corta": "Orange Data Mining es una suite de software libre de código abierto para visualización de datos, análisis exploratorio, minería de datos y aprendizaje automático. Su interfaz de programación visual permite construir flujos de trabajo arrastrando y conectando componentes llamados widgets, lo que la hace accesible tanto para principiantes como para usuarios avanzados. Está desarrollada en Python y C++, y sus funciones pueden ampliarse con complementos especializados.",
+      "url_acceso": "https://orangedatamining.com/?lang=es",
+      "licencia": "GPL v3",
+      "anio_lanzamiento": 1996,
+      "autor_referencia": "Bioinformatics Laboratory, Universidad de Liubliana (Eslovenia)",
+      "video_url": "https://www.youtube.com/watch?v=1inAFE3qftw",
+      "imagen_url": null
+    },
+    {
+      "slug": "tensorflow",
+      "tema_slug": "redes-neuronales-deep-learning",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","deep-learning","aprendizaje-supervisado","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "TensorFlow",
+      "objetivo": "Construir, entrenar y desplegar modelos de aprendizaje automático y redes neuronales mediante grafos de cálculo numérico.",
+      "descripcion_corta": "TensorFlow es una biblioteca de código abierto para el aprendizaje automático y el aprendizaje profundo, desarrollada por Google. Permite definir y ejecutar cálculos numéricos sobre grafos de flujo de datos, facilitando la creación y el entrenamiento de redes neuronales. Es escalable a múltiples CPU y GPU y ofrece APIs para Python, JavaScript y otros lenguajes.",
+      "url_acceso": "https://www.tensorflow.org/?hl=es",
+      "licencia": "Apache 2.0",
+      "anio_lanzamiento": 2015,
+      "autor_referencia": "Google Brain Team",
+      "video_url": "https://www.youtube.com/watch?v=bwvf25qmLWM",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/TensorFlow_logo.svg/250px-TensorFlow_logo.svg.png"
+    },
+    {
+      "slug": "pytorch",
+      "tema_slug": "redes-neuronales-deep-learning",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","deep-learning","aprendizaje-supervisado","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "PyTorch",
+      "objetivo": "Construir, entrenar y desplegar redes neuronales y modelos de aprendizaje profundo mediante cálculo con tensores y diferenciación automática.",
+      "descripcion_corta": "PyTorch es una biblioteca de código abierto para aprendizaje automático y aprendizaje profundo basada en Python. Ofrece cálculo con tensores acelerado por GPU, grafos de cómputo dinámicos y un sistema de diferenciación automática que facilita la creación y el entrenamiento de redes neuronales. Cuenta con un amplio ecosistema de herramientas y es ampliamente utilizada tanto en investigación como en producción.",
+      "url_acceso": "https://pytorch.org/",
+      "licencia": "BSD 3-Clause",
+      "anio_lanzamiento": 2016,
+      "autor_referencia": "Meta AI (actualmente PyTorch Foundation, Linux Foundation)",
+      "video_url": "https://www.youtube.com/watch?v=QetoD5LXlEg",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/PyTorch_logo_black.svg"
+    },
+    {
+      "slug": "opencv",
+      "tema_slug": "reconocimiento-patrones-pln",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","maquinas-reactivas","aprendizaje-supervisado","deep-learning","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "OpenCV",
+      "objetivo": "Procesar imágenes y videos para tareas de visión por computadora, como detección de objetos, reconocimiento facial y análisis de imágenes en tiempo real.",
+      "descripcion_corta": "OpenCV (Open Source Computer Vision Library) es una biblioteca de código abierto orientada a la visión por computadora y el aprendizaje automático. Ofrece miles de algoritmos para procesar imágenes y videos, detectar y reconocer objetos y rostros, y desarrollar aplicaciones de visión artificial. Es multiplataforma y cuenta con interfaces para lenguajes como C++, Python y Java.",
+      "url_acceso": "https://opencv.org/",
+      "licencia": "Apache 2.0",
+      "anio_lanzamiento": 1999,
+      "autor_referencia": "Intel (actualmente OpenCV.org / OpenCV Foundation)",
+      "video_url": "https://www.youtube.com/watch?v=Nh1eob7tsr0",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/OpenCV_logo_black.svg"
+    },
+    {
+      "slug": "whisper",
+      "tema_slug": "reconocimiento-patrones-pln",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-racionalmente","memoria-limitada","aprendizaje-supervisado","deep-learning","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
       "nombre": "Whisper (OpenAI)",
-      "objetivo": "Sistema de reconocimiento de voz automático de código abierto con soporte multilingüe y alta robustez ante ruido y acentos.",
-      "descripcion_corta": "Whisper es un modelo de reconocimiento de voz de OpenAI entrenado en 680 000 horas de audio diverso. Soporta reconocimiento y traducción en múltiples idiomas, incluyendo español. Es de código abierto (MIT) y puede ejecutarse localmente o a través de la API de OpenAI.",
+      "objetivo": "Transcribir y traducir automáticamente audio hablado a texto en múltiples idiomas mediante un modelo de reconocimiento automático del habla.",
+      "descripcion_corta": "Whisper es un modelo de reconocimiento automático del habla (ASR) de código abierto desarrollado por OpenAI, entrenado con 680.000 horas de datos multilingües y multitarea. Convierte audio en texto con alta precisión, incluso en entornos ruidosos y con acentos variados, y admite tareas de transcripción, traducción e identificación de idioma. Se distribuye como código y pesos de modelo bajo licencia MIT, lo que permite su uso local y privado.",
       "url_acceso": "https://github.com/openai/whisper",
       "licencia": "MIT",
       "anio_lanzamiento": 2022,
       "autor_referencia": "OpenAI",
-      "video_url": "https://www.youtube.com/watch?v=HbY51mVKrcE",
+      "video_url": "https://www.youtube.com/watch?v=n2x43tA-hzI",
       "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/6/66/OpenAI_logo_2025_%28symbol%29.svg"
     },
     {
-      "tema_slug": "interaccion-hombre-maquina",
-      "clasificacion_slug": "redes-neuronales",
-      "nombre": "MediaPipe",
-      "objetivo": "Suite de soluciones de ML de Google para detección de pose, manos y gestos en tiempo real sobre imágenes, video y streams de cámara.",
-      "descripcion_corta": "MediaPipe es el framework de Google AI Edge para aplicaciones de ML en dispositivos, con soluciones preentrenadas para reconocimiento de manos (Hand Landmark), pose corporal y rostro. Es el punto de partida natural para explorar interfaces gestuales y reconocimiento de lengua de señas.",
-      "url_acceso": "https://developers.google.com/edge/mediapipe/solutions/guide",
+      "slug": "hugging-face",
+      "tema_slug": "reconocimiento-patrones-pln",
+      "clasificaciones_slugs": ["ia-debil-estrecha","sistemas-que-actuan-como-humanos","memoria-limitada","aprendizaje-supervisado","deep-learning","ia-subsimbolica","aprendizaje-inductivo","conocimiento-empirico","conocimiento-procedimental"],
+      "nombre": "Hugging Face",
+      "objetivo": "Plataforma colaborativa de código abierto para compartir, descubrir y desplegar modelos de inteligencia artificial, conjuntos de datos y aplicaciones de aprendizaje automático.",
+      "descripcion_corta": "Hugging Face es una plataforma y comunidad de código abierto dedicada al aprendizaje automático, frecuentemente descrita como el \"GitHub de la inteligencia artificial\". A través de su Hub permite alojar y compartir cientos de miles de modelos preentrenados, conjuntos de datos y demostraciones interactivas (Spaces). Además mantiene bibliotecas ampliamente utilizadas, como Transformers, Datasets y Diffusers, que facilitan el desarrollo de aplicaciones de IA.",
+      "url_acceso": "https://huggingface.co/",
       "licencia": "Apache 2.0",
-      "anio_lanzamiento": 2019,
-      "autor_referencia": "Google",
-      "video_url": "https://www.youtube.com/watch?v=oaK74yozU9g",
-      "imagen_url": null
-    },
-    {
-      "tema_slug": "interaccion-hombre-maquina",
-      "clasificacion_slug": null,
-      "nombre": "Web Speech API",
-      "objetivo": "API nativa del navegador para integrar reconocimiento de voz y síntesis de texto en aplicaciones web sin dependencias externas.",
-      "descripcion_corta": "La Web Speech API es un estándar del navegador que permite a las aplicaciones web acceder al micrófono del usuario para reconocimiento de voz (SpeechRecognition) y convertir texto a voz (SpeechSynthesis). Es compatible principalmente con Chrome/Edge y es la tecnología detrás del buscador por voz de esta aplicación.",
-      "url_acceso": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API",
-      "licencia": "Estándar abierto (sin licencia de software)",
-      "anio_lanzamiento": 2012,
-      "autor_referencia": "W3C / Google (implementación en Chrome)",
-      "video_url": "https://www.youtube.com/watch?v=shq1tyUkaAk",
-      "imagen_url": null
+      "anio_lanzamiento": 2016,
+      "autor_referencia": "Hugging Face, Inc. (Clément Delangue, Julien Chaumond y Thomas Wolf)",
+      "video_url": "https://www.youtube.com/watch?v=jG4Ns63tTeo",
+      "imagen_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Hf-logo-with-title.svg"
     }
   ]
 }

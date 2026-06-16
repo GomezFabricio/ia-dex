@@ -9,11 +9,20 @@ import type { AuthContextValue } from './auth-context-value'
 // AuthProvider — StrictMode-safe session hydration + auth state subscription
 // Context shape and AuthContext object live in auth-context-value.ts to comply
 // with the react-refresh/only-export-components rule (ADR D2).
+//
+// role semantics (AD1/AD9):
+//   - loading guards session resolution; role is independent and defaults null.
+//   - After a session is available, a non-blocking profiles fetch sets role.
+//   - On signout / no session, role is reset to null.
+//   - The `active` flag prevents state updates after unmount (same pattern as
+//     the existing session hydration guard).
 // ---------------------------------------------------------------------------
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
+  const [role, setRole] = useState<'user' | 'admin' | null>(null)
 
   useEffect(() => {
     // Single effect coordinates hydration and live updates so `loading`
@@ -21,12 +30,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // double-mount (the INITIAL_SESSION event covers hydration).
     let active = true
 
+    // Fetches the role from profiles for a given user id.
+    // Silently ignores errors — role defaults to null on any failure.
+    async function fetchRole(userId: string) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .maybeSingle()
+      if (active) {
+        const fetched = data?.role
+        setRole(fetched === 'admin' ? 'admin' : fetched === 'user' ? 'user' : null)
+      }
+    }
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
+    } = supabase.auth.onAuthStateChange((event, s) => {
       if (active) {
         setSession(s)
         setLoading(false)
+        // PASSWORD_RECOVERY fires when supabase-js detects a recovery token in
+        // the URL. Latch it so RestablecerPage only shows the password form
+        // during a genuine recovery flow, never for a normal logged-in session. (X3)
+        if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+
+        if (s?.user) {
+          fetchRole(s.user.id)
+        } else {
+          setRole(null)
+        }
       }
     })
 
@@ -37,6 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (active) {
         setSession(s)
         setLoading(false)
+        if (s?.user) {
+          fetchRole(s.user.id)
+        } else {
+          setRole(null)
+        }
       }
     })
 
@@ -56,6 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user: session?.user ?? null,
     session,
     loading,
+    passwordRecovery,
+    role,
     signOut,
   }
 

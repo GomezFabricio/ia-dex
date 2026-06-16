@@ -42,6 +42,12 @@ const GEMINI_FALLBACK_MODEL =
 // 2500 ms per attempt; two attempts worst-case = 5 s, within the frontend's
 // 8 s invoke timeout with room for embedding + RPC.
 const GEMINI_TIMEOUT_MS = 2500;
+// match_threshold for buscar_hibrido. Read from the MATCH_THRESHOLD secret so the
+// empirical tuning can change via a Supabase secret instead of an edit + redeploy.
+// Defaults to the tuned 0.82 when the secret is absent or malformed.
+const _matchThresholdRaw = parseFloat(Deno.env.get('MATCH_THRESHOLD') ?? '0.82');
+// A bad secret yields NaN; fall back to the default rather than passing NaN to the RPC.
+const MATCH_THRESHOLD = Number.isFinite(_matchThresholdRaw) ? _matchThresholdRaw : 0.82;
 
 interface Filtros {
   tema_id?: string;
@@ -243,9 +249,10 @@ Deno.serve(async (req: Request) => {
     const queryEmbedding = Array.from(embeddingRaw as Float32Array);
 
     // ── Call hybrid RPC ──────────────────────────────────────────────────────
-    // match_threshold 0.82: empirically tuned for gte-small on this Spanish corpus.
+    // match_threshold: empirically tuned for gte-small on this Spanish corpus.
     // Irrelevant queries (e.g. off-topic text) peak at ~0.80; relevant AI-tool
-    // queries start at 0.82+. Explicit here so it documents the tuned value.
+    // queries start at 0.82+. Sourced from MATCH_THRESHOLD (default 0.82) so the
+    // tuning can change without editing this function.
     const { data: resultados, error: rpcErr } = await supabase.rpc(
       'buscar_hibrido',
       {
@@ -255,7 +262,7 @@ Deno.serve(async (req: Request) => {
         p_licencia: filtrosAplicados.licencia ?? null,
         p_anio_desde: filtrosAplicados.anio_desde ?? null,
         p_anio_hasta: filtrosAplicados.anio_hasta ?? null,
-        match_threshold: 0.82,
+        match_threshold: MATCH_THRESHOLD,
       },
     );
 

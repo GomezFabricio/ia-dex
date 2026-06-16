@@ -17,6 +17,8 @@ export type Database = {
       clasificaciones_si: {
         Row: {
           created_at: string
+          created_by: string | null
+          criterio_id: string
           ejemplos: string | null
           en_que_consiste: string | null
           enlaces: Json
@@ -25,9 +27,12 @@ export type Database = {
           nombre: string
           orden: number
           slug: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
+          criterio_id: string
           ejemplos?: string | null
           en_que_consiste?: string | null
           enlaces?: Json
@@ -36,9 +41,12 @@ export type Database = {
           nombre: string
           orden?: number
           slug: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
+          criterio_id?: string
           ejemplos?: string | null
           en_que_consiste?: string | null
           enlaces?: Json
@@ -47,8 +55,76 @@ export type Database = {
           nombre?: string
           orden?: number
           slug?: string
+          video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "clasificaciones_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clasificaciones_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clasificaciones_si_criterio_id_fkey"
+            columns: ["criterio_id"]
+            isOneToOne: false
+            referencedRelation: "criterios_si"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criterios_si: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          descripcion: string | null
+          id: string
+          nombre: string
+          orden: number
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          orden?: number
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          orden?: number
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criterios_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "criterios_si_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       eventos: {
         Row: {
@@ -131,12 +207,145 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          apellido: string | null
+          created_at: string
+          id: string
+          nombre: string | null
+          role: string
+        }
+        Insert: {
+          apellido?: string | null
+          created_at?: string
+          id: string
+          nombre?: string | null
+          role?: string
+        }
+        Update: {
+          apellido?: string | null
+          created_at?: string
+          id?: string
+          nombre?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
+      progreso_roadmap: {
+        Row: {
+          completado_at: string
+          tema_id: string
+          user_id: string
+        }
+        Insert: {
+          completado_at?: string
+          tema_id: string
+          user_id: string
+        }
+        Update: {
+          completado_at?: string
+          tema_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progreso_roadmap_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publicaciones: {
+        Row: {
+          autor_id: string | null
+          clasificacion_si_id: string | null
+          created_at: string
+          cuerpo: string | null
+          enlaces: Json
+          estado: string
+          firma: string | null
+          id: string
+          imagen_url: string | null
+          imagenes: Json
+          slug: string
+          tema_id: string | null
+          titulo: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          autor_id?: string | null
+          clasificacion_si_id?: string | null
+          created_at?: string
+          cuerpo?: string | null
+          enlaces?: Json
+          estado?: string
+          firma?: string | null
+          id?: string
+          imagen_url?: string | null
+          imagenes?: Json
+          slug: string
+          tema_id?: string | null
+          titulo: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          autor_id?: string | null
+          clasificacion_si_id?: string | null
+          created_at?: string
+          cuerpo?: string | null
+          enlaces?: Json
+          estado?: string
+          firma?: string | null
+          id?: string
+          imagen_url?: string | null
+          imagenes?: Json
+          slug?: string
+          tema_id?: string | null
+          titulo?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publicaciones_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publicaciones_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publicaciones_clasificacion_si_id_fkey"
+            columns: ["clasificacion_si_id"]
+            isOneToOne: false
+            referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publicaciones_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       software: {
         Row: {
           anio_lanzamiento: number | null
           autor_referencia: string | null
-          clasificacion_si_id: string | null
           created_at: string
+          created_by: string | null
           descripcion_corta: string | null
           embedding: string | null
           fts: unknown
@@ -145,6 +354,7 @@ export type Database = {
           licencia: string | null
           nombre: string
           objetivo: string | null
+          slug: string
           tema_id: string
           url_acceso: string | null
           video_url: string | null
@@ -152,8 +362,8 @@ export type Database = {
         Insert: {
           anio_lanzamiento?: number | null
           autor_referencia?: string | null
-          clasificacion_si_id?: string | null
           created_at?: string
+          created_by?: string | null
           descripcion_corta?: string | null
           embedding?: string | null
           fts?: unknown
@@ -162,6 +372,7 @@ export type Database = {
           licencia?: string | null
           nombre: string
           objetivo?: string | null
+          slug: string
           tema_id: string
           url_acceso?: string | null
           video_url?: string | null
@@ -169,8 +380,8 @@ export type Database = {
         Update: {
           anio_lanzamiento?: number | null
           autor_referencia?: string | null
-          clasificacion_si_id?: string | null
           created_at?: string
+          created_by?: string | null
           descripcion_corta?: string | null
           embedding?: string | null
           fts?: unknown
@@ -179,16 +390,24 @@ export type Database = {
           licencia?: string | null
           nombre?: string
           objetivo?: string | null
+          slug?: string
           tema_id?: string
           url_acceso?: string | null
           video_url?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "software_clasificacion_si_id_fkey"
-            columns: ["clasificacion_si_id"]
+            foreignKeyName: "software_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "clasificaciones_si"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_autores_publicos"
             referencedColumns: ["id"]
           },
           {
@@ -200,6 +419,50 @@ export type Database = {
           },
         ]
       }
+      software_clasificaciones: {
+        Row: {
+          clasificacion_si_id: string
+          software_id: string
+        }
+        Insert: {
+          clasificacion_si_id: string
+          software_id: string
+        }
+        Update: {
+          clasificacion_si_id?: string
+          software_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "software_clasificaciones_clasificacion_si_id_fkey"
+            columns: ["clasificacion_si_id"]
+            isOneToOne: false
+            referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_clasificaciones_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "software"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "software_clasificaciones_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "v_software_populares"
+            referencedColumns: ["software_id"]
+          },
+          {
+            foreignKeyName: "software_clasificaciones_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "v_software_rating"
+            referencedColumns: ["software_id"]
+          },
+        ]
+      }
       temas: {
         Row: {
           created_at: string
@@ -208,6 +471,7 @@ export type Database = {
           nombre: string
           orden: number
           slug: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -216,6 +480,7 @@ export type Database = {
           nombre: string
           orden?: number
           slug: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -224,6 +489,7 @@ export type Database = {
           nombre?: string
           orden?: number
           slug?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -280,6 +546,24 @@ export type Database = {
       }
     }
     Views: {
+      v_autores_publicos: {
+        Row: {
+          apellido: string | null
+          id: string | null
+          nombre: string | null
+        }
+        Insert: {
+          apellido?: string | null
+          id?: string | null
+          nombre?: string | null
+        }
+        Update: {
+          apellido?: string | null
+          id?: string | null
+          nombre?: string | null
+        }
+        Relationships: []
+      }
       v_software_populares: {
         Row: {
           nombre: string | null
@@ -301,6 +585,7 @@ export type Database = {
     Functions: {
       buscar_hibrido: {
         Args: {
+          adaptive_margin?: number
           match_limit?: number
           match_threshold?: number
           p_anio_desde?: number
@@ -314,7 +599,6 @@ export type Database = {
         Returns: {
           anio_lanzamiento: number
           autor_referencia: string
-          clasificacion_si_id: string
           created_at: string
           descripcion_corta: string
           id: string
@@ -328,6 +612,26 @@ export type Database = {
         }[]
       }
       get_embed_secret: { Args: never; Returns: string }
+      puede_gestionar_contenido: { Args: never; Returns: boolean }
+      software_relacionados: {
+        Args: { p_limit?: number; p_software_id: string }
+        Returns: {
+          anio_lanzamiento: number
+          autor_referencia: string
+          created_at: string
+          created_by: string
+          descripcion_corta: string
+          id: string
+          imagen_url: string
+          licencia: string
+          nombre: string
+          objetivo: string
+          slug: string
+          tema_id: string
+          url_acceso: string
+          video_url: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

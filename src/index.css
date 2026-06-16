@@ -1,72 +1,245 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   IA-dex — "Tech-Index" design system
-   A dex (catalog/index) of AI software. Indexed, data-forward, dual-theme.
-   Theming is CLASS-BASED: dark is the default; a `.light` class on <html>
-   overrides the tokens. (We previously used light-dark(), but the production
-   CSS minifier downlevels it to prefers-color-scheme media queries, which
-   breaks a manual toggle — it would only follow the OS setting.)
-   Signature: violet accent + cyan glow, display + mono type, visible structure.
+   IA-dex — "Cine-neural" design system (evolved from "Tech-Index").
+   A dex (catalog/index) of AI software: indexed, data-forward, dual-theme,
+   cinematic. Theming is CLASS-BASED — dark is the default (lives in @theme);
+   a `.light` class on <html> overrides the tokens. light-dark() is avoided
+   (the production minifier downlevels it to prefers-color-scheme media queries,
+   which would break the manual toggle). The Tailwind `dark:` variant is likewise
+   unused: components are theme-agnostic; only the tokens know the theme.
+   Signature: violet → magenta → cyan tri-tone, display + mono type, hero scrims.
 --------------------------------------------------------------------------- */
 
+/* Class-based theme strategy (not a media query). */
+@custom-variant light (&:where(.light, .light *));
+
+/* ----------------------------------------------------------------------------
+   1. TOKENS — DARK (default)
+   -------------------------------------------------------------------------- */
 @theme {
-  /* Type scale — three roles: body / display / data-label */
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  /* Type families — three roles: body / display / data-label */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Surfaces — DARK defaults; a DISTINCT border token keeps edges visible. */
-  --color-bg: #0b1020;
-  --color-surface: #151b2e;
-  --color-surface-2: #1c2540;
-  --color-border: #2a3350;
+  /* Type scale */
+  --text-hero: clamp(2.75rem, 6vw, 4.5rem); /* per-page hero H1 — Space Grotesk 700 */
+  --text-display: clamp(2rem, 4vw, 3rem); /* section heroes / SI titles — 700 */
+  --text-h1: 2rem;
+  --text-h2: 1.5rem; /* Space Grotesk 600 */
+  --text-h3: 1.25rem;
+  --text-body-lg: 1.125rem; /* hero subcopy — Inter 400/500 */
+  --text-body: 1rem;
+  --text-sm: 0.875rem;
+  --text-label: 0.6875rem; /* 11px — dex-label, uppercase, tracking-widest */
+
+  /* Surfaces — layered cinematic near-black */
+  --color-bg: #070a14;
+  --color-bg-2: #0b1020; /* second canvas for banded sections */
+  --color-surface: #11162a; /* cards / rails */
+  --color-surface-2: #1a2140; /* elevated / hover */
+  --color-border: #283156; /* visible borders */
+  --color-border-strong: #3a4470; /* emphasized borders */
 
   /* Ink */
-  --color-text: #e6eaf5;
-  --color-muted: #8a93b2;
+  --color-text: #eaedfb;
+  --color-muted: #939dc0;
+  --color-faint: #5c6685; /* captions / disabled */
 
-  /* Brand — violet signature + cyan glow */
-  --color-accent: #7c5cff;
-  --color-accent-strong: #9a80ff;
-  --color-accent-2: #22d3ee;
-  --color-error: #f87171;
+  /* Brand — neural tri-tone: violet → magenta → cyan */
+  --color-accent: #8b5cff; /* electric violet (primary) */
+  --color-accent-strong: #a684ff; /* hover / emphasis */
+  --color-accent-2: #25e0f0; /* quantum cyan (secondary glow) */
+  --color-accent-3: #ff4fd8; /* neural magenta (glow/accent only) */
 
-  /* Elevation */
+  /* Ink on accent fill */
+  --color-on-accent: #070a14;
+
+  /* Fixed scrim for unpredictable photos (does NOT change per theme) */
+  --color-scrim: rgb(8 11 24 / 0.62);
+
+  /* Semantic */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #fb7185;
+  --color-info: #38bdf8;
+
+  /* Signature gradients */
+  --gradient-neural: linear-gradient(110deg, var(--color-accent) 0%, var(--color-accent-3) 50%, var(--color-accent-2) 100%);
+  --gradient-vc: linear-gradient(to right, var(--color-accent), var(--color-accent-2));
+  --gradient-hero-scrim: linear-gradient(to top, var(--color-bg) 8%, color-mix(in oklab, var(--color-bg) 72%, transparent) 42%, transparent 78%);
+  --gradient-hero-wash: radial-gradient(120% 100% at 18% 0%, color-mix(in oklab, var(--color-accent) 34%, transparent), transparent 55%),
+    radial-gradient(90% 90% at 100% 0%, color-mix(in oklab, var(--color-accent-2) 26%, transparent), transparent 60%);
+
+  /* Elevation + glows */
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35);
   --shadow-pop: 0 16px 40px -18px rgb(0 0 0 / 0.75);
-  --shadow-glow:
-    0 0 0 1px color-mix(in oklab, var(--color-accent) 45%, transparent),
-    0 18px 40px -20px color-mix(in oklab, var(--color-accent) 60%, transparent);
+  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 50%, transparent), 0 22px 55px -22px color-mix(in oklab, var(--color-accent) 70%, transparent);
+  --shadow-glow-cyan: 0 0 0 1px color-mix(in oklab, var(--color-accent-2) 50%, transparent), 0 22px 55px -22px color-mix(in oklab, var(--color-accent-2) 65%, transparent);
+  --shadow-hero: 0 40px 120px -40px color-mix(in oklab, var(--color-accent-3) 55%, transparent);
 }
 
-/* Light theme overrides — unlayered so they win over the @theme tokens.
-   Applied by adding the `.light` class to <html> (see useTheme + index.html). */
+/* ----------------------------------------------------------------------------
+   2. TOKENS — LIGHT (overrides; applied via `.light` on <html>)
+   Cinematic in dark, calm and legible in light. Accents darken to pass AA on
+   white; glows soften.
+   -------------------------------------------------------------------------- */
 :root.light {
-  --color-bg: #f6f7fb;
+  --color-bg: #f5f6fc;
+  --color-bg-2: #eceff9;
   --color-surface: #ffffff;
-  --color-surface-2: #eef1f8;
-  --color-border: #dde2ef;
-  --color-text: #1b2034;
-  --color-muted: #5c6783;
-  --color-accent: #6d4ef5;
-  --color-accent-strong: #5a3ce0;
-  --color-accent-2: #0891b2;
+  --color-surface-2: #eef1f9;
+  --color-border: #dce1f0;
+  --color-border-strong: #c3cadf;
+  --color-text: #161b30;
+  --color-muted: #525c7b;
+  --color-faint: #7a82a0;
+  --color-accent: #6d3cf0; /* darker violet for AA on white */
+  --color-accent-strong: #5a2ddb;
+  --color-accent-2: #0892a8; /* darker cyan for AA on white */
+  --color-accent-3: #c026a8; /* darker magenta for AA on white */
+  --color-on-accent: #ffffff;
+  --color-success: #059669;
+  --color-warning: #b45309;
   --color-error: #dc2626;
-  --shadow-card: 0 1px 2px rgb(20 25 45 / 0.10);
+  --color-info: #0284c7;
+  --shadow-card: 0 1px 2px rgb(20 25 45 / 0.1);
   --shadow-pop: 0 16px 40px -18px rgb(20 25 45 / 0.22);
   --scrollbar-thumb: #c4cad9;
   --scrollbar-track: #eef1f8;
   color-scheme: light;
 }
 
+/* ----------------------------------------------------------------------------
+   3. UTILITIES (@utility — NOT @layer components)
+   -------------------------------------------------------------------------- */
+
+/* Brand-gradient clipped text. Reserved for the wordmark and the single largest
+   hero H1 per page — never body copy or section H2. */
+@utility neural-text {
+  background-image: var(--gradient-neural);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Data labels: dex numbers, years, licenses, ratings, IDs. Short, uppercase. */
+@utility dex-label {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The faint "dex" lattice behind concept heroes and placeholders. */
+@utility dex-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-border) 70%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--color-border) 70%, transparent) 1px, transparent 1px);
+  background-size: 46px 46px;
+}
+
+/* Cinematic bottom→top scrim to near-black. */
+@utility hero-scrim {
+  background-image: var(--gradient-hero-scrim);
+}
+
+/* Ambient wash — colored light bleeding behind artwork. */
+@utility hero-wash {
+  background-image: var(--gradient-hero-wash);
+}
+
+/* Glow ring for featured cards/elements. */
+@utility glow-ring {
+  box-shadow: var(--shadow-glow);
+}
+
+/* Instant focus ring (no transition; independent of motion). */
+@utility focus-ring {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Global scroll-driven entrance primitive. Apply to sections, grids, dl, rankings.
+   Wrapped in @supports so unsupported browsers render content statically visible. */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    animation: reveal-in linear both;
+    animation-timeline: view(block);
+    animation-range: entry 0% cover 28%;
+  }
+}
+
+/* Skeleton shimmer (matches the final shape, no CLS). */
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-2);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent);
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   4. KEYFRAMES
+   -------------------------------------------------------------------------- */
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes breathe {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-accent) 50%, transparent); }
+  70% { box-shadow: 0 0 0 16px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes cta-pulse {
+  0%, 100% { box-shadow: var(--shadow-glow); }
+  50% { box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 65%, transparent), 0 26px 72px -18px color-mix(in oklab, var(--color-accent) 88%, transparent); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-26px); }
+}
+@keyframes drift {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+@keyframes route-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Voice overlay placeholder bars — oscillate while speech is detected. */
+@keyframes voice-bar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+/* Modal entrance. */
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+}
+
+/* ----------------------------------------------------------------------------
+   5. BASE — global focus, type defaults, native chrome, reduced-motion
+   -------------------------------------------------------------------------- */
 @layer base {
   :root {
     color-scheme: dark;
     accent-color: var(--color-accent);
 
-    --scrollbar-thumb: #2a3350;
-    --scrollbar-track: #0b1020;
+    --scrollbar-thumb: #283156;
+    --scrollbar-track: #070a14;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
     scrollbar-width: thin;
   }
@@ -78,9 +251,11 @@
   }
 
   body {
-    /* Normalize fallback x-height so swapping Inter in causes no layout
-       shift (CLS) — modern-web-guidance: visually-stable-font-fallbacks. */
+    /* Normalize fallback x-height so swapping Inter in causes no CLS
+       (modern-web-guidance: visually-stable-font-fallbacks). */
     font-size-adjust: from-font;
+    font-family: var(--font-sans);
+    line-height: 1.6;
     background-color: var(--color-bg);
     color: var(--color-text);
   }
@@ -97,6 +272,12 @@
     text-wrap: pretty;
   }
 
+  /* Visible focus on everything interactive (a11y debt #1). Instant, motion-free. */
+  :where(a, button, [role="button"], input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
   ::selection {
     background-color: color-mix(in oklab, var(--color-accent) 38%, transparent);
     color: var(--color-text);
@@ -109,23 +290,6 @@
   }
   dialog[open] {
     animation: modal-in 0.18s ease-out;
-  }
-  @keyframes modal-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px) scale(0.98);
-    }
-  }
-
-  /* Voice overlay placeholder bars — oscillate while speech is detected. */
-  @keyframes voice-bar {
-    0%,
-    100% {
-      transform: scaleY(0.3);
-    }
-    50% {
-      transform: scaleY(1);
-    }
   }
 
   /* Legacy WebKit scrollbar fallback (Safari < 18.2 / old Chrome). */
@@ -143,24 +307,116 @@
       background: var(--scrollbar-track);
     }
   }
+
+  /* Reduced-motion: decorative loops stop; reveals land on the visible frame. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   6. POSTER RAIL — card hover/focus choreography + scroll track
+   The PosterCard markup is in React; these are the motion/state classes it
+   relies on. Hover effects are gated behind @media(hover:hover) so touch
+   devices don't get stuck-hover; keyboard users get the SAME reveal via
+   :focus-within (a11y). transition is scoped to transform/shadow/border —
+   never `all` — so paint stays cheap.
+   -------------------------------------------------------------------------- */
+.poster-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.poster-img {
+  transition: transform 0.45s ease;
+}
+.poster-peek {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* Keyboard a11y: reveal the peek when focus enters the card (any device). */
+.poster-card:focus-within .poster-peek {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Pointer devices only — avoid sticky :hover on touch. */
+@media (hover: hover) {
+  .poster-card:hover {
+    transform: scale(1.06);
+    z-index: 20;
+    border-color: color-mix(in oklab, var(--color-accent) 60%, transparent);
+    box-shadow: var(--shadow-glow);
+  }
+  .poster-card:hover .poster-img {
+    transform: scale(1.09);
+  }
+  .poster-card:hover .poster-peek {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Horizontal rail track: hide the scrollbar (chrome handled by snap + arrows). */
+[data-rail] {
+  scrollbar-width: none;
+}
+[data-rail]::-webkit-scrollbar {
+  display: none;
+}
+
+/* ----------------------------------------------------------------------------
+   7. SHELL + HERO — ambient motion
+   Decorative floating orbs behind the home hero and inside the frosted sidebar.
+   Plain classes (not Tailwind utilities) because they only carry an animation;
+   the float-y keyframe lives in §4. Reduced-motion (§5) freezes them.
+   -------------------------------------------------------------------------- */
+.orb-float {
+  animation: float-y 11s ease-in-out infinite;
+}
+.orb-float-2 {
+  animation: float-y 14s ease-in-out infinite reverse;
+}
+
+/* Primary hero CTA — gently breathing glow (the cta-pulse keyframe is in §4). */
+.cta-pulse {
+  animation: cta-pulse 2.6s ease-in-out infinite;
+}
+
+/* Assistant FAB — idle breathing ring (breathe keyframe in §4) + attention dot. */
+.gfab-idle {
+  animation: breathe 3.4s ease-out infinite;
+}
+.attn-dot {
+  animation: pop-in 0.25s ease-out both;
+}
+@keyframes pop-in {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+/* Podio ranking rows — the accent rank bar grows on hover (pointer devices). */
+.rank-bar {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+@media (hover: hover) {
+  .ranking-row:hover .rank-bar {
+    transform: scaleX(1);
+  }
 }
 
 /* ---------------------------------------------------------------------------
-   Utilities
+   Usage notes
+   - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav
+     rail, hover states, and the primary CTA. Everything else is matte.
+   - neural-text: wordmark + a single hero H1 per page. Never body copy or H2.
+   - Magenta (accent-3) is a glow/accent color, NEVER body text.
+   - On accent fill, text is text-on-accent (dark in dark, white in light).
 --------------------------------------------------------------------------- */
-
-/* Data label: monospace, tabular figures — for dex numbers, years, licenses. */
-@utility dex-label {
-  font-family: var(--font-mono);
-  font-feature-settings: "tnum" 1, "ss01" 1;
-  letter-spacing: 0.02em;
-}
-
-/* Indexed grid backdrop — the faint "dex" lattice behind shell surfaces. */
-@utility dex-grid {
-  background-image:
-    linear-gradient(to right, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 55%, transparent) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-position: center;
-}

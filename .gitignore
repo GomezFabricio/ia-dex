@@ -34,3 +34,11 @@ supabase/.temp/
 
 .claude/
 .agents/
+# Local env files (Vite) — keep credentials out of git
+.env
+.env.local
+.env.*.local
+
+# Local visual-verification tooling (Playwright)
+pw-verify.mjs
+.pw-tmp/

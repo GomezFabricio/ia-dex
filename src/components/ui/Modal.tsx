@@ -11,10 +11,19 @@ type Props = {
   open: boolean
   onClose: () => void
   labelledBy?: string
+  // Additive: callers can override the default max-width (e.g. a wide lightbox).
+  // Existing consumers pass nothing and render identically (max-w-sm).
+  maxWidthClassName?: string
   children: React.ReactNode
 }
 
-export default function Modal({ open, onClose, labelledBy, children }: Props) {
+export default function Modal({
+  open,
+  onClose,
+  labelledBy,
+  maxWidthClassName = 'max-w-sm',
+  children,
+}: Props) {
   const ref = useRef<HTMLDialogElement>(null)
 
   // Sync the imperative <dialog> state with the `open` prop.
@@ -45,7 +54,7 @@ export default function Modal({ open, onClose, labelledBy, children }: Props) {
       ref={ref}
       onClick={handleClick}
       aria-labelledby={labelledBy}
-      className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-border bg-surface p-6 text-text shadow-pop"
+      className={`m-auto w-[calc(100%-2rem)] ${maxWidthClassName} rounded-2xl border border-border bg-surface p-6 text-text shadow-pop`}
     >
       <div className="flex flex-col gap-4">{children}</div>
     </dialog>
