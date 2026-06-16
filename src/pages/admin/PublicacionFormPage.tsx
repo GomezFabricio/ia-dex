@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as publicacionesService from '../../services/publicacionesService'
 import { listarTemas } from '../../services/temasService'
@@ -7,6 +7,11 @@ import { slugify } from '../../lib/slug'
 import { toEmbedUrl } from '../../lib/youtube'
 import type { Enlace, Tema, ClasificacionConCriterio } from '../../types/dtos'
 import type { TablesInsert, TablesUpdate } from '../../types/database.types'
+
+// RichTextEditor is lazy-loaded so TipTap/ProseMirror lands in its own chunk
+// (fetched only when an admin opens this form) instead of the main bundle that
+// every public blog reader downloads.
+const RichTextEditor = lazy(() => import('../../components/ui/RichTextEditor'))
 
 // ---------------------------------------------------------------------------
 // PublicacionFormPage — create/edit form, controlled inputs + useState (NO
@@ -364,14 +369,20 @@ export default function PublicacionFormPage() {
           <label htmlFor="cuerpo" className="text-muted text-sm">
             Cuerpo
           </label>
-          <textarea
-            id="cuerpo"
-            rows={10}
-            value={cuerpo}
-            onChange={(e) => setCuerpo(e.target.value)}
-            className={`${inputClass} resize-y`}
-            placeholder="Contenido de la publicación (opcional para un borrador)"
-          />
+          <Suspense
+            fallback={
+              <div className="bg-bg border border-border rounded-lg px-3 py-2 text-sm text-muted">
+                Cargando editor…
+              </div>
+            }
+          >
+            <RichTextEditor
+              id="cuerpo"
+              value={cuerpo}
+              onChange={setCuerpo}
+              placeholder="Contenido de la publicación (opcional para un borrador)"
+            />
+          </Suspense>
         </div>
 
         {/* Imagen */}

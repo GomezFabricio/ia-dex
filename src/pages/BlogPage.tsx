@@ -4,6 +4,7 @@ import { usePublicaciones } from '../hooks/usePublicaciones'
 import { useIsAdmin } from '../hooks/useIsAdmin'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
+import { htmlToText } from '../lib/sanitizeHtml'
 import type { PublicacionConAutor } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
@@ -28,10 +29,12 @@ function readStoredView(): BlogView {
   }
 }
 
-// Plain-text excerpt from the body: collapse whitespace; CSS line-clamp truncates.
+// Plain-text excerpt from the body: strip HTML tags so markup never shows as
+// literal text; htmlToText also collapses whitespace + trims (works for legacy
+// plain text too). CSS line-clamp truncates.
 function excerptOf(cuerpo: string | null): string {
   if (cuerpo === null) return ''
-  return cuerpo.replace(/\s+/g, ' ').trim()
+  return htmlToText(cuerpo)
 }
 
 // Thumbnail or lettered placeholder. Sizing/rounding comes from `className` so

@@ -6,6 +6,7 @@ import VideoEmbed from '../components/software/VideoEmbed'
 import Modal from '../components/ui/Modal'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
+import { sanitizeHtml, htmlToText, looksLikeHtml } from '../lib/sanitizeHtml'
 import type { PublicacionConAutor } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
@@ -13,7 +14,10 @@ import type { PublicacionConAutor } from '../types/dtos'
 // Reads :slug via usePublicacion(slug). D4 states: loading / error+retry /
 // not-found / data. A null result is the NOT-FOUND state.
 //
-// cuerpo renders as plain text with whitespace-pre-wrap (NO markdown, per D10).
+// cuerpo renders as rich text: new bodies are HTML produced by the editor and
+// are sanitized (DOMPurify) before dangerouslySetInnerHTML inside a .dex-prose
+// container; legacy plain-text bodies (no tags) keep their whitespace-pre-wrap
+// rendering. looksLikeHtml() picks the path; sanitizeHtml is the trust boundary.
 // imagen_url renders directly in <img src> with object-cover, BYPASSING the
 // useImageOk 200px gate (author-curated images, per ST3). video_url renders via
 // VideoEmbed + toEmbedUrl. Author name comes from autorNombre (Capability 4).
@@ -95,6 +99,16 @@ export default function PublicacionDetallePage() {
     return [...mismoTema, ...resto].slice(0, 3)
   }, [todas, data])
 
+  // Sanitize the HTML body once per fetched row (not on every render). Lives up
+  // here with the other hooks so it runs before the early returns below (React
+  // hooks rules). `data` may still be null here — guard with optional chaining;
+  // an empty string is the no-body fallback. Depends on the whole `data` object
+  // (matching the relacionadas memo) so the linter's inferred deps line up.
+  const cuerpoSanitizado = useMemo(
+    () => (data?.cuerpo ? sanitizeHtml(data.cuerpo) : ''),
+    [data],
+  )
+
   // Loading state
   if (loading) {
     return (
@@ -136,8 +150,10 @@ export default function PublicacionDetallePage() {
   const pub = data
   const fecha = formatFecha(pub.created_at)
   const enlacesFiltrados = pub.enlaces.filter((e) => e.url)
+  // Word count from the TEXT, not the markup, so HTML tags never inflate it.
+  const textoCuerpo = pub.cuerpo !== null ? htmlToText(pub.cuerpo) : ''
   const palabrasCuerpo =
-    pub.cuerpo !== null ? pub.cuerpo.trim().split(/\s+/).filter(Boolean).length : 0
+    textoCuerpo === '' ? 0 : textoCuerpo.split(/\s+/).filter(Boolean).length
   // Only show a reading-time badge for posts long enough to be meaningful.
   const minutosLectura = palabrasCuerpo >= 50 ? Math.max(1, Math.round(palabrasCuerpo / 200)) : 0
 
@@ -241,12 +257,20 @@ export default function PublicacionDetallePage() {
           </section>
         )}
 
-        {/* cuerpo — plain text, line breaks preserved (no markdown) */}
-        {pub.cuerpo !== null && pub.cuerpo !== '' && (
-          <div className="whitespace-pre-wrap text-body-lg leading-relaxed text-text">
-            {pub.cuerpo}
-          </div>
-        )}
+        {/* cuerpo — sanitized HTML for new rich-text bodies, plain text (line
+            breaks preserved) for legacy bodies */}
+        {pub.cuerpo !== null &&
+          pub.cuerpo !== '' &&
+          (looksLikeHtml(pub.cuerpo) ? (
+            <div
+              className="dex-prose text-body-lg leading-relaxed text-text"
+              dangerouslySetInnerHTML={{ __html: cuerpoSanitizado }}
+            />
+          ) : (
+            <div className="whitespace-pre-wrap text-body-lg leading-relaxed text-text">
+              {pub.cuerpo}
+            </div>
+          ))}
 
         {/* Video */}
         {pub.video_url !== null && pub.video_url !== '' && (

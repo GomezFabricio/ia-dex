@@ -412,6 +412,146 @@
   }
 }
 
+/* ----------------------------------------------------------------------------
+   8. RICH-TEXT PROSE — shared by the editor's editable area AND the article
+   render so WYSIWYG matches the published page exactly. Plain CSS (not a
+   Tailwind utility) because it styles arbitrary nested HTML the editor emits;
+   all values come from the existing design tokens. .ProseMirror base styles
+   cover the editor surface (focus ring lives on the container, not here).
+   -------------------------------------------------------------------------- */
+.dex-prose {
+  color: var(--color-text);
+}
+
+/* Vertical rhythm between block children; headings breathe a bit more. */
+.dex-prose > * + * {
+  margin-top: 1em;
+}
+.dex-prose > h1,
+.dex-prose > h2,
+.dex-prose > h3,
+.dex-prose > h4 {
+  margin-top: 1.6em;
+}
+
+.dex-prose h1,
+.dex-prose h2,
+.dex-prose h3,
+.dex-prose h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+.dex-prose h1 {
+  font-size: var(--text-display);
+}
+.dex-prose h2 {
+  font-size: var(--text-h2);
+}
+.dex-prose h3 {
+  font-size: var(--text-h3);
+}
+.dex-prose h4 {
+  font-size: var(--text-body-lg);
+}
+
+.dex-prose p {
+  color: var(--color-text);
+  line-height: 1.7;
+}
+
+.dex-prose strong,
+.dex-prose b {
+  font-weight: 700;
+}
+.dex-prose em,
+.dex-prose i {
+  font-style: italic;
+}
+.dex-prose u {
+  text-decoration: underline;
+}
+.dex-prose s,
+.dex-prose strike {
+  text-decoration: line-through;
+}
+
+.dex-prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+.dex-prose a:hover {
+  color: var(--color-accent-strong);
+}
+
+/* Lists must show their markers — the Tailwind/TipTap reset strips them, so set
+   the marker style and outside positioning explicitly. */
+.dex-prose ul,
+.dex-prose ol {
+  padding-left: 1.5em;
+  list-style-position: outside;
+}
+.dex-prose ul {
+  list-style-type: disc;
+}
+.dex-prose ol {
+  list-style-type: decimal;
+}
+.dex-prose li + li {
+  margin-top: 0.35em;
+}
+
+.dex-prose blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1em;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.dex-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-surface);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+.dex-prose pre {
+  background: var(--color-surface);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.dex-prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.dex-prose hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 1.5em 0;
+}
+
+/* Editor surface: the container shows the focus ring, so the editable area has
+   no outline of its own. It fills the wrapper's min-height (set in the React
+   component) and shows a text cursor. */
+.ProseMirror {
+  outline: none;
+  min-height: 100%;
+  cursor: text;
+}
+
+/* TipTap Placeholder extension empty-state hint. */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-muted);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 /* ---------------------------------------------------------------------------
    Usage notes
    - Neon (accent / accent-2 / accent-3) lives ONLY in heroes, the active nav
