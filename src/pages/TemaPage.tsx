@@ -6,6 +6,10 @@ import { usePublicacionesPorTema } from '../hooks/usePublicacionesPorTema'
 import { useClasificacionesPorSoftwareIds } from '../hooks/useClasificacionesPorSoftwareIds'
 import PosterCard from '../components/software/PosterCard'
 import StarRating from '../components/ui/StarRating'
+import VideoEmbed from '../components/software/VideoEmbed'
+import InlineEdit from '../components/admin/InlineEdit'
+import { useIsAdmin } from '../hooks/useIsAdmin'
+import * as temasService from '../services/temasService'
 import type { ClasificacionConCriterio, CriterioSI } from '../types/dtos'
 
 // ---------------------------------------------------------------------------
@@ -30,6 +34,11 @@ export default function TemaPage() {
   const slug = temaSlug ?? ''
 
   const tema = useTema(slug)
+  // Admin gate for the edit-only video anchor — it must not leak the raw URL to
+  // the public. InlineEdit self-gates its own pencil; this only decides which
+  // anchors to MOUNT. Called unconditionally (Rules of Hooks) before the early
+  // returns below.
+  const isAdmin = useIsAdmin()
   const software = useSoftwarePorTema(tema.data?.id)
   const publicaciones = usePublicacionesPorTema(tema.data?.id)
 
@@ -98,13 +107,76 @@ export default function TemaPage() {
             <h1 className="font-display mb-3.5 text-[clamp(2rem,4.5vw,3rem)] font-bold tracking-[-0.02em] text-text">
               {temaData.nombre}
             </h1>
-            {temaData.descripcion !== null && temaData.descripcion !== undefined && (
-              <p className="mb-3.5 max-w-[620px] text-body-lg leading-relaxed text-muted">{temaData.descripcion}</p>
+            {/* Descripcion — public content; a block <div> (NOT a <p>) so the
+                InlineEdit Modal (native <dialog>) and 44px pencil stay valid and
+                don't shift layout for admins. Mounted for everyone when set, and
+                for admins even when null (so they can ADD one) — but never shown
+                to the public as a bare em dash when empty (the old page rendered
+                this block conditionally, so this keeps the public view unchanged). */}
+            {(temaData.descripcion != null || isAdmin) && (
+              <div className="mb-3.5 max-w-[620px] text-body-lg leading-relaxed text-muted">
+                <InlineEdit
+                  value={temaData.descripcion}
+                  variant="textarea"
+                  label="la descripción"
+                  onSave={(next) =>
+                    temasService
+                      .editar(temaData.id, { descripcion: next as string | null })
+                      .then(() => {})
+                  }
+                  onSaved={tema.refetch}
+                >
+                  <span>{temaData.descripcion ?? '—'}</span>
+                </InlineEdit>
+              </div>
+            )}
+            {/* Video — edit-only anchor; admins only (avoids leaking the raw
+                YouTube URL to the public). Always mounted for admins so they can
+                ADD a video even when video_url is null. The public VideoEmbed is
+                the separate gated block below the hero. */}
+            {isAdmin && (
+              <div className="reveal mb-3.5 flex flex-col gap-2">
+                <div className="dex-label text-[10px] text-muted">Video</div>
+                <div className="text-sm leading-relaxed text-text">
+                  <InlineEdit
+                    value={temaData.video_url}
+                    variant="youtube"
+                    label="el video"
+                    onSave={(next) =>
+                      temasService
+                        .editar(temaData.id, { video_url: next as string | null })
+                        .then(() => {})
+                    }
+                    onSaved={tema.refetch}
+                  >
+                    <span>{temaData.video_url ?? '—'}</span>
+                  </InlineEdit>
+                </div>
+              </div>
             )}
             <StarRating key={temaData.id} tipo="tema" contenidoId={temaData.id} />
           </div>
         </div>
       </section>
+
+      {/* Public video embed — gated on a set value; visible to everyone when
+          present. New public block (temas.video_url, migration 018). */}
+      {temaData.video_url != null && temaData.video_url !== '' && (
+        <section className="reveal mx-auto w-full max-w-[1400px] px-4 pt-2 sm:px-8">
+          <header className="mb-4 flex items-center gap-3">
+            <span
+              className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+              aria-hidden="true"
+            />
+            <h2 className="font-display m-0 text-xl font-semibold tracking-[-0.015em] text-text">
+              Video
+            </h2>
+          </header>
+          <div className="overflow-hidden rounded-[18px] border border-border">
+            <VideoEmbed url={temaData.video_url} nombre={temaData.nombre} />
+          </div>
+        </section>
+      )}
 
       {/* Contenido didáctico — per-tema publicaciones (rendered only when ≥1) */}
       {!publicaciones.loading &&
