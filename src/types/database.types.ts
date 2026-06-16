@@ -498,27 +498,58 @@ export type Database = {
       }
       temas_foro: {
         Row: {
+          clasificacion_si_id: string | null
           created_at: string
           cuerpo: string | null
           id: string
+          software_id: string | null
+          tema_id: string | null
           titulo: string
           user_id: string
         }
         Insert: {
+          clasificacion_si_id?: string | null
           created_at?: string
           cuerpo?: string | null
           id?: string
+          software_id?: string | null
+          tema_id?: string | null
           titulo: string
           user_id: string
         }
         Update: {
+          clasificacion_si_id?: string | null
           created_at?: string
           cuerpo?: string | null
           id?: string
+          software_id?: string | null
+          tema_id?: string | null
           titulo?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "temas_foro_clasificacion_si_id_fkey"
+            columns: ["clasificacion_si_id"]
+            isOneToOne: false
+            referencedRelation: "clasificaciones_si"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "temas_foro_software_id_fkey"
+            columns: ["software_id"]
+            isOneToOne: false
+            referencedRelation: "software"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "temas_foro_tema_id_fkey"
+            columns: ["tema_id"]
+            isOneToOne: false
+            referencedRelation: "temas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       valoraciones: {
         Row: {

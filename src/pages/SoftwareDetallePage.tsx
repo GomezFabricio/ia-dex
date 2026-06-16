@@ -8,6 +8,7 @@ import { useImageOk } from '../hooks/useImageOk'
 import { useClasificacionesDeSoftware } from '../hooks/useClasificacionesDeSoftware'
 import VideoEmbed from '../components/software/VideoEmbed'
 import ContentRow from '../components/software/ContentRow'
+import DebatesSobreEsto from '../components/foro/DebatesSobreEsto'
 import StarRating from '../components/ui/StarRating'
 import InlineEdit from '../components/admin/InlineEdit'
 import { useIsAdmin } from '../hooks/useIsAdmin'
@@ -393,6 +394,9 @@ export default function SoftwareDetallePage() {
           </section>
         )}
       </div>
+
+      {/* Debates — foro threads scoped to this herramienta */}
+      <DebatesSobreEsto tipo="software" id={sw.id} />
 
       {/* Relacionados — semantic rail (PR-6), same-theme fallback */}
       <div className="pb-16">

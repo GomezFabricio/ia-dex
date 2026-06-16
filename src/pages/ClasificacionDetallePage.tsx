@@ -6,6 +6,7 @@ import { usePublicacionesPorClasificacion } from '../hooks/usePublicacionesPorCl
 import { useTemas } from '../hooks/useTemas'
 import StarRating from '../components/ui/StarRating'
 import ContentRow from '../components/software/ContentRow'
+import DebatesSobreEsto from '../components/foro/DebatesSobreEsto'
 import VideoEmbed from '../components/software/VideoEmbed'
 import InlineEdit from '../components/admin/InlineEdit'
 import { useIsAdmin } from '../hooks/useIsAdmin'
@@ -362,6 +363,9 @@ export default function ClasificacionDetallePage() {
           />
         </div>
       )}
+
+      {/* Debates — foro threads scoped to this clasificación (sí) */}
+      <DebatesSobreEsto tipo="clasificacion_si" id={clasif.id} />
     </div>
   )
 }

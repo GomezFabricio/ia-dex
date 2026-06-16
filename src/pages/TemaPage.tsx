@@ -5,6 +5,7 @@ import { useSoftwarePorTema } from '../hooks/useSoftwarePorTema'
 import { usePublicacionesPorTema } from '../hooks/usePublicacionesPorTema'
 import { useClasificacionesPorSoftwareIds } from '../hooks/useClasificacionesPorSoftwareIds'
 import PosterCard from '../components/software/PosterCard'
+import DebatesSobreEsto from '../components/foro/DebatesSobreEsto'
 import StarRating from '../components/ui/StarRating'
 import VideoEmbed from '../components/software/VideoEmbed'
 import InlineEdit from '../components/admin/InlineEdit'
@@ -250,6 +251,9 @@ export default function TemaPage() {
             </div>
           )}
       </div>
+
+      {/* Debates — foro threads scoped to this tema */}
+      <DebatesSobreEsto tipo="tema" id={temaData.id} />
     </div>
   )
 }

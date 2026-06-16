@@ -58,9 +58,34 @@ export type TemaForo = Tables<'temas_foro'>
 
 export type MensajeForo = Tables<'mensajes_foro'>
 
+// Forum debate scope — a debate may be anchored to AT MOST ONE catalog
+// dimension (a herramienta/software, a tema, or a "sí"/clasificacion_si), or
+// stay general (null). The three temas_foro columns are mutually exclusive,
+// enforced at the DB by the temas_foro_scope_at_most_one CHECK (migration 024).
+export type ForoScopeTipo = 'software' | 'tema' | 'clasificacion_si'
+
+// Resolved scope for display: the dimension plus the target entity's id, nombre
+// (badge label) and slug (link to its detail page).
+export type ForoScope = {
+  tipo: ForoScopeTipo
+  id: string
+  nombre: string
+  slug: string
+}
+
+// Filter for a scoped foro view (e.g. /foro?scope_tipo=software&scope_id=…).
+export type ForoFiltro = {
+  tipo: ForoScopeTipo
+  id: string
+}
+
 // Composed read types: a foro row plus its resolved author display name
-// (sourced from v_autores_publicos, mirroring PublicacionConAutor).
-export type TemaForoConAutor = TemaForo & { autorNombre: string }
+// (sourced from v_autores_publicos, mirroring PublicacionConAutor). temas_foro
+// additionally carries its resolved scope (null for general debates).
+export type TemaForoConAutor = TemaForo & {
+  autorNombre: string
+  scope: ForoScope | null
+}
 
 export type MensajeForoConAutor = MensajeForo & { autorNombre: string }
 
@@ -184,6 +209,11 @@ export type NuevaValoracion = {
 export type NuevoTemaForo = {
   titulo: string
   cuerpo?: string
+  // At most one scope target (mutually exclusive) — omit all three for a
+  // general debate. The DB CHECK rejects setting more than one.
+  software_id?: string | null
+  tema_id?: string | null
+  clasificacion_si_id?: string | null
 }
 
 export type NuevoMensaje = {

@@ -6,6 +6,7 @@ import { useIsAdmin } from '../hooks/useIsAdmin'
 import MensajeItem from '../components/foro/MensajeItem'
 import { formatFecha } from '../lib/date'
 import { hueFor, washFor } from '../lib/hue'
+import { scopeHref, scopeLabel } from '../lib/foroScope'
 import * as foroService from '../services/foroService'
 
 // ---------------------------------------------------------------------------
@@ -131,9 +132,19 @@ export default function ForoTemaPage() {
         <div className="order-1 flex min-w-0 flex-col gap-6">
           {/* Title */}
           <div>
-            <span className="dex-label inline-block rounded-full border border-accent/25 bg-accent/[0.12] px-2 py-[3px] text-[9px] text-accent-strong">
-              Discusión
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="dex-label inline-block rounded-full border border-accent/25 bg-accent/[0.12] px-2 py-[3px] text-[9px] text-accent-strong">
+                Discusión
+              </span>
+              {tema.scope !== null && (
+                <Link
+                  to={scopeHref(tema.scope)}
+                  className="dex-label inline-flex items-center rounded-full border border-accent/35 bg-accent/[0.15] px-2 py-[3px] text-[9px] text-accent-strong no-underline transition-colors hover:text-text"
+                >
+                  {scopeLabel(tema.scope.tipo)} · {tema.scope.nombre} →
+                </Link>
+              )}
+            </div>
             <h1 className="font-display mt-3 text-[clamp(1.6rem,3.5vw,2.2rem)] font-bold tracking-[-0.02em] text-text">
               {tema.titulo}
             </h1>

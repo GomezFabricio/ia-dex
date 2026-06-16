@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { TemaForoConAutor } from '../../types/dtos'
 import { formatFecha } from '../../lib/date'
 import { hueFor, washFor } from '../../lib/hue'
+import { scopeLabel } from '../../lib/foroScope'
 
 // ---------------------------------------------------------------------------
 // TemaForoItem — single thread card in the foro listing (cine-neural).
@@ -41,6 +42,11 @@ export default function TemaForoItem({ tema, currentUserId }: Props) {
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="text-sm text-muted">{authorLabel}</span>
             <span className="dex-label text-[9px] text-faint">{formatFecha(tema.created_at)}</span>
+            {tema.scope !== null && (
+              <span className="dex-label rounded-full border border-accent/35 bg-accent/[0.12] px-2 py-0.5 text-[9px] text-accent-strong">
+                {scopeLabel(tema.scope.tipo)} · {tema.scope.nombre}
+              </span>
+            )}
           </div>
         </div>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-muted" aria-hidden="true">
