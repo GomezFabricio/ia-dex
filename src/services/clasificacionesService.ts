@@ -1,6 +1,11 @@
 import { supabase } from '../lib/supabase'
-import type { ClasificacionConCriterio, CriterioSI, Enlace } from '../types/dtos'
-import type { Tables } from '../types/database.types'
+import type {
+  ClasificacionConCriterio,
+  ClasificacionSI,
+  CriterioSI,
+  Enlace,
+} from '../types/dtos'
+import type { Json, Tables, TablesUpdate } from '../types/database.types'
 
 type ClasificacionRow = Tables<'clasificaciones_si'>
 
@@ -143,4 +148,60 @@ export async function listarClasificacionesPorSoftwareIds(
   }
 
   return result
+}
+
+// ---------------------------------------------------------------------------
+// Admin writes — guarded FIRST by auth.getUser() throwing 'Requiere sesión'
+// when there is no session. The guard is only a friendly early error; RLS
+// (puede_gestionar_contenido()) is the authoritative enforcement — a logged-in
+// non-admin still gets a row-level rejection from Postgres. (IE8)
+// ---------------------------------------------------------------------------
+
+async function requireUser() {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Requiere sesión')
+  return user
+}
+
+/**
+ * Updates a clasificacion_si by id and returns the updated row as ClasificacionSI
+ * (flat row with enlaces parsed back to Enlace[] at the write boundary, same
+ * contract as the read mappers). The criterio embed is NOT re-selected here — an
+ * UPDATE on clasificaciones_si alone yields a bare row; the page refetches the
+ * full ClasificacionConCriterio via its own read. This return is a confirm/throw
+ * vehicle, not a re-render source.
+ *
+ * Throws 'Requiere sesión' before any network call when unauthenticated.
+ */
+export async function editar(
+  id: string,
+  patch: TablesUpdate<'clasificaciones_si'>,
+): Promise<ClasificacionSI> {
+  await requireUser()
+
+  // IE3-ENLACES-SER: filter incomplete rows and serialize Enlace[] → Json before
+  // hitting the DB. Empty array serializes to [] (not null). This is the inverse
+  // of the parseEnlaces read boundary at the top of this file.
+  const serialized: TablesUpdate<'clasificaciones_si'> =
+    'enlaces' in patch && Array.isArray(patch.enlaces)
+      ? {
+          ...patch,
+          enlaces: (patch.enlaces as unknown as Enlace[]).filter(
+            (e) => e.titulo.trim() !== '' && e.url.trim() !== '',
+          ) as unknown as Json,
+        }
+      : patch
+
+  const { data, error } = await supabase
+    .from('clasificaciones_si')
+    .update(serialized)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return { ...data, enlaces: parseEnlaces(data.enlaces) }
 }

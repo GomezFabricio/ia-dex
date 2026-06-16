@@ -6,8 +6,13 @@ import { usePublicacionesPorClasificacion } from '../hooks/usePublicacionesPorCl
 import { useTemas } from '../hooks/useTemas'
 import StarRating from '../components/ui/StarRating'
 import ContentRow from '../components/software/ContentRow'
+import VideoEmbed from '../components/software/VideoEmbed'
+import InlineEdit from '../components/admin/InlineEdit'
+import { useIsAdmin } from '../hooks/useIsAdmin'
 import { hueFor, washFor } from '../lib/hue'
+import * as clasificacionesService from '../services/clasificacionesService'
 import type { ClasificacionConCriterio } from '../types/dtos'
+import type { Json } from '../types/database.types'
 
 // ---------------------------------------------------------------------------
 // ClasificacionDetallePage — "cine-neural" SI-classification ficha (phase 7).
@@ -23,6 +28,11 @@ export default function ClasificacionDetallePage() {
   const slug = slugParam ?? ''
 
   const { data, loading, error, refetch } = useClasificacion(slug)
+  // Admin gate for the edit-only anchors (imagen / video / empty-enlaces) that
+  // exist solely as edit affordances — they must not leak into the public view.
+  // InlineEdit still self-gates its own pencil; this only decides which anchors
+  // to MOUNT. Called unconditionally (Rules of Hooks) before the early returns.
+  const isAdmin = useIsAdmin()
   const tools = useSoftwarePorClasificacion(data?.id)
   const publicaciones = usePublicacionesPorClasificacion(data?.id)
   const temas = useTemas()
@@ -97,9 +107,21 @@ export default function ClasificacionDetallePage() {
             <h1 className="font-display mb-5 text-[clamp(2.25rem,5vw,3.4rem)] font-bold leading-[1.07] tracking-[-0.02em] text-text">
               {clasif.nombre}
             </h1>
-            <p className="mb-5 max-w-[560px] text-body-lg leading-relaxed text-muted">
-              {clasif.en_que_consiste ?? '—'}
-            </p>
+            <div className="mb-5 max-w-[560px] text-body-lg leading-relaxed text-muted">
+              <InlineEdit
+                value={clasif.en_que_consiste}
+                variant="textarea"
+                label="en qué consiste"
+                onSave={(next) =>
+                  clasificacionesService
+                    .editar(clasif.id, { en_que_consiste: next as string | null })
+                    .then(() => {})
+                }
+                onSaved={refetch}
+              >
+                <span>{clasif.en_que_consiste ?? '—'}</span>
+              </InlineEdit>
+            </div>
             <StarRating key={clasif.id} tipo="clasificacion_si" contenidoId={clasif.id} />
           </div>
 
@@ -143,31 +165,152 @@ export default function ClasificacionDetallePage() {
           </svg>
           <div>
             <div className="dex-label mb-1.5 text-[10px] text-accent-strong">Ejemplos</div>
-            <p className="leading-relaxed text-text">{clasif.ejemplos ?? '—'}</p>
+            <div className="leading-relaxed text-text">
+              <InlineEdit
+                value={clasif.ejemplos}
+                variant="textarea"
+                label="los ejemplos"
+                onSave={(next) =>
+                  clasificacionesService
+                    .editar(clasif.id, { ejemplos: next as string | null })
+                    .then(() => {})
+                }
+                onSaved={refetch}
+              >
+                <span>{clasif.ejemplos ?? '—'}</span>
+              </InlineEdit>
+            </div>
           </div>
         </div>
 
-        {/* Enlaces de interés — hidden when empty after filtering */}
-        {enlacesFiltrados.length > 0 && (
+        {/* Imagen — edit-only anchor; admins only. The public image lives in the
+            hero diagram panel, so this anchor would only duplicate it for the
+            public. Admin-only so they can set/replace the didactic image. */}
+        {isAdmin && (
+          <div className="reveal flex flex-col gap-2">
+            <div className="dex-label text-[10px] text-muted">Imagen</div>
+            <div className="text-sm leading-relaxed text-text">
+              <InlineEdit
+                value={clasif.imagen_url}
+                variant="image"
+                label="la imagen"
+                uploadPrefix="clasificaciones"
+                uploadEntityId={clasif.id}
+                onSave={(next) =>
+                  clasificacionesService
+                    .editar(clasif.id, { imagen_url: next as string | null })
+                    .then(() => {})
+                }
+                onSaved={refetch}
+              >
+                <ImagenAnchor value={clasif.imagen_url} />
+              </InlineEdit>
+            </div>
+          </div>
+        )}
+
+        {/* Video — edit-only anchor; admins only (avoids leaking the raw YouTube
+            URL to the public). Always mounted for admins so they can ADD a video
+            even when video_url is null. The public VideoEmbed is the separate
+            gated block below. */}
+        {isAdmin && (
+          <div className="reveal flex flex-col gap-2">
+            <div className="dex-label text-[10px] text-muted">Video</div>
+            <div className="text-sm leading-relaxed text-text">
+              <InlineEdit
+                value={clasif.video_url}
+                variant="youtube"
+                label="el video"
+                onSave={(next) =>
+                  clasificacionesService
+                    .editar(clasif.id, { video_url: next as string | null })
+                    .then(() => {})
+                }
+                onSaved={refetch}
+              >
+                <span>{clasif.video_url ?? '—'}</span>
+              </InlineEdit>
+            </div>
+          </div>
+        )}
+
+        {/* Public video embed — gated on a set value; visible to everyone when
+            present. New public block (clasificaciones_si.video_url, migration 018). */}
+        {clasif.video_url != null && clasif.video_url !== '' && (
           <section className="reveal flex flex-col gap-3">
-            <div className="dex-label text-[10px] text-muted">Enlaces de interés</div>
-            <div className="flex flex-wrap gap-2.5">
-              {enlacesFiltrados.map((enlace, index) => (
-                <a
-                  key={index}
-                  href={enlace.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-[10px] border border-border bg-surface px-3.5 py-2.5 text-sm text-text no-underline transition-colors hover:border-accent/60 hover:text-accent-strong"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-2" aria-hidden="true">
-                    <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
-                  </svg>
-                  {enlace.titulo}
-                </a>
-              ))}
+            <header className="flex items-center gap-3">
+              <span
+                className="h-[18px] w-1 shrink-0 rounded-sm bg-gradient-to-b from-accent to-accent-2"
+                aria-hidden="true"
+              />
+              <h2 className="font-display m-0 text-xl font-semibold tracking-[-0.015em] text-text">
+                Video
+              </h2>
+            </header>
+            <div className="overflow-hidden rounded-[18px] border border-border">
+              <VideoEmbed url={clasif.video_url} nombre={clasif.nombre} />
             </div>
           </section>
+        )}
+
+        {/* Enlaces de interés — public chips when present, wrapped so admins get
+            the editor; an admin-only empty-state anchor lets them add the first
+            link when the list is empty (the public still sees nothing). */}
+        {enlacesFiltrados.length > 0 ? (
+          <section className="reveal flex flex-col gap-3">
+            <div className="dex-label text-[10px] text-muted">Enlaces de interés</div>
+            <div>
+              <InlineEdit
+                value={clasif.enlaces}
+                variant="enlaces"
+                label="los enlaces"
+                onSave={(next) =>
+                  clasificacionesService
+                    .editar(clasif.id, { enlaces: next as unknown as Json })
+                    .then(() => {})
+                }
+                onSaved={refetch}
+              >
+                <span className="flex flex-wrap gap-2.5">
+                  {enlacesFiltrados.map((enlace, index) => (
+                    <a
+                      key={index}
+                      href={enlace.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-[10px] border border-border bg-surface px-3.5 py-2.5 text-sm text-text no-underline transition-colors hover:border-accent/60 hover:text-accent-strong"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-2" aria-hidden="true">
+                        <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+                      </svg>
+                      {enlace.titulo}
+                    </a>
+                  ))}
+                </span>
+              </InlineEdit>
+            </div>
+          </section>
+        ) : (
+          isAdmin && (
+            <section className="reveal flex flex-col gap-3">
+              <div className="dex-label text-[10px] text-muted">Enlaces de interés</div>
+              <div className="text-sm text-text">
+                <InlineEdit
+                  value={clasif.enlaces}
+                  variant="enlaces"
+                  label="los enlaces"
+                  onSave={(next) =>
+                    clasificacionesService
+                      .editar(clasif.id, { enlaces: next as unknown as Json })
+                      .then(() => {})
+                  }
+                  onSaved={refetch}
+                >
+                  <span className="text-sm text-muted">Sin enlaces — agregar</span>
+                </InlineEdit>
+              </div>
+            </section>
+          )
         )}
       </div>
 
@@ -220,5 +363,26 @@ export default function ClasificacionDetallePage() {
         </div>
       )}
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// ImagenAnchor — the read-only render for the admin-only imagen_url InlineEdit.
+// Shows a small thumbnail when set, an em dash when empty. The public didactic
+// image lives in the hero diagram panel; this is the stable, visible edit anchor
+// (admins only). On save + refetch the hero panel re-renders with the new URL.
+// ---------------------------------------------------------------------------
+
+function ImagenAnchor({ value }: { value: string | null | undefined }) {
+  const isEmpty = value === null || value === undefined || value === ''
+
+  if (isEmpty) return <span>—</span>
+
+  return (
+    <img
+      src={value}
+      alt=""
+      className="h-12 w-auto rounded-md border border-border object-cover"
+    />
   )
 }

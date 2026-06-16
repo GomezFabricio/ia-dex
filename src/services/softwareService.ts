@@ -6,6 +6,7 @@ import type {
   BusquedaInteligenteRequest,
   BusquedaInteligenteResponse,
 } from '../types/dtos'
+import type { TablesUpdate } from '../types/database.types'
 import * as clasificacionesService from './clasificacionesService'
 
 /**
@@ -131,6 +132,47 @@ export async function buscar(filtros: FiltrosBusqueda): Promise<Software[]> {
 
   if (error) throw error
   return data ?? []
+}
+
+// ---------------------------------------------------------------------------
+// Admin writes — guarded FIRST by auth.getUser() throwing 'Requiere sesión'
+// when there is no session. The guard is only a friendly early error; RLS
+// (puede_gestionar_contenido()) is the authoritative enforcement — a logged-in
+// non-admin still gets a row-level rejection from Postgres. (IE8)
+// ---------------------------------------------------------------------------
+
+async function requireUser() {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) throw new Error('Requiere sesión')
+  return user
+}
+
+/**
+ * Updates a software by id and returns the updated row.
+ * Throws 'Requiere sesión' before any network call when unauthenticated.
+ *
+ * .select() returns the full row including the internal embedding/fts columns;
+ * the Promise<Software> return-type annotation narrows them away structurally
+ * (Software is an Omit-subset of the row), mirroring obtenerSoftware.
+ */
+export async function editar(
+  id: string,
+  patch: TablesUpdate<'software'>,
+): Promise<Software> {
+  await requireUser()
+
+  const { data, error } = await supabase
+    .from('software')
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
 }
 
 /**
