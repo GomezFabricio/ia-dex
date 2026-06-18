@@ -47,7 +47,7 @@ Filters = hard constraints (WHERE); text = soft relevance (ranking). Text or voi
 ## Risks
 
 | Risk | Likelihood | Mitigation |
-|------|------------|------------|
+|------|------------|-----------|
 | Gemini extraction fails/quota | Med | Skip extraction; treat full text as semantic query |
 | Edge Function down/slow | Med | Mandatory frontend fallback to `ilike` |
 | 23 rows → everything "matches" | High | Similarity threshold in RPC |

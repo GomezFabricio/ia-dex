@@ -47,7 +47,7 @@ grant execute ... to anon, authenticated;
 **Alternatives**: hardcoded URL constant (rejected: leaks env coupling into migration history, painful on project clone); service key in DB settings (rejected: secret-in-plaintext).
 **Rationale**: this is the documented Supabase automatic-embeddings pattern; anon key is already public so storing it is low risk; `embed` itself escalates with service role internally.
 
-- Trigger: AFTER INSERT OR UPDATE OF nombre, objetivo, descripcion_corta, tema_id; sets `embedding = null` then fires async pg_net call with `{id}`; `embed` recomputes from `nombre + objetivo + descripcion_corta + tema.nombre` and updates the row.
+- Trigger: AFTER INSERT OR UPDATE OF nome, objetivo, descripcion_corta, tema_id; sets `embedding = null` then fires async pg_net call with `{id}`; `embed` recomputes from `nombre + objetivo + descripcion_corta + tema.nombre` and updates the row.
 - **Backfill**: same migration ends with `update software set nombre = nombre;` → 23 async embed calls. Verification step: `select count(*) from software where embedding is null` must reach 0.
 
 ### Decision: Gemini intent extraction with tema-name enum
